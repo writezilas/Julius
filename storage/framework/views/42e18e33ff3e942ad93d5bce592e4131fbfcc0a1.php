@@ -1,5 +1,5 @@
 <!doctype html >
-    
+
 <html lang="<?php echo e(str_replace('_', '-', app()->getLocale())); ?>" data-layout="<?php echo e(auth()->user()->role_id == 1 ? 'vertical' : 'horizontal'); ?>" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
 <head>
@@ -11,6 +11,7 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="<?php echo e(URL::asset('assets/images/favicon.ico')); ?>">
     <?php echo $__env->make('layouts.head-css', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    @toastr_css
 </head>
 
 <?php $__env->startSection('body'); ?>
@@ -50,6 +51,7 @@
 
     <!-- JAVASCRIPT -->
     <?php echo $__env->make('layouts.vendor-scripts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+
 </body>
 
 </html>

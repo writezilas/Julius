@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Role;
 use Illuminate\Http\Request;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleController extends Controller
 {
@@ -21,16 +22,6 @@ class RoleController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -38,29 +29,18 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $data = $request->validate([
+            'name' => 'bail|required|unique:roles|max:255',
+        ]);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        $data['guard_name'] = 'auth';
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if(Role::create($data)) {
+            toastr()->success('Role has been created successfully');
+        }
+
+        return redirect()->back();
+
     }
 
     /**
@@ -72,22 +52,80 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $role = Role::findOrFail($id);
+
+        $data = $request->validate([
+            'name' => 'bail|required|unique:roles|max:255',
+        ]);
+
+        if($role->update($data)) {
+            toastr()->success('Role has been updated successfully');
+        }else {
+            toastr()->error('Failed to updated role');
+        }
+
+        return redirect()->back();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        $role = Role::findOrFail($id);
+        if($role->delete()) {
+            toastr()->success('Role has been deleted successfully');
+        }else {
+            toastr()->error('Failed to delete role');
+        }
+
+        return back();
     }
 
     public function permission($role_id) {
         $pageTitle = 'Permission edit of role';
-        return view('admin-panel.roles.permission', compact('pageTitle'));
+         $role = Role::find($role_id);
+        $permissionsOfTheRoles = Role::findByName($role->name)->permissions;
+        $all_modules = Permission::groupBy('module_name')->get('module_name');
+
+        $permissions = [];
+        foreach ($all_modules as $module) {
+            $moduleWisePermissions = Permission::where('module_name', $module->module_name)->get();
+            $permissionsPerModule = [
+                'module_name' => $module->module_name,
+                'permission' => $moduleWisePermissions
+            ];
+            $permissions[] = $permissionsPerModule;
+        }
+
+        $allPermission = [];
+        foreach ($permissionsOfTheRoles as $permission)
+            $allPermission[] = $permission->name;
+        if(empty($allPermission))
+            $allPermission[] = 'no-permission';
+
+
+        return view('admin-panel.roles.permission', compact('pageTitle', 'role', 'allPermission', 'permissions'));
+    }
+
+
+    public function updatePermission(Request $request, $id)
+    {
+        $role = \Spatie\Permission\Models\Role::find($id);
+
+        $allCurrentPermissions = Permission::all();
+
+        foreach ($allCurrentPermissions as $currentPermission) {
+            if($request->has($currentPermission->name)){
+                $permission = Permission::firstOrCreate(['name' => $currentPermission->name]);
+                if(!$role->hasPermissionTo($currentPermission->name)){
+                    $role->givePermissionTo($permission);
+                }
+            }
+            else {
+                $role->revokePermissionTo($currentPermission->name);
+            }
+        }
+
+
+        toastr()->success('Permissions has been assigned successfully');
+        return back();
     }
 }

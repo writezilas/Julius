@@ -1,0 +1,14 @@
+[
+    {"name": "role-index", "guard_name": "web", "module_name": "role-management"},
+    {"name": "role-create", "guard_name": "web", "module_name": "role-management"},
+    {"name": "role-edit", "guard_name": "web", "module_name": "role-management"},
+    {"name": "role-update", "guard_name": "web", "module_name": "role-management"},
+    {"name": "permission-edit", "guard_name": "web", "module_name": "role-management"},
+
+    {"name": "announcement-index", "guard_name": "web", "module_name": "announcement"},
+    {"name": "announcement-create", "guard_name": "web", "module_name": "announcement"},
+    {"name": "announcement-edit", "guard_name": "web", "module_name": "announcement"},
+    {"name": "announcement-update", "guard_name": "web", "module_name": "announcement"},
+    {"name": "announcement-delete", "guard_name": "web", "module_name": "announcement"}
+]
+

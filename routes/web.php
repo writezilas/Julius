@@ -27,8 +27,24 @@ Route::get('cache-clear', function(){
 
 
 Route::group(['middleware'=>'auth'],function () {
+
     Route::get('/', [App\Http\Controllers\HomeController::class, 'root'])->name('root');
-    Route::get('admin', [App\Http\Controllers\HomeController::class, 'index'])->name('index');
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('admin.index');
+
+        Route::prefix('roles')->group(function () {
+            Route::get('/', [RoleController::class, 'index'])->name('admin.role.index');
+            Route::post('/', [RoleController::class, 'store'])->name('admin.role.store');
+            Route::patch('/{role_id}', [RoleController::class, 'update'])->name('admin.role.update');
+            Route::get('/delete/{role_id}', [RoleController::class, 'destroy'])->name('admin.role.delete');
+            Route::get('/permission/{role_id}', [RoleController::class, 'permission'])->name('admin.role.permission');
+
+            Route::patch('/permission/{role_id}',[RoleController::class, 'updatePermission'])->name('admin.role.permission.save');
+
+        });
+    });
+
 });
 
 
@@ -46,8 +62,7 @@ Route::resource('users', App\Http\Controllers\UserController::class);
 
 Route::resource('supports', App\Http\Controllers\SupportController::class);
 
-Route::get('admin/roles', [RoleController::class, 'index'])->name('admin.role');
-Route::get('admin/role/permission/{role_id}', [RoleController::class, 'permission'])->name('admin.role.permission');
+
 
 
 Route::get('admin/setting/sms', [SettingController::class, 'createSmsSetting'])->name('admin.setting.sms.create');

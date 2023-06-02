@@ -14,5 +14,36 @@
 <script src="{{ URL::asset('/assets/js/pages/sweetalerts.init.js') }}"></script>
 
 <script src="{{ URL::asset('/assets/js/app.min.js') }}"></script>
+@toastr_js
+@toastr_render
+<script>
+    @if(count($errors) > 0)
+        @foreach($errors->all() as $error)
+            toastr.error("{{ $error }}");
+        @endforeach
+    @endif
+</script>
+<script>
+    $(document).on("click", ".delete_two", function(e){
+        e.preventDefault();
+
+        var link = $(this).attr("href");
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'delete'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = link;
+            }
+        })
+    });
+</script>
 @yield('script')
 @yield('script-bottom')
+

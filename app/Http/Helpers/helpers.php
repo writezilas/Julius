@@ -19,3 +19,15 @@
 	    }
 	    return $config;
 }
+
+function isAllPermissionOfModuleActive($permissionOfModule, $allPermission): bool
+{
+    $status = true;
+    foreach($permissionOfModule as $permissionItem) {
+        if(!in_array($permissionItem->name, $allPermission)) {
+            $status = false;
+        }
+    }
+    return $status;
+}
+

@@ -3,7 +3,7 @@
     <!-- LOGO -->
     <div class="navbar-brand-box">
         <!-- Dark Logo-->
-        <a href="<?php echo e(route('index')); ?>" class="logo logo-dark">
+        <a href="<?php echo e(route('admin.index')); ?>" class="logo logo-dark">
             <span class="logo-sm">
                 <img src="<?php echo e(URL::asset('assets/images/logo-sm.png')); ?>" alt="" height="22">
             </span>
@@ -12,7 +12,7 @@
             </span>
         </a>
         <!-- Light Logo-->
-        <a href="<?php echo e(route('index')); ?>" class="logo logo-light">
+        <a href="<?php echo e(route('admin.index')); ?>" class="logo logo-light">
             <span class="logo-sm">
                 <img src="<?php echo e(URL::asset('assets/images/logo-sm.png')); ?>" alt="" height="22">
             </span>
@@ -32,7 +32,7 @@
             </div>
             <ul class="navbar-nav" id="navbar-nav">
                 <li class="menu-title"><span><?php echo app('translator')->get('translation.menu'); ?></span></li>
-                <a class="nav-link menu-link" href="<?php echo e(route('index')); ?>">
+                <a class="nav-link menu-link" href="<?php echo e(route('admin.index')); ?>">
                    <i class="ri-home-2-fill"></i>  <span><?php echo app('translator')->get('translation.dashboard'); ?></span>
                 </a>
 
@@ -68,7 +68,7 @@
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('admin.role')); ?>" class="nav-link"><?php echo app('translator')->get('Role permissions'); ?></a>
+                                <a href="<?php echo e(route('admin.role.index')); ?>" class="nav-link"><?php echo app('translator')->get('Role permissions'); ?></a>
                             </li>
                         </ul>
                     </div>

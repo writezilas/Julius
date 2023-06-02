@@ -3,7 +3,7 @@
     <!-- LOGO -->
     <div class="navbar-brand-box">
         <!-- Dark Logo-->
-        <a href="{{ route('index') }}" class="logo logo-dark">
+        <a href="{{ route('admin.index') }}" class="logo logo-dark">
             <span class="logo-sm">
                 <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
             </span>
@@ -12,7 +12,7 @@
             </span>
         </a>
         <!-- Light Logo-->
-        <a href="{{ route('index') }}" class="logo logo-light">
+        <a href="{{ route('admin.index') }}" class="logo logo-light">
             <span class="logo-sm">
                 <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
             </span>
@@ -32,7 +32,7 @@
             </div>
             <ul class="navbar-nav" id="navbar-nav">
                 <li class="menu-title"><span>@lang('translation.menu')</span></li>
-                <a class="nav-link menu-link" href="{{ route('index') }}">
+                <a class="nav-link menu-link" href="{{ route('admin.index') }}">
                    <i class="ri-home-2-fill"></i>  <span>@lang('translation.dashboard')</span>
                 </a>
 
@@ -68,7 +68,7 @@
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.role') }}" class="nav-link">@lang('Role permissions')</a>
+                                <a href="{{ route('admin.role.index') }}" class="nav-link">@lang('Role permissions')</a>
                             </li>
                         </ul>
                     </div>

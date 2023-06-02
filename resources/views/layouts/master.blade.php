@@ -1,5 +1,5 @@
 <!doctype html >
-    
+
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{auth()->user()->role_id == 1 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
 <head>
@@ -11,6 +11,7 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico')}}">
     @include('layouts.head-css')
+    @toastr_css
 </head>
 
 @section('body')
@@ -50,6 +51,7 @@
 
     <!-- JAVASCRIPT -->
     @include('layouts.vendor-scripts')
+
 </body>
 
 </html>
