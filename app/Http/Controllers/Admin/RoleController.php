@@ -17,7 +17,7 @@ class RoleController extends Controller
     public function index()
     {
         $pageTitle = 'Role list';
-        $roles = Role::paginate(25);
+        $roles = Role::where('id', '!=' ,2)->get();
         return view('admin-panel.roles.index', compact('roles', 'pageTitle'));
     }
 
@@ -33,7 +33,7 @@ class RoleController extends Controller
             'name' => 'bail|required|unique:roles|max:255',
         ]);
 
-        $data['guard_name'] = 'auth';
+        $data['guard_name'] = 'web';
 
         if(Role::create($data)) {
             toastr()->success('Role has been created successfully');
@@ -70,6 +70,12 @@ class RoleController extends Controller
     public function destroy($id)
     {
         $role = Role::findOrFail($id);
+
+        if($role->id == 2) {
+            toastr()->success('You can not delete this role');
+            return back();
+        }
+
         if($role->delete()) {
             toastr()->success('Role has been deleted successfully');
         }else {

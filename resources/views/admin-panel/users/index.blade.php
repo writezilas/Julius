@@ -1,11 +1,6 @@
 @extends('layouts.master')
 @section('title') {{$pageTitle}}  @endsection
-{{--@section('css')--}}
-{{--    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />--}}
-{{--    <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />--}}
-{{--@endsection--}}
 @section('content')
-
     @component('components.breadcrumb')
         @slot('li_1') @lang('translation.dashboard') @endslot
         @slot('title') {{$pageTitle}} @endslot

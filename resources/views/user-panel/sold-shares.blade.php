@@ -2,7 +2,6 @@
 @php($pageTitle = __('translation.soldshares') . ' Info')
 @section('title') {{$pageTitle}}  @endsection
 @section('css')
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
 @endsection
 @section('content')
 
@@ -10,7 +9,7 @@
         @slot('li_1') @lang('translation.dashboard') @endslot
         @slot('title') {{$pageTitle}} @endslot
     @endcomponent
-    
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
@@ -54,11 +53,5 @@
 
 @endsection
 @section('script')
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-    
-    <script src="{{ URL::asset('assets/js/pages/datatables.init.js') }}"></script>
-    <script src="{{ URL::asset('/assets/js/app.min.js') }}"></script>
 @endsection

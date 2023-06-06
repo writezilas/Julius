@@ -14,3 +14,10 @@
 {{--sweetalert --}}
 <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />
 {{-- @yield('css') --}}
+
+
+<style rel="stylesheet" type="text/css">
+    .invalid-feedback {
+        display: block !important;
+    }
+</style>

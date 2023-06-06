@@ -38,37 +38,40 @@
 
 
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarUsers" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCustomer">
+                    <a class="nav-link menu-link" href="#sidebarUsers" data-bs-toggle="collapse" role="button" aria-expanded="<?php echo e(areActiveRoutesBool(['users.status'])); ?>" aria-controls="sidebarCustomer">
                         <i class="ri-user-2-fill"></i> <span><?php echo app('translator')->get('User Management'); ?></span>
                     </a>
-                    <div class="collapse menu-dropdown" id="sidebarUsers">
+                    <div class="collapse menu-dropdown <?php echo e(areActiveRoutesBool(['users.status', 'admin.role.index', 'admin.role.permission', 'admin.staff.index', 'admin.staff.create', 'admin.staff.edit']) ? 'show' : ''); ?>" id="sidebarUsers">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="#sidebarCustomer" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsers">
+                                <a class="nav-link menu-link" href="#sidebarCustomer" data-bs-toggle="collapse" role="button" aria-expanded="<?php echo e(areActiveRoutesBool(['users.status'])); ?>" aria-controls="sidebarUsers">
                                     <span><?php echo app('translator')->get('Customer Management'); ?></span>
                                 </a>
-                                <div class="collapse menu-dropdown" id="sidebarCustomer">
+                                <div class="collapse menu-dropdown <?php echo e(areActiveRoutesBool(['users.status']) ? 'show' : ''); ?>" id="sidebarCustomer">
                                     <ul class="nav nav-sm flex-column">
+
+
+
                                         <li class="nav-item">
-                                            <a href="<?php echo e(url('users/pending')); ?>" class="nav-link"><?php echo app('translator')->get('Pending Users'); ?></a>
+                                            <a href="<?php echo e(url('users/block')); ?>" class="nav-link <?php echo e(Request::is('users/block') ? 'active' : ''); ?>"><?php echo app('translator')->get('Block Users'); ?></a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="<?php echo e(url('users/block')); ?>" class="nav-link"><?php echo app('translator')->get('Block Users'); ?></a>
+                                            <a href="<?php echo e(url('users/suspend')); ?>" class="nav-link <?php echo e(Request::is('users/suspend') ? 'active' : ''); ?>"><?php echo app('translator')->get('Suspend Users'); ?></a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="<?php echo e(url('users/suspend')); ?>" class="nav-link"><?php echo app('translator')->get('Suspend Users'); ?></a>
+                                            <a href="<?php echo e(url('users/fine')); ?>" class="nav-link <?php echo e(Request::is('users/fine') ? 'active' : ''); ?>"><?php echo app('translator')->get('Fine Users'); ?></a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="<?php echo e(url('users/fine')); ?>" class="nav-link"><?php echo app('translator')->get('Fine Users'); ?></a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="<?php echo e(url('users/all')); ?>" class="nav-link"><?php echo app('translator')->get('All Users'); ?></a>
+                                            <a href="<?php echo e(url('users/all')); ?>" class="nav-link <?php echo e(Request::is('users/all') ? 'active' : ''); ?>"><?php echo app('translator')->get('All Users'); ?></a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a href="<?php echo e(route('admin.role.index')); ?>" class="nav-link"><?php echo app('translator')->get('Role permissions'); ?></a>
+                                <a href="<?php echo e(route('admin.role.index')); ?>" class="nav-link <?php echo e(areActiveRoutes(['admin.role.index', 'admin.role.permission'])); ?>"><?php echo app('translator')->get('Role permissions'); ?></a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="<?php echo e(route('admin.staff.index')); ?>" class="nav-link <?php echo e(areActiveRoutes(['admin.staff.index', 'admin.staff.create', 'admin.staff.edit'])); ?>"><?php echo app('translator')->get('Staffs'); ?></a>
                             </li>
                         </ul>
                     </div>

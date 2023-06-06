@@ -30,7 +30,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @forelse($roles as $key => $role)
+                    @foreach($roles as $key => $role)
                         <tr>
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $role->name }}</td>
@@ -72,16 +72,10 @@
                                 </div>
                             </div>
                         </div>
-                    @empty
-                        <tr class="odd">
-                            <td valign="top" colspan="7" class="dataTables_empty">
-                                {{$emptyMessage}}
-                            </td>
-                        </tr>
-                    @endforelse
+
+                        @endforeach
                     </tbody>
                 </table>
-                {{ $roles->links() }}
             </div>
         </div>
     </div>

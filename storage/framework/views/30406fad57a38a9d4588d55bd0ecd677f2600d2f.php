@@ -14,4 +14,11 @@
 
 <link href="<?php echo e(URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')); ?>" rel="stylesheet" type="text/css" />
 
+
+
+<style rel="stylesheet" type="text/css">
+    .invalid-feedback {
+        display: block !important;
+    }
+</style>
 <?php /**PATH /opt/lampp/htdocs/other/autobidder/resources/views/layouts/head-css.blade.php ENDPATH**/ ?>

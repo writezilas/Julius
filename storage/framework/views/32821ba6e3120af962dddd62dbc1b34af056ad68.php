@@ -29,7 +29,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <?php $__empty_1 = true; $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                    <?php $__currentLoopData = $roles; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $role): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                         <tr>
                             <td><?php echo e($key + 1); ?></td>
                             <td><?php echo e($role->name); ?></td>
@@ -71,18 +71,10 @@
                                 </div>
                             </div>
                         </div>
-                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                        <tr class="odd">
-                            <td valign="top" colspan="7" class="dataTables_empty">
-                                <?php echo e($emptyMessage); ?>
 
-                            </td>
-                        </tr>
-                    <?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </tbody>
                 </table>
-                <?php echo e($roles->links()); ?>
-
             </div>
         </div>
     </div>

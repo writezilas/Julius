@@ -30,9 +30,9 @@ class CreateUsersTable extends Migration
             $table->timestamps();
         });
         User::create([
-            'name'              => 'Auto Bidder', 
-            'username'          => 'superadmin', 
-            'phone'             => '03400000000', 
+            'name'              => 'Auto Bidder',
+            'username'          => 'superadmin',
+            'phone'             => '03400000000',
             'role_id'           => 1,
             'email'             => 'admin@autobidder.com',
             'password'          => Hash::make('123456'),

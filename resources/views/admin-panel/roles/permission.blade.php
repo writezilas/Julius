@@ -71,7 +71,6 @@
                                                     >
                                                     <label class="form-check-label" for="check-permission-{{ $permissionItem->name }}">
                                                         {{ ucfirst(str_replace('-',' ', $permissionItem->name)) }}
-                                                        {{ in_array($permissionItem->name, $allPermission) }}
                                                     </label>
                                                 </div>
                                             @endforeach

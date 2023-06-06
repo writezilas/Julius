@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\StaffController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 /*
@@ -42,8 +44,24 @@ Route::group(['middleware'=>'auth'],function () {
 
             Route::patch('/permission/{role_id}',[RoleController::class, 'updatePermission'])->name('admin.role.permission.save');
 
+
+            Route::controller(StaffController::class)->prefix('staff')->group(function () {
+                Route::get('/', 'index')->name('admin.staff.index');
+                Route::get('/create', 'create')->name('admin.staff.create');
+                Route::post('/', 'store')->name('admin.staff.store');
+                Route::get('/{id}/edit', 'edit')->name('admin.staff.edit');
+                Route::patch('/{id}', 'update')->name('admin.staff.update');
+                Route::get('/delete/{id}', 'destroy')->name('admin.staff.delete');
+            });
+
+
+
         });
     });
+
+    Route::get('profile', [HomeController::class, 'profile'])->name('profile');
+
+
 
 });
 
@@ -69,6 +87,9 @@ Route::get('admin/setting/sms', [SettingController::class, 'createSmsSetting'])-
 Route::get('admin/setting/mail', [SettingController::class, 'createMailSetting'])->name('admin.setting.mail.create');
 
 Route::resource('announcement', AnnouncementController::class);
+
+Route::get('{any}', [HomeController::class, 'index'])->name('index');
+
 
 
 

@@ -38,37 +38,40 @@
 
 
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarUsers" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarCustomer">
+                    <a class="nav-link menu-link" href="#sidebarUsers" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['users.status']) }}" aria-controls="sidebarCustomer">
                         <i class="ri-user-2-fill"></i> <span>@lang('User Management')</span>
                     </a>
-                    <div class="collapse menu-dropdown" id="sidebarUsers">
+                    <div class="collapse menu-dropdown {{ areActiveRoutesBool(['users.status', 'admin.role.index', 'admin.role.permission', 'admin.staff.index', 'admin.staff.create', 'admin.staff.edit']) ? 'show' : '' }}" id="sidebarUsers">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="#sidebarCustomer" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsers">
+                                <a class="nav-link menu-link" href="#sidebarCustomer" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['users.status']) }}" aria-controls="sidebarUsers">
                                     <span>@lang('Customer Management')</span>
                                 </a>
-                                <div class="collapse menu-dropdown" id="sidebarCustomer">
+                                <div class="collapse menu-dropdown {{ areActiveRoutesBool(['users.status']) ? 'show' : '' }}" id="sidebarCustomer">
                                     <ul class="nav nav-sm flex-column">
+{{--                                        <li class="nav-item">--}}
+{{--                                            <a href="{{url('users/pending')}}" class="nav-link {{ Request::is('users/pending') ? 'active' : '' }}">@lang('Pending Users')</a>--}}
+{{--                                        </li>--}}
                                         <li class="nav-item">
-                                            <a href="{{url('users/pending')}}" class="nav-link">@lang('Pending Users')</a>
+                                            <a href="{{url('users/block')}}" class="nav-link {{ Request::is('users/block') ? 'active' : '' }}">@lang('Block Users')</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{url('users/block')}}" class="nav-link">@lang('Block Users')</a>
+                                            <a href="{{url('users/suspend')}}" class="nav-link {{ Request::is('users/suspend') ? 'active' : '' }}">@lang('Suspend Users')</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{url('users/suspend')}}" class="nav-link">@lang('Suspend Users')</a>
+                                            <a href="{{url('users/fine')}}" class="nav-link {{ Request::is('users/fine') ? 'active' : '' }}">@lang('Fine Users')</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="{{url('users/fine')}}" class="nav-link">@lang('Fine Users')</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{url('users/all')}}" class="nav-link">@lang('All Users')</a>
+                                            <a href="{{url('users/all')}}" class="nav-link {{ Request::is('users/all') ? 'active' : '' }}">@lang('All Users')</a>
                                         </li>
                                     </ul>
                                 </div>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('admin.role.index') }}" class="nav-link">@lang('Role permissions')</a>
+                                <a href="{{ route('admin.role.index') }}" class="nav-link {{ areActiveRoutes(['admin.role.index', 'admin.role.permission']) }}">@lang('Role permissions')</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('admin.staff.index') }}" class="nav-link {{ areActiveRoutes(['admin.staff.index', 'admin.staff.create', 'admin.staff.edit']) }}">@lang('Staffs')</a>
                             </li>
                         </ul>
                     </div>

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'avatar',
+        'role_id',
         'username',
         'phone',
         'refferal_code',
@@ -54,7 +55,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(TradingCategory::class);
     }
-    
+
     public function role()
     {
         return $this->belongsTo(Role::class);

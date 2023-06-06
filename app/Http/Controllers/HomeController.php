@@ -127,4 +127,14 @@ class HomeController extends Controller
             }
         }
     }
+
+    public function profile() {
+        if(\auth()->user()->role_id === 2) {
+            return view('user-panel.profile');
+        }else {
+            return 'page for admin';
+        }
+
+    }
+
 }

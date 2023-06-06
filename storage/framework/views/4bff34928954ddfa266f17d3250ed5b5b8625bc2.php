@@ -72,8 +72,6 @@
                                                     <label class="form-check-label" for="check-permission-<?php echo e($permissionItem->name); ?>">
                                                         <?php echo e(ucfirst(str_replace('-',' ', $permissionItem->name))); ?>
 
-                                                        <?php echo e(in_array($permissionItem->name, $allPermission)); ?>
-
                                                     </label>
                                                 </div>
                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
