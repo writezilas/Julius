@@ -25,7 +25,7 @@
                                 <img src="<?php echo e(URL::asset('assets/images/autobidder_light.png')); ?>" alt="" height="20">
                             </a>
                         </div>
-                        <p class="mt-3 fs-15 fw-medium">Your Preferred Trading Partner</p>
+                        <p class="mt-3 fs-15 fw-medium">Your Preferred Trading Partner </p>
                     </div>
                 </div>
             </div>
@@ -79,8 +79,10 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>" name="password" placeholder="Enter password" id="password-input" value="123456">
-                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+unset($__errorArgs, $__bag); ?>" name="password" placeholder="Enter password" id="login-password-input" value="123456">
+                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" onclick="togglePassword()">
+                                                <i class="ri-eye-fill align-middle"></i>
+                                            </button>
                                             <?php $__errorArgs = ['password'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
@@ -143,7 +145,18 @@ unset($__errorArgs, $__bag); ?>
 <?php $__env->startSection('script'); ?>
 <script src="<?php echo e(URL::asset('assets/libs/particles.js/particles.js.min.js')); ?>"></script>
 <script src="<?php echo e(URL::asset('assets/js/pages/particles.app.js')); ?>"></script>
-<script src="<?php echo e(URL::asset('assets/js/pages/password-addon.init.js')); ?>"></script>
+
+
+    <script type="text/javascript">
+        function togglePassword() {
+            var x = document.getElementById("login-password-input");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
 
 <?php $__env->stopSection(); ?>
 

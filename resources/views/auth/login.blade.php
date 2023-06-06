@@ -26,7 +26,7 @@
                                 <img src="{{ URL::asset('assets/images/autobidder_light.png')}}" alt="" height="20">
                             </a>
                         </div>
-                        <p class="mt-3 fs-15 fw-medium">Your Preferred Trading Partner</p>
+                        <p class="mt-3 fs-15 fw-medium">Your Preferred Trading Partner </p>
                     </div>
                 </div>
             </div>
@@ -59,8 +59,10 @@
                                         </div>
                                         <label class="form-label" for="password-input">Password</label>
                                         <div class="position-relative auth-pass-inputgroup mb-3">
-                                            <input type="password" class="form-control pe-5 @error('password') is-invalid @enderror" name="password" placeholder="Enter password" id="password-input" value="123456">
-                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+                                            <input type="password" class="form-control pe-5 @error('password') is-invalid @enderror" name="password" placeholder="Enter password" id="login-password-input" value="123456">
+                                            <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" onclick="togglePassword()">
+                                                <i class="ri-eye-fill align-middle"></i>
+                                            </button>
                                             @error('password')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -126,6 +128,17 @@
 @section('script')
 <script src="{{ URL::asset('assets/libs/particles.js/particles.js.min.js') }}"></script>
 <script src="{{ URL::asset('assets/js/pages/particles.app.js') }}"></script>
-<script src="{{ URL::asset('assets/js/pages/password-addon.init.js') }}"></script>
+{{--<script src="{{ URL::asset('assets/js/pages/password-addon.init.js') }}"></script>--}}
+
+    <script type="text/javascript">
+        function togglePassword() {
+            var x = document.getElementById("login-password-input");
+            if (x.type === "password") {
+                x.type = "text";
+            } else {
+                x.type = "password";
+            }
+        }
+    </script>
 
 @endsection
