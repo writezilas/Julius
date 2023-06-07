@@ -132,7 +132,8 @@ class HomeController extends Controller
         if(\auth()->user()->role_id === 2) {
             return view('user-panel.profile');
         }else {
-            return 'page for admin';
+            $pageTitle = 'Admin profile';
+            return view('admin-panel.settings.profile', compact('pageTitle'));
         }
 
     }
