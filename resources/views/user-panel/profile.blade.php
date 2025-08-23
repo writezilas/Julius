@@ -7,7 +7,7 @@
     <div class="position-relative mx-n4 mt-n4">
         <div class="profile-wid-bg profile-setting-img">
             <img src="{{ URL::asset('assets/images/profile-bg.jpg') }}" class="profile-wid-img" alt="">
-            
+
         </div>
     </div>
 
@@ -17,17 +17,17 @@
                 <div class="card-body p-4">
                     <div class="text-center">
                         <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
-                            <img src="@if (Auth::user()->avatar != '') {{ URL::asset('images/' . Auth::user()->avatar) }}@else{{ URL::asset('assets/images/users/avatar-1.jpg') }} @endif"
+                            <img src="@if (Auth::user()->avatar && Auth::user()->avatar != '') {{ asset(Auth::user()->avatar) }} @else{{ URL::asset('images/default.jpg') }} @endif"
                                 class="  rounded-circle avatar-xl img-thumbnail user-profile-image"
                                 alt="user-profile-image">
-                            <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
+                            {{-- <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
                                 <input id="profile-img-file-input" type="file" class="profile-img-file-input">
                                 <label for="profile-img-file-input" class="profile-photo-edit avatar-xs">
                                     <span class="avatar-title rounded-circle bg-light text-body">
                                         <i class="ri-camera-fill"></i>
                                     </span>
                                 </label>
-                            </div>
+                            </div> --}}
                         </div>
                         <h5 class="fs-16 mb-1">{{Auth::user()->name}}</h5>
                         <p class="text-muted mb-0">{{Auth::user()->username}}</p>
@@ -64,7 +64,9 @@
                 <div class="card-body p-4">
                     <div class="tab-content">
                         <div class="tab-pane active" id="personalDetails" role="tabpanel">
-                            <form action="javascript:void(0);">
+                            <form action="{{ route('updateProfile', auth()->user()->id) }}" method="post" enctype="multipart/form-data">
+                                @csrf
+                                @method('PATCH')
                                 <div class="row">
                                     <!--end col-->
                                     <div class="col-lg-6">
@@ -84,7 +86,7 @@
                                             <label for="username" class="form-label">Username</label>
                                             <input type="text" class="form-control" id="username" name="username"
                                                 placeholder="Enter your username" value="{{auth()->user()->username}}" disabled>
-                                            @error('name')
+                                            @error('username')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
                                                 </span>
@@ -111,7 +113,7 @@
                                             <label for="email" class="form-label">Email
                                                 Address</label>
                                             <input type="email" class="form-control" id="email"
-                                                placeholder="Enter your email" value="{{auth()->user()->email}}" disabled>
+                                                placeholder="Enter your email" value="{{auth()->user()->email}}" name="email" disabled>
                                         </div>
                                     </div>
                                     <div class="col-lg-6">
@@ -121,8 +123,19 @@
                                                 placeholder="Enter your refferal" value="{{auth()->user()->refferal_code}}" disabled>
                                         </div>
                                     </div>
+                                    <div class="col-lg-6">
+                                        <div class="mb-3">
+                                            <label class="form-label">Avatar</label>
+                                            <input type="file" class="form-control" name="avatar">
+                                            @error('avatar')
+                                            <span class="invalid-feedback" role="alert">
+                                                        <strong>{{ $message }}</strong>
+                                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                     <!--end col-->
-                                    
+
                                     <!--end col-->
                                     <div class="col-lg-12">
                                         <div class="hstack gap-2 justify-content-end">
@@ -202,7 +215,7 @@
                                         <div class="mb-3">
                                             <label for="trading_category_id" class="form-label">Trading Category</label>
                                             <input type="text" class="form-control" id="trading_category_id" name="trading_category_id"
-                                                placeholder="Enter your trading_category_id" value="{{auth()->user()->trading_category->name}}" readonly>
+                                                placeholder="Enter your trading_category_id" value="{{auth()->user()->trade ? auth()->user()->trade->name : ''}}" readonly>
                                             @error('trading_category_id')
                                                 <span class="invalid-feedback" role="alert">
                                                     <strong>{{ $message }}</strong>
@@ -210,49 +223,60 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    
+
                                 </div>
                                 <!--end row-->
                             </form>
                         </div>
                         <!--end tab-pane-->
                         <div class="tab-pane" id="changePassword" role="tabpanel">
-                            <form action="javascript:void(0);">
+                            <form action="{{ route('updatePassword', auth()->user()->id) }}" method="post">
+                                @csrf
                                 <div class="row g-2">
                                     <div class="col-lg-4">
                                         <div>
-                                            <label for="oldpasswordInput" class="form-label">Old
-                                                Password*</label>
-                                            <input type="password" class="form-control" id="oldpasswordInput"
+                                            <label class="form-label">
+                                                Current Password*</label>
+                                            <input type="password" class="form-control" name="current_password"
                                                 placeholder="Enter current password">
                                         </div>
+                                        @error('current_password')
+                                        <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                        @enderror
                                     </div>
                                     <!--end col-->
                                     <div class="col-lg-4">
                                         <div>
-                                            <label for="newpasswordInput" class="form-label">New
-                                                Password*</label>
-                                            <input type="password" class="form-control" id="newpasswordInput"
+                                            <label class="form-label">New Password*</label>
+                                            <input type="password" class="form-control" name="password"
                                                 placeholder="Enter new password">
                                         </div>
+                                        @error('password')
+                                        <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                        @enderror
                                     </div>
                                     <!--end col-->
                                     <div class="col-lg-4">
                                         <div>
-                                            <label for="confirmpasswordInput" class="form-label">Confirm
-                                                Password*</label>
-                                            <input type="password" class="form-control" id="confirmpasswordInput"
+                                            <label  class="form-label">Confirm Password*</label>
+                                            <input type="password" class="form-control" name="password_confirmation"
                                                 placeholder="Confirm password">
                                         </div>
                                     </div>
                                     <!--end col-->
-                                    <div class="col-lg-12">
-                                        <div class="mb-3">
-                                            <a href="javascript:void(0);"
-                                                class="link-primary text-decoration-underline">Forgot
-                                                Password ?</a>
+                                    @if (Route::has('password.request'))
+                                        <div class="col-lg-12">
+                                            <div class="mb-3">
+                                                <a href="{{ route('password.request') }}"
+                                                    class="link-primary text-decoration-underline">Forgot
+                                                    Password ?</a>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endif
                                     <!--end col-->
                                     <div class="col-lg-12">
                                         <div class="text-end">
@@ -264,7 +288,7 @@
                                 </div>
                                 <!--end row-->
                             </form>
-                           
+
                         </div>
                         <!--end tab-pane-->
                     </div>
@@ -277,5 +301,4 @@
 @endsection
 @section('script')
     <script src="{{ URL::asset('assets/js/pages/profile-setting.init.js') }}"></script>
-    <script src="{{ URL::asset('/assets/js/app.min.js') }}"></script>
 @endsection

@@ -1,13 +1,13 @@
 <!doctype html >
 
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{auth()->user()->role_id == 1 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{ auth()->user()->role_id != 2 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-mode="{{auth()->check() ? auth()->user()->mode : 'light' }}">
 
 <head>
     <meta charset="utf-8" />
     <title>@yield('title')| {{env('APP_NAME', 'AUTO BIDDER')}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
-    <meta content="Themesbrand" name="author" />
+    <meta content="Autobidder.live is peer-to-peer investment platform that simulates the stock exchange market." name="description" />
+    <meta content="Autobidder" name="author" />
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico')}}">
     @include('layouts.head-css')
@@ -22,12 +22,12 @@
         @if(request()->get('md'))
             @include('layouts.sidebar2')
         @else
-            @if(auth()->user()->role_id == 1)
-                @include('layouts.topbar')
-                @include('layouts.sidebar')
-            @else
+            @if(auth()->user()->role_id == 2)
                 @include('user-panel.partials.topbar')
                 @include('user-panel.partials.sidebar')
+            @else
+                @include('layouts.topbar')
+                @include('layouts.sidebar')
             @endif
         @endif
         <!-- ============================================================== -->
@@ -53,5 +53,7 @@
     @include('layouts.vendor-scripts')
 
 </body>
-
+<script>
+  
+</script>
 </html>

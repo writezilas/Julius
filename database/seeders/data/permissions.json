@@ -1,14 +1,83 @@
 [
+    {"name": "view-analytic", "guard_name": "web", "module_name": "dashboard"},
+    {"name": "view-share-pending-confirmation", "guard_name": "web", "module_name": "dashboard"},
+    {"name": "accept-share-pending-confirmation", "guard_name": "web", "module_name": "dashboard"},
+
     {"name": "role-index", "guard_name": "web", "module_name": "role-management"},
     {"name": "role-create", "guard_name": "web", "module_name": "role-management"},
     {"name": "role-edit", "guard_name": "web", "module_name": "role-management"},
     {"name": "role-update", "guard_name": "web", "module_name": "role-management"},
+    {"name": "role-delete", "guard_name": "web", "module_name": "role-management"},
     {"name": "permission-edit", "guard_name": "web", "module_name": "role-management"},
 
     {"name": "announcement-index", "guard_name": "web", "module_name": "announcement"},
     {"name": "announcement-create", "guard_name": "web", "module_name": "announcement"},
     {"name": "announcement-edit", "guard_name": "web", "module_name": "announcement"},
     {"name": "announcement-update", "guard_name": "web", "module_name": "announcement"},
-    {"name": "announcement-delete", "guard_name": "web", "module_name": "announcement"}
+    {"name": "announcement-delete", "guard_name": "web", "module_name": "announcement"},
+    
+    {"name": "staff-index", "guard_name": "web", "module_name": "staff"},
+    {"name": "staff-create", "guard_name": "web", "module_name": "staff"},
+    {"name": "staff-edit", "guard_name": "web", "module_name": "staff"},
+    {"name": "staff-update", "guard_name": "web", "module_name": "staff"},
+    {"name": "staff-delete", "guard_name": "web", "module_name": "staff"},
+   
+    {"name": "customer-index", "guard_name": "web", "module_name": "customer"},
+    {"name": "customer-view", "guard_name": "web", "module_name": "customer"},
+    {"name": "customer-update", "guard_name": "web", "module_name": "customer"},
+    
+    
+    {"name": "allocate-share-to-user", "guard_name": "web", "module_name": "share-management"},
+    {"name": "allocate-share-to-user-history", "guard_name": "web", "module_name": "share-management"},
+    {"name": "allocate-share-to-user-history-delete", "guard_name": "web", "module_name": "share-management"},
+    {"name": "transfer-share-from-user", "guard_name": "web", "module_name": "share-management"},
+    
+    {"name": "send-email", "guard_name": "web", "module_name": "email"},
+    {"name": "send-sms", "guard_name": "web", "module_name": "sms"},
+    
+    {"name": "support-index", "guard_name": "web", "module_name": "support"},
+    {"name": "support-view", "guard_name": "web", "module_name": "support"},
+
+    {"name": "trade-index", "guard_name": "web", "module_name": "trade"},
+    {"name": "trade-create", "guard_name": "web", "module_name": "trade"},
+    {"name": "trade-edit", "guard_name": "web", "module_name": "trade"},
+    {"name": "trade-update", "guard_name": "web", "module_name": "trade"},
+    {"name": "trade-delete", "guard_name": "web", "module_name": "trade"},
+    
+    {"name": "trade-periods-index", "guard_name": "web", "module_name": "trade-periods"},
+    {"name": "trade-periods-create", "guard_name": "web", "module_name": "trade-periods"},
+    {"name": "trade-periods-edit", "guard_name": "web", "module_name": "trade-periods"},
+    {"name": "trade-periods-update", "guard_name": "web", "module_name": "trade-periods"},
+    {"name": "trade-periods-delete", "guard_name": "web", "module_name": "trade-periods"},
+    
+    
+    {"name": "how-it-work-page-view", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "how-it-work-page-update", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "term-and-condition-page-view", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "term-and-condition-page-update", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "privacy-policy-page-view", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "privacy-policy-page-update", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "confidentiality-policy-page-view", "guard_name": "web", "module_name": "frontend-setting"},
+    {"name": "confidentiality-policy-page-update", "guard_name": "web", "module_name": "frontend-setting"},
+   
+   
+    {"name": "general-setting-view", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "general-setting-update", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "set-min-max-trading-amount-view", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "set-min-max-trading-amount-update", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "set-income-tax-rate-view", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "set-income-tax-rate-update", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "sms-api-page-view", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "sms-api-page-update", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "email-api-page-view", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "email-api-page-update", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "payments-api-page-view", "guard_name": "web", "module_name": "general-setting"},
+    {"name": "payments-api-page-update", "guard_name": "web", "module_name": "general-setting"},
+
+    {"name": "market-index", "guard_name": "web", "module_name": "market"},
+    {"name": "market-create", "guard_name": "web", "module_name": "market"},
+    {"name": "market-edit", "guard_name": "web", "module_name": "market"},
+    {"name": "market-update", "guard_name": "web", "module_name": "market"},
+    {"name": "market-delete", "guard_name": "web", "module_name": "market"}
 ]
 

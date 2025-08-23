@@ -26,7 +26,7 @@
                                 <img src="{{ URL::asset('assets/images/autobidder_light.png')}}" alt="" height="20">
                             </a>
                         </div>
-                        <p class="mt-3 fs-15 fw-medium">Your Preferred Trading Partner </p>
+                        <p class="mt-3 fs-15 fw-medium">Your Preferred Trading Partner</p>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                                     @csrf
                                     <div class="mb-3">
                                         <label for="username" class="form-label">Email</label>
-                                        <input type="text" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', 'admin@themesbrand.com') }}" id="username" name="email" placeholder="Enter Email">
+                                        <input type="text" class="form-control @error('email') is-invalid @enderror" value="{{ old('email') }}" id="username" name="email" placeholder="Enter Email">
                                         @error('email')
                                             <span class="invalid-feedback" role="alert">
                                                 <strong>{{ $message }}</strong>
@@ -54,12 +54,14 @@
                                     </div>
 
                                     <div class="mb-3">
-                                        <div class="float-end">
-                                            <a href="auth-pass-reset-basic" class="text-muted">Forgot password?</a>
-                                        </div>
+                                        @if (Route::has('password.request'))
+                                            <div class="float-end">
+                                                <a href="{{ route('password.request') }}" class="text-muted">Forgot password?</a>
+                                            </div>
+                                        @endif
                                         <label class="form-label" for="password-input">Password</label>
                                         <div class="position-relative auth-pass-inputgroup mb-3">
-                                            <input type="password" class="form-control pe-5 @error('password') is-invalid @enderror" name="password" placeholder="Enter password" id="login-password-input" value="123456">
+                                            <input type="password" class="form-control pe-5 @error('password') is-invalid @enderror" name="password" placeholder="Enter password" id="login-password-input" value="">
                                             <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted" type="button" onclick="togglePassword()">
                                                 <i class="ri-eye-fill align-middle"></i>
                                             </button>

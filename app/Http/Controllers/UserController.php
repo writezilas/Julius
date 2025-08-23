@@ -10,17 +10,18 @@ class UserController extends Controller
     protected $pageTitle;
     protected $emptyMessage;
 
-    protected function filterUsers($type) {
+    protected function filterUsers($type)
+    {
 
         $users = User::query();
-        $this->pageTitle    = ucfirst($type). ' Users';
-        $this->emptyMessage = 'No '.$type. ' users found';
+        $this->pageTitle    = ucfirst($type) . ' Users';
+        $this->emptyMessage = 'No ' . $type . ' users found';
 
-        if($type != 'all'){
+        if ($type != 'all') {
             $users = $users->$type();
         }
 
-        return $users->latest()->paginate(10);
+        return $users->where('role_id', 2)->latest()->get();
     }
 
     public function index()
@@ -62,7 +63,11 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        $user = User::findOrFail($id);
+        $pageTitle = "User view";
+        $emptyMessage = "No data found";
 
+        return view('admin-panel.users.view', compact('pageTitle', 'emptyMessage', 'user'));
     }
     /**
      * Display the specified resource.
@@ -70,10 +75,28 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function statusUpdate(Request $request,$id)
+    //    public function statusUpdate(Request $request,$id)
+    //    {
+    //        $update = User::where('id', $id)->update(['status' => $request->status]);
+    //        return 'success';
+    //    }
+
+    public function statusUpdate(Request $request, $id)
     {
-        $update = User::where('id', $id)->update(['status' => $request->status]);
-        return 'success';
+        $user = User::findOrFail($id);
+        $user->status = $request->status;
+        if($request->status == 'suspend'){
+            $user->block_until = \Carbon\Carbon::parse(now())->addHours($request->time);
+        }
+        $user->save();
+        toastr()->success('User status updated successfully');
+        return back();
+    }
+
+    public function changeMode(){
+        $user = User::findOrFail(auth()->user()->id);
+        $user->mode = $user->mode == 'dark' ? 'light' : 'dark';
+        $user->save();
     }
 
     /**
@@ -108,5 +131,14 @@ class UserController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function revertSuspendUsers()
+    {
+        User::where('status', 'suspend')->where('block_until', '<', now())->update([
+            'status' => 'fine',
+            'block_until' => null
+        ]);
+    
     }
 }

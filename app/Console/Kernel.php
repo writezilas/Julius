@@ -15,7 +15,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('sharematured:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/cron.log", true);
+        $schedule->command('paymentfailedshare:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/paymentfailedforshare.log", true);
+    $schedule->command('unblockTemporaryBlockedUsers:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/unblockTemporaryBlockedUsers.log", true);
+        $schedule->command('update-shares')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/update-shares.log", true);
     }
 
     /**

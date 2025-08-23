@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Support;
+use App\Notifications\NewTicket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 class SupportController extends Controller
 {
@@ -48,12 +51,20 @@ class SupportController extends Controller
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
             'email'      => $request->email,
-            'number'  => $request->telephone,
+            'number'     => $request->telephone,
             'username'   => $request->username,
             'message'    => $request->message,
         ]);
 
-        return redirect(url('support'))->with('message', 'Your has been submit successfully! will contact you shortly!');
+        if($support) {
+            $support_email = get_gs_value('support_email') ?? 'support@autobidder.live'; 
+            Notification::route('mail', $support_email)->notify(new NewTicket($support));
+            toastr()->success('Support request submitted successfully. We will reach you as soon as possible');
+        }else {
+            toastr()->error('Failed to submit support request');
+        }
+
+        return back();
     }
 
     /**
@@ -100,4 +111,15 @@ class SupportController extends Controller
     {
         //
     }
+
+
+    public function supportsForAdmin() {
+        $supports = Support::orderBy('id', 'desc')->get();
+        $pageTitle = 'Supports';
+
+        return view('admin-panel.communications.supports', compact('pageTitle', 'supports'));
+
+    }
+
+
 }

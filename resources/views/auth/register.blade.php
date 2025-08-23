@@ -151,6 +151,7 @@
                                             </div>
                                         </div>
                                         <div class=" mb-4">
+                                            <label for="input-password">Avatar</label>
                                             <input type="file" class="form-control @error('avatar') is-invalid @enderror"
                                                 name="avatar" id="input-avatar">
                                             @error('avatar')
@@ -246,10 +247,15 @@
                                         <div class="mb-3">
                                             <label for="trading_category_id" class="form-label">Trading Category: <span
                                                     class="text-danger">*</span></label>
-                                            <select class="form-control" name="trading_category_id">
-                                                <option value="1">MPESA</option>
-                                                <option value="2">Telkom</option>
-                                                <option value="3">Airtel</option>
+                                            @php
+                                                $trades = \App\Models\Trade::where('status', 1)->get();
+                                            @endphp
+                                            <select class="form-control" name="trade_id">
+                                                @foreach($trades as $trade)
+                                                    <option value="{{ $trade->id }}">
+                                                        {{ $trade->name }}
+                                                    </option>
+                                                @endforeach
                                             </select>
                                             @error('trading_category_id')
                                                 <span class="invalid-feedback" role="alert">
@@ -270,7 +276,7 @@
                                                     Please agree
                                                 </div>
                                             </div>
-                                            
+
                                         </div>
 
                                         <div class="mt-4">

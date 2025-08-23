@@ -60,9 +60,9 @@ class StaffController extends Controller
         $data['password'] = Hash::make($request->password);
         $data['email_verified_at'] = date('Y-m-d H:i:s');
         $data['created_at'] = now();
-        $data['avatar'] = 'avatar-1.jpg';
+        $data['avatar'] = 'assets/images/users/avatar-1.jpg';
 
-         $user = User::create($data);
+        $user = User::create($data);
 
         if($user) {
             $role = Role::find($request->role_id);

@@ -16,7 +16,7 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    {{ auth()->user()->can('role-edit') ? 'he can' : 'he done' }}
+                    
                     <form action="{{ route('admin.staff.update', $user->id) }}" method="post">
                         @csrf
                         @method('PATCH')
@@ -93,11 +93,13 @@
                                     @enderror
                                 </div>
                             </div>
+                            @can('staff-update')
                             <div class="col-lg-12">
                                 <div class="form-group float-end">
                                     <button type="submit" class="btn btn-primary">Save staff</button>
                                 </div>
                             </div>
+                            @endcan
                         </div>
                     </form>
                 </div>

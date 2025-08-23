@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
+use App\Models\UserShare;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -29,15 +31,59 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        if (view()->exists('user-panel.'.$request->path())) {
-            return view('user-panel.'.$request->path());
+        
+        if (view()->exists('user-panel.' . $request->path())) {
+
+            return view('user-panel.' . $request->path());
         }
         return abort(404);
     }
 
     public function root()
     {
-        return view('index');
+        $user = User::with('role')->find(auth()->user()->id);
+        
+        
+        $startDate = Carbon::now()->subDays(7);
+
+        // Fetch data from the database for the last 7 days
+        $data = UserShare::where('user_id', auth()->user()->id)->where('created_at', '>=', $startDate)
+            ->get(['share_will_get', 'profit_share', 'created_at']);
+
+        // Initialize arrays for bought, earning, and days
+        $bought = [];
+        $earning = [];
+        $days = [];
+
+        // Initialize arrays to store counts and sums for each day
+        $orderCountByDay = [];
+        $earningSumByDay = [];
+
+        // Format the data for the chart
+        foreach ($data as $record) {
+            // Count the number of orders for each day
+            $day = Carbon::parse($record->created_at)->format('D');
+            $orderCountByDay[$day] = isset($orderCountByDay[$day]) ? $orderCountByDay[$day] + 1 : 1;
+
+            // Sum the earning for each day
+            $earningSumByDay[$day] = isset($earningSumByDay[$day]) ? $earningSumByDay[$day] + $record->profit_share : $record->profit_share;
+        }
+
+        // Populate arrays for bought and earning based on the counts and sums
+        foreach (array_keys($orderCountByDay) as $day) {
+            $days[] = $day;
+            $bought[] = isset($orderCountByDay[$day]) ? $orderCountByDay[$day] : 0;
+            $earning[] = isset($earningSumByDay[$day]) ? $earningSumByDay[$day] : 0;
+        }
+
+        // Create the result array
+        $resultArray = [
+            'bought' => $bought,
+            'earning' => $earning,
+            'days' => $days,
+        ];
+        
+        return view('user-panel.dashboard' , compact('resultArray'));
     }
 
     /*Language Translation*/
@@ -90,7 +136,6 @@ class HomeController extends Controller
             //     'Message' => "Something went wrong!"
             // ], 200); // Status code here
             return redirect()->back();
-
         }
     }
 

@@ -11,11 +11,15 @@
 	 <div class="row justify-content-center mt-4">
         <div class="col-lg-5">
             <div class="text-center mb-4">
-                <h4 class="fw-semibold fs-22">Telegram Channel</h4>
+                <h4 class="fw-semibold fs-22">Official Channels</h4>
                 <p class="text-muted mb-2 fs-15">Join our Telegram channel here:</p>
-                <p class="text-muted mb-2 fs-15"><a href="http://127.0.0.1:8000/support">http://127.0.0.1:8000/support</a></p>
+                <p class="text-muted mb-2 fs-15"><a href="https://t.me/+0kkvjg6icXM5YTc0">https://t.me/+0kkvjg6icXM5YTc0</a></p>
+                <p class="text-muted mb-2 fs-15">Join our Telegram Group here:</p>
+                <p class="text-muted mb-2 fs-15"><a href="https://t.me/+OKuCnLKZzxVlMmQ0">https://t.me/+OKuCnLKZzxVlMmQ0</a></p>
+                
             </div>
         </div><!--end col-->
+        
     </div><!--end row-->
     <div class="row justify-content-center">
         <div class="col-lg-6">
@@ -39,9 +43,6 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter first name
-                                        </div>
 	                                </div>
 	                            </div>
 	                            <div class="col-xxl-12 col-md-12 mb-3">
@@ -55,9 +56,6 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter last name
-                                        </div>
 	                                </div>
 	                            </div>
 	                            <div class="col-xxl-12 col-md-12 mb-3">
@@ -71,9 +69,6 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter email
-                                        </div>
 	                                </div>
 	                            </div>
 	                            <div class="col-xxl-12 col-md-12 mb-3">
@@ -87,9 +82,6 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter username
-                                        </div>
 	                                </div>
 	                            </div>
 
@@ -104,9 +96,6 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter telephone
-                                        </div>
 	                                </div>
 	                            </div>
 	                            <div class="col-xxl-12 col-md-12 mb-3">
@@ -119,15 +108,12 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                         @enderror
-                                        <div class="invalid-feedback">
-                                            Please enter message
-                                        </div>
                                         <div id="messageHelpBlock" class="form-text">
                                         	Limit word to 150 words
                                         </div>
 	                                </div>
 	                            </div>
-	                            
+
 	                             <div class="mt-4">
                                     <button class="btn btn-success w-100" type="submit">Submit</button>
                                 </div>
@@ -146,6 +132,5 @@
 @endsection
 
 @section('script')
-	<script src="{{ URL::asset('/assets/js/app.min.js') }}"></script>
 	<script src="{{ URL::asset('assets/js/pages/form-validation.init.js') }}"></script>
 @endsection

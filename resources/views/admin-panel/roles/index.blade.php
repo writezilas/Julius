@@ -1,14 +1,14 @@
 @extends('layouts.master')
-@section('title') {{$pageTitle}}  @endsection
+@section('title') {{$pageTitle}} @endsection
 {{--@section('css')--}}
-{{--    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />--}}
-{{--    <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />--}}
+{{-- <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />--}}
+{{-- <link href="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.css')}}" rel="stylesheet" type="text/css" />--}}
 {{--@endsection--}}
 @section('content')
 
 @component('components.breadcrumb')
-    @slot('li_1') @lang('translation.dashboard') @endslot
-    @slot('title') {{$pageTitle}} @endslot
+@slot('li_1') @lang('translation.dashboard') @endslot
+@slot('title') {{$pageTitle}} @endslot
 @endcomponent
 
 <div class="row">
@@ -16,36 +16,49 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <h5 class="card-title mb-0"> {{ $pageTitle }} </h5>
+                @can('role-create')
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roleCreateModal">
                     <i class="ri-add-box-fill"></i> New
                 </button>
+                @endcan
             </div>
             <div class="card-body">
                 <table id="alternative-pagination" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
                     <thead>
-                    <tr>
-                        <th>SR No.</th>
-                        <th>Role</th>
-                        <th>Action</th>
-                    </tr>
+                        <tr>
+                            <th>SR No.</th>
+                            <th>Role</th>
+                            @canAny(['role-edit', 'role-delete', 'permission-edit'])
+                            <th>Action</th>
+                            @endcanAny
+                        </tr>
                     </thead>
                     <tbody>
-                    @foreach($roles as $key => $role)
+                        @foreach($roles as $key => $role)
                         <tr>
                             <td>{{ $key + 1 }}</td>
                             <td>{{ $role->name }}</td>
-                             <td>
-                                 <a href="{{ route('admin.role.permission', $role->id) }}" class="btn btn-sm btn-soft-primary" >
-                                     <i class="ri-settings-3-fill"></i>
-                                 </a>
-                                 <a href="{{ route('admin.role.delete', $role->id) }}" class="btn btn-sm btn-soft-danger delete_two">
-                                     <i class="ri-delete-bin-5-line"></i>
-                                 </a>
-                                 <button class="btn btn-sm btn-soft-success" data-bs-toggle="modal" data-bs-target="#roleEditModal{{ $role->id }}">
-                                     <i class="ri-edit-2-fill"></i>
-                                 </button>
-                             </td>
+                            @canAny(['role-edit', 'role-delete', 'permission-edit'])
+                            <td>
+                                @can('permission-edit')
+                                <a href="{{ route('admin.role.permission', $role->id) }}" class="btn btn-sm btn-soft-primary">
+                                    <i class="ri-settings-3-fill"></i>
+                                </a>
+                                @endcan
+                                @can('role-delete')
+                                <a href="{{ route('admin.role.delete', $role->id) }}" class="btn btn-sm btn-soft-danger delete_two">
+                                    <i class="ri-delete-bin-5-line"></i>
+                                </a>
+                                @endcan
+                                @can('role-edit')
+                                <button class="btn btn-sm btn-soft-success" data-bs-toggle="modal" data-bs-target="#roleEditModal{{ $role->id }}">
+                                    <i class="ri-edit-2-fill"></i>
+                                </button>
+                                @endcan
+                            </td>
+                            @endcanAny
                         </tr>
+                        @can('role-edit')
                         <div class="modal fade" id="roleEditModal{{ $role->id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
@@ -72,6 +85,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endcan
 
                         @endforeach
                     </tbody>

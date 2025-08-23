@@ -13,16 +13,18 @@
                     <h5 class="card-title mb-0">{{$pageTitle}}</h5>
                 </div>
                 <div class="card-body">
-                    <table id="alternative-pagination" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
+                    <table id="scroll-horizontal" class="table table-bordered dt-responsive nowrap align-middle mdl-data-table" style="width:100%">
                         <thead>
                             <tr>
                                 <th>SR No.</th>
                                 <th>Name</th>
+                                <th>Username</th>
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Created At</th>
-                                <th>Status</th>
-                                {{-- <th>Action</th> --}}
+                                @can('customer-view')
+                                <th>Action</th>
+                                @endcan
                             </tr>
                         </thead>
                         <tbody>
@@ -30,21 +32,16 @@
                                 <tr>
                                     <td>{{$loop->iteration}}</td>
                                     <td>{{$user->name}}</td>
+                                    <td>{{$user->username}}</td>
                                     <td>{{$user->email}}</td>
                                     <td>{{$user->role->name}}</td>
                                     <td>{{\Carbon\Carbon::parse($user->created_at)}}</td>
+                                    @can('customer-view')
                                     <td>
-                                        <select class="form-control form-control-sm"
-                                            id="status-update"
-                                            @disabled($user->role_id == 1)
-                                            data-id={{$user->id}}>
-                                            <option value="pending" @selected($user->status == 'pending')>Pending</option>
-                                            <option value="block" @selected($user->status == 'block')>Block</option>
-                                            <option value="suspend" @selected($user->status == 'suspend')>Suspend</option>
-                                            <option value="fine" @selected($user->status == 'fine') >Fine</option>
-                                        </select>
+                                        <a href="{{ route('user.single', $user->id) }}" class="btn btn-primary">View</a>
                                     </td>
-                                    {{-- <td><button class="btn btn-sm btn-soft-danger"><i class="ri-delete-bin-5-line"></i> </button></td> --}}
+                                    @endcan
+                                    
                                 </tr>
                             @empty
                                 <tr class="odd">
@@ -55,6 +52,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                    {{-- <div class="pagination float-end">
+                        {{$users->links()}}
+                    </div> --}}
                 </div>
             </div>
         </div>
@@ -63,7 +63,9 @@
 
 @endsection
 @section('script')
-
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <script src="{{ URL::asset('assets/js/pages/datatables.init.js') }}"></script>
     <script type="text/javascript">
         $(document).on('change', '#status-update', function(e) {
             e.preventDefault();

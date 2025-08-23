@@ -5,14 +5,20 @@
 <script src="{{ URL::asset('assets/libs/feather-icons/feather-icons.min.js') }}"></script>
 <script src="{{ URL::asset('assets/js/pages/plugins/lord-icon-2.1.0.min.js') }}"></script>
 <script src="{{ URL::asset('assets/js/plugins.min.js') }}"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+{{-- <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> --}}
+{{-- <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script> --}}
 
-<script src="{{ URL::asset('assets/js/pages/datatables.init.js') }}"></script>
+{{-- <script src="{{ URL::asset('assets/js/pages/datatables.init.js') }}"></script> --}}
 
+{{--sweetalert--}}
 <script src="{{ URL::asset('/assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 <script src="{{ URL::asset('/assets/js/pages/sweetalerts.init.js') }}"></script>
+{{--select2 js --}}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
+<script>
+    base_url = "{{ url('/') }}";
+</script>
 <script src="{{ URL::asset('/assets/js/app.min.js') }}"></script>
 
 <script>
@@ -42,6 +48,25 @@
             }
         })
     });
+
+    $(document).ready(function() {
+        $('.select2').select2();
+
+        $('.select2').on('select2:open', function () {
+            if ($('#selectall').length === 0) {
+                $('.select2-dropdown').prepend('<button id="selectall" class="btn btn-sm btn-soft-success m-2">Select All</button><button id="deselectall" class="btn btn-sm btn-soft-danger m-2">Deselect All</button>');
+            }
+        });
+
+        $(document).on('click', '#selectall', function() {
+            $(".select2 > option").prop("selected","selected");
+            $(".select2").trigger("change");
+        });
+        $(document).on('click', '#deselectall', function() {
+            $('.select2').val(null).trigger('change');
+        });
+    });
+    
 </script>
 @yield('script')
 @yield('script-bottom')
