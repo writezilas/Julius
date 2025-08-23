@@ -23,7 +23,7 @@ function get_gs_value($key, $full = false)
 {
     $config = GeneralSetting::where('key', $key)->first();
     if (!$full) {
-        return $config->value;
+        return $config ? $config->value : null;
     }
     return $config;
 }
@@ -93,9 +93,19 @@ if (!function_exists('updateMaturedShareStatus')) {
     function updateMaturedShareStatus()
     {
         $shares = \App\Models\UserShare::whereStatus('completed')->whereNotNull('start_date')->where('is_ready_to_sell', 0)->get();
+        $paymentFailureService = new \App\Services\PaymentFailureService();
 
         foreach ($shares as $key => $share) {
-            if (\Carbon\Carbon::parse($share->start_date)->addDays($share->period) < \Carbon\Carbon::now()) {
+            // Skip paused shares
+            if ($share->timer_paused) {
+                continue;
+            }
+
+            // Get adjusted timer to account for paused duration
+            $timerInfo = $paymentFailureService->getAdjustedShareTimer($share);
+            $adjustedEndTime = $timerInfo['adjusted_end_time'];
+
+            if ($adjustedEndTime && $adjustedEndTime < \Carbon\Carbon::now()) {
 
                 $profit = calculateProfitOfShare($share);
 
@@ -113,7 +123,7 @@ if (!function_exists('updateMaturedShareStatus')) {
 
                 \App\Models\UserProfitHistory::create($profitHistoryData);
 
-                Log::info('Share update as ready to sell: ' . $share->id);
+                Log::info('Share update as ready to sell (adjusted for pause): ' . $share->id);
             }
         }
     }
@@ -133,12 +143,27 @@ if (!function_exists('updatePaymentFailedShareStatus')) {
     function updatePaymentFailedShareStatus()
     {
         $shares = \App\Models\UserShare::whereStatus('paired')->whereNull('start_date')->get();
+        $paymentFailureService = new \App\Services\PaymentFailureService();
 
         foreach ($shares as $key => $share) {
             if (\Carbon\Carbon::parse($share->created_at)->addHours(3) < \Carbon\Carbon::now()) {
 
                 $share->status = 'failed';
                 $share->save();
+
+                // Handle payment failure for the user
+                try {
+                    $result = $paymentFailureService->handlePaymentFailure(
+                        $share->user_id, 
+                        'Payment timeout - share failed after 3 hours'
+                    );
+                    
+                    if ($result['suspended']) {
+                        Log::warning('User suspended due to payment failure: ' . $share->user->username);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error handling payment failure: ' . $e->getMessage());
+                }
 
                 foreach ($share->pairedShares as $pairedShare) {
                     $userShare = UserShare::findOrFail($pairedShare->paired_user_share_id);
@@ -156,13 +181,28 @@ if (!function_exists('updatePaymentFailedShareStatus')) {
 if (!function_exists('getSoldShareStatus')) {
     function getSoldShareStatus($share): string
     {
-        if ($share->start_date != '' && $share->is_reqdy_to_sell === 0) {
+        // If share has been fully sold (no shares left and has sold some)
+        if ($share->total_share_count == 0 && $share->hold_quantity == 0 && $share->sold_quantity > 0) {
+            return 'Sold';
+        }
+        // If share is active and not ready to sell yet
+        elseif ($share->start_date != '' && $share->is_ready_to_sell === 0) {
             return 'Active';
-        } elseif ((($share->share_will_get + $share->profit_share) > $share->total_share_count) && ($share->total_share_count !== 0 || $share->hold_quantity !== 0)) {
-            return 'paired';
-        } elseif ($share->total_share_count === 0 && $share->hold_quantity === 0) {
+        }
+        // If share is partially sold (some shares sold, some remaining)
+        elseif ($share->sold_quantity > 0 && ($share->total_share_count > 0 || $share->hold_quantity > 0)) {
+            return 'Partially Sold';
+        }
+        // If share has been paired but not fully processed
+        elseif ((($share->share_will_get + $share->profit_share) > $share->total_share_count) && ($share->total_share_count !== 0 || $share->hold_quantity !== 0)) {
+            return 'Paired';
+        }
+        // If share is completed but not sold
+        elseif ($share->total_share_count === 0 && $share->hold_quantity === 0 && $share->sold_quantity === 0) {
             return 'Completed';
-        } else {
+        }
+        // Default status
+        else {
             return 'Pending';
         }
     }
@@ -243,6 +283,63 @@ if (!function_exists('get_markets')) {
     {
         return Market::select('open_time', 'close_time')
                 ->orderBy('open_time')->get();
+    }
+}
+if (!function_exists('get_app_timezone')) {
+    function get_app_timezone()
+    {
+        try {
+            return get_gs_value('app_timezone') ?? config('app.timezone', 'UTC');
+        } catch (Exception $e) {
+            // Fallback to config timezone if database is not accessible
+            return config('app.timezone', 'UTC');
+        }
+    }
+}
+if (!function_exists('is_market_open')) {
+    function is_market_open()
+    {
+        $markets = get_markets();
+        $appTimezone = get_app_timezone();
+        $now = \Carbon\Carbon::now($appTimezone);
+        
+        foreach ($markets as $market) {
+            $todayDate = $now->format('Y-m-d');
+            $open = \Carbon\Carbon::parse($todayDate . ' ' . $market->open_time, $appTimezone);
+            $close = \Carbon\Carbon::parse($todayDate . ' ' . $market->close_time, $appTimezone);
+            
+            if ($now->between($open, $close)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+}
+if (!function_exists('get_next_market_open_time')) {
+    function get_next_market_open_time()
+    {
+        $markets = get_markets();
+        $appTimezone = get_app_timezone();
+        $now = \Carbon\Carbon::now($appTimezone);
+        $todayDate = $now->format('Y-m-d');
+        
+        if (count($markets) == 0) {
+            return null;
+        }
+        
+        // Check if there's a market that opens later today
+        foreach ($markets as $market) {
+            $open = \Carbon\Carbon::parse($todayDate . ' ' . $market->open_time, $appTimezone);
+            
+            if ($now->lt($open)) {
+                return $open;
+            }
+        }
+        
+        // If no market opens today, return tomorrow's first market opening
+        $firstMarket = $markets->first();
+        return \Carbon\Carbon::parse($todayDate . ' ' . $firstMarket->open_time, $appTimezone)->addDay();
     }
 }
 if (!function_exists('createRefferalBonus')) {

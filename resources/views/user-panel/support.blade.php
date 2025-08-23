@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @php($pageTitle = __('translation.support'))
-@section('title') {{$pageTitle}}  @endsection
+@section('title', $pageTitle)
 @section('content')
 
 	@component('components.breadcrumb')

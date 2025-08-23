@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.autobidder.microscheduler</string>
+    
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/php</string>
+        <string>/Applications/XAMPP/xamppfiles/htdocs/Autobidder/artisan</string>
+        <string>schedule:micro</string>
+        <string>--duration=3600</string>
+        <string>--interval=1</string>
+    </array>
+    
+    <key>WorkingDirectory</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/Autobidder</string>
+    
+    <key>RunAtLoad</key>
+    <true/>
+    
+    <key>KeepAlive</key>
+    <true/>
+    
+    <key>StandardOutPath</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/Autobidder/storage/logs/microscheduler-stdout.log</string>
+    
+    <key>StandardErrorPath</key>
+    <string>/Applications/XAMPP/xamppfiles/htdocs/Autobidder/storage/logs/microscheduler-stderr.log</string>
+    
+    <key>StartInterval</key>
+    <integer>3600</integer>
+    
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/usr/local/bin:/usr/bin:/bin</string>
+        <key>APP_ENV</key>
+        <string>local</string>
+    </dict>
+    
+    <key>UserName</key>
+    <string>mac</string>
+    
+    <key>GroupName</key>
+    <string>staff</string>
+</dict>
+</plist>

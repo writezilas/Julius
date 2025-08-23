@@ -39,6 +39,32 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Application Timezone *</label>
+                                <select name="settings[app_timezone]" class="form-control">
+                                    @php
+                                        $timezones = timezone_identifiers_list();
+                                        try {
+                                            $current_timezone = @$gs['app_timezone'] ?? 'UTC';
+                                        } catch (Exception $e) {
+                                            $current_timezone = 'UTC';
+                                        }
+                                    @endphp
+                                    @foreach($timezones as $timezone)
+                                        <option value="{{ $timezone }}" {{ $timezone === $current_timezone ? 'selected' : '' }}>
+                                            {{ $timezone }} ({{ now()->setTimezone($timezone)->format('H:i') }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('settings.app_timezone')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                                <small class="form-text text-muted">This timezone will be used for all market opening/closing times</small>
+                            </div>
+                        </div>
                         {{-- <div class="col-6">
                             <div class="form-group">
                                 <label>Open Market *</label>

@@ -17,50 +17,21 @@ if($now->gt($close)){
 }
 @endphp --}}
 @php
-    $todayDate = now()->format('Y-m-d');
-   
-    $now = now();
+    $appTimezone = get_app_timezone();
+    $now = \Carbon\Carbon::now($appTimezone);
+    $todayDate = $now->format('Y-m-d');
     
-    $isTradeOpen = false;
-
-    // Retrieve time slots from the database
+    // Use the new helper functions for timezone-aware market timing
+    $isTradeOpen = is_market_open();
     $timeSlots = get_markets();
     
-    if(count($timeSlots)){
-        foreach ($timeSlots as $slot) {
-            $open = \Carbon\Carbon::parse($todayDate . ' ' . $slot->open_time);
-            $close = \Carbon\Carbon::parse($todayDate . ' ' . $slot->close_time);
-
-            if ($now->between($open, $close)) {
-                $isTradeOpen = true;
-                break; // Market is open, no need to check further
-            }
-        }
-        // if market is not open, so we have check which is time slot is next and if there not any other slots so add one day to open time
-
-        if (!$isTradeOpen) {
-            if(count($timeSlots) == 1){
-                $open = \Carbon\Carbon::parse($todayDate . ' ' . $timeSlots[0]->open_time)->addDay();
-            }else{
-                $isHasNext = false;
-                foreach ($timeSlots as $slot) {
-                    $open = \Carbon\Carbon::parse($todayDate . ' ' . $slot->open_time);
-                    $close = \Carbon\Carbon::parse($todayDate . ' ' . $slot->close_time);
-                    
-                    if ($now->isBefore($open)) {
-                        $isHasNext = true;
-                        $open = \Carbon\Carbon::parse($todayDate . ' ' . $slot->open_time); 
-                        break;
-                    }
-                }
-                if(!$isHasNext){
-                    $open = \Carbon\Carbon::parse($todayDate . ' ' . $timeSlots[0]->open_time)->addDay();
-                }
-            }
-        }
+    // Get next opening time if market is closed
+    $open = null;
+    if (!$isTradeOpen) {
+        $open = get_next_market_open_time();
     }
 @endphp
-@if(isset($isTradeOpen) && $isTradeOpen == 1 || count($timeSlots) == 0)
+@if($isTradeOpen || count($timeSlots) == 0)
 <div class="row">
     @php
     $trades = \App\Models\Trade::where('status', 1)->OrderBy('id', 'desc')->get();
@@ -115,7 +86,11 @@ if($now->gt($close)){
         <div class="card-body">
             <div class="table-card p-4">
                 <p>Auction closed at the moment. Click REFRESH when it is time to bid.</p>
-                <span id="count-down" data-time="{{$open}}">0d 0h 0m 0s</span>
+                @if($open)
+                    <p class="text-muted">Market will open at: <strong>{{ $open->format('h:i A') }}</strong></p>
+                    <p class="text-muted small">Time shown in {{ $appTimezone }} timezone</p>
+                    <span id="count-down" data-time="{{$open->utc()}}">0d 0h 0m 0s</span>
+                @endif
                 <div class="mt-3">
                     <a href="{{ route('user.dashboard') }}" class="btn btn-primary">Refresh</a>
                 </div>
@@ -152,7 +127,9 @@ if($now->gt($close)){
             }
         }, 1000);
     }
-    getCounterTime('{{ \Carbon\Carbon::parse($open) }}', "count-down");
+    @if($open)
+        getCounterTime('{{ $open->utc() }}', "count-down");
+    @endif
 </script>
 
 @endsection

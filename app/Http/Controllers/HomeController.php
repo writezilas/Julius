@@ -157,24 +157,91 @@ class HomeController extends Controller
     {
         $pageTitle = __('translation.refferals');
         $refferals = User::where('refferal_code', \auth()->user()->username)->latest()->get();
-        return view('user-panel.refferals', compact('pageTitle', 'refferals'));
+        
+        // Calculate referral statistics
+        $totalReferrals = $refferals->count();
+        $totalEarnings = $refferals->sum('ref_amount');
+        $pendingPayments = $refferals->where('ref_amount', 0)->count();
+        $paidReferrals = $refferals->where('ref_amount', '>', 0)->count();
+        
+        // Recent referrals (last 7 days)
+        $recentReferrals = $refferals->filter(function($referral) {
+            return $referral->created_at >= now()->subDays(7);
+        })->count();
+        
+        return view('user-panel.refferals', compact(
+            'pageTitle', 
+            'refferals', 
+            'totalReferrals',
+            'totalEarnings',
+            'pendingPayments',
+            'paidReferrals',
+            'recentReferrals'
+        ));
     }
     public function boughtShares()
     {
         $pageTitle = __('translation.boughtshares');
 
-        $boughtShares = UserShare::where('user_id', \auth()->user()->id)->orderBy('id', 'DESC')->get();
+        // Get paginated results (10 items per page)
+        $boughtShares = UserShare::where('user_id', \auth()->user()->id)
+            ->orderBy('id', 'DESC')
+            ->paginate(10);
 
-        return view('user-panel.bought-shares', compact('pageTitle', 'boughtShares'));
+        // Get statistics for all shares (not just current page)
+        $allShares = UserShare::where('user_id', \auth()->user()->id)->get();
+        $totalShares = $allShares->count();
+        $activeShares = $allShares->where('status', 'pending')->count();
+        $completedShares = $allShares->where('status', 'completed')->count();
+        $failedShares = $allShares->where('status', 'failed')->count();
+        $totalInvestment = $allShares->sum('amount');
+
+        return view('user-panel.bought-shares', compact(
+            'pageTitle', 
+            'boughtShares', 
+            'totalShares', 
+            'activeShares', 
+            'completedShares', 
+            'failedShares', 
+            'totalInvestment'
+        ));
     }
 
     public function soldShares()
     {   
-        
         $pageTitle = __('translation.soldshares');
 
-        $soldShares = UserShare::where('user_id', \auth()->user()->id)->whereStatus('completed')->where('start_date', '!=', '')->orderBy('id', 'desc')->get();
-        return view('user-panel.sold-shares', compact('pageTitle', 'soldShares'));
+        // Get paginated results (10 items per page) with trade relationship
+        $soldShares = UserShare::with('trade')
+            ->where('user_id', \auth()->user()->id)
+            ->whereStatus('completed')
+            ->where('start_date', '!=', '')
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+        // Get statistics for all sold shares (not just current page)
+        $allSoldShares = UserShare::where('user_id', \auth()->user()->id)
+            ->whereStatus('completed')
+            ->where('start_date', '!=', '')
+            ->get();
+            
+        $totalSoldShares = $allSoldShares->count();
+        $maturedShares = $allSoldShares->where('is_ready_to_sell', 1)->count();
+        $runningShares = $allSoldShares->where('is_ready_to_sell', 0)->count();
+        $totalInvestment = $allSoldShares->sum('share_will_get');
+        $totalEarnings = $allSoldShares->sum('profit_share');
+        $totalReturn = $totalInvestment + $totalEarnings;
+
+        return view('user-panel.sold-shares', compact(
+            'pageTitle', 
+            'soldShares', 
+            'totalSoldShares', 
+            'maturedShares', 
+            'runningShares', 
+            'totalInvestment', 
+            'totalEarnings', 
+            'totalReturn'
+        ));
     }
     public function support()
     {

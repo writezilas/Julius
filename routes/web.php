@@ -36,6 +36,14 @@ use Illuminate\Http\Request;
 */
 
 Auth::routes();
+
+// Account suspended route (outside auth middleware since user can't login)
+Route::get('/account/suspended', [App\Http\Controllers\Auth\LoginController::class, 'suspended'])->name('account.suspended');
+// Account blocked route (outside auth middleware since user can't login)
+Route::get('/account/blocked', [App\Http\Controllers\Auth\LoginController::class, 'blocked'])->name('account.blocked');
+
+// Suspension status check (requires authentication)
+Route::middleware('auth')->get('/suspension/status', [App\Http\Controllers\Auth\SuspensionController::class, 'checkStatus'])->name('suspension.status');
 Route::get('/email/verify', function () {
     return view('auth.verify');
 })->middleware('auth')->name('verification.notice');
@@ -165,8 +173,18 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
 
         Route::get('users/{slug}', [App\Http\Controllers\UserController::class, 'index'])->name('users.status')->middleware('permission:customer-index');
         Route::get('user/{user_id}', [UserController::class, 'show'])->name('user.single')->middleware('permission:customer-view');
+        Route::put('user/{id}', [UserController::class, 'update'])->name('admin.user.update')->middleware('permission:customer-update');
         Route::post('users/{id}/status-update', [App\Http\Controllers\UserController::class, 'statusUpdate'])->name('users.status-update')->middleware('permission:customer-update');
         Route::resource('users', App\Http\Controllers\UserController::class);
+
+        // Chat Settings Routes
+        Route::controller(App\Http\Controllers\Admin\ChatSettingController::class)->prefix('chat-settings')->group(function () {
+            Route::get('/', 'index')->name('admin.chat-settings.index');
+            Route::put('/', 'update')->name('admin.chat-settings.update');
+            Route::post('/toggle', 'toggleChat')->name('admin.chat-settings.toggle');
+            Route::get('/settings', 'getSettings')->name('admin.chat-settings.get');
+            Route::post('/reset', 'resetToDefault')->name('admin.chat-settings.reset');
+        });
     });
 
     Route::get('profile', [HomeController::class, 'profile'])->name('profile');
@@ -183,6 +201,17 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
     Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('page.privacy_policy');
     Route::get('/terms-and-conditions', [HomeController::class, 'termsAndConditions'])->name('page.termsAndConditions');
     Route::get('/confidentiality-policy', [HomeController::class, 'confidentialityPolicy'])->name('page.confidentialityPolicy');
+
+    // Chat System Routes
+    Route::prefix('chat')->group(function () {
+        Route::get('/', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+        Route::get('/conversations', [App\Http\Controllers\ChatController::class, 'getConversations'])->name('chat.conversations');
+        Route::get('/conversations/{id}/messages', [App\Http\Controllers\ChatController::class, 'getMessages'])->name('chat.messages');
+        Route::post('/conversations/{id}/messages', [App\Http\Controllers\ChatController::class, 'sendMessage'])->name('chat.send');
+        Route::post('/conversations/{id}/read', [App\Http\Controllers\ChatController::class, 'markAsRead'])->name('chat.read');
+        Route::get('/unread-count', [App\Http\Controllers\ChatController::class, 'getUnreadCount'])->name('chat.unread_count');
+        Route::get('/settings', [App\Http\Controllers\ChatController::class, 'getChatSettings'])->name('chat.settings');
+    });
 
     //    Route::get('{any}', [HomeController::class, 'index'])->name('index');
 
@@ -222,6 +251,16 @@ Route::get('clear/cache', function () {
     return 'cache cleared';
 });
 
+// Specific route for signup to avoid the catch-all route
+Route::get('signup', function () {
+    return redirect()->route('register');
+});
+
+// Catch-all route moved to the end to avoid conflicts
 Route::get('{slug}', function ($slug) {
-    return view($slug);
+    // Only allow specific slugs to prevent conflicts with existing routes
+    if (in_array($slug, ['about', 'contact', 'faq', 'help', 'info'])) {
+        return view($slug);
+    }
+    abort(404);
 });

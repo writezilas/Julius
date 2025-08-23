@@ -1,1 +1,314 @@
-<!-- Live Statistics Section -->\n<div class=\"row\">\n    <div class=\"col-xl-12\">\n        <div class=\"card\">\n            <div class=\"card-header border-0 align-items-center d-flex\">\n                <h4 class=\"card-title mb-0 flex-grow-1\">\n                    <i class=\"ri-pulse-line me-2\"></i>Live Statistics\n                </h4>\n                <div class=\"flex-shrink-0\">\n                    <small class=\"text-muted\" id=\"last-updated\">Updated just now</small>\n                </div>\n            </div>\n            <div class=\"card-body p-0\">\n                <!-- Navigation Tabs -->\n                <ul class=\"nav nav-tabs nav-justified\" role=\"tablist\">\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link active\" data-bs-toggle=\"tab\" href=\"#leaderboard-tab\" role=\"tab\">\n                            <i class=\"ri-trophy-line me-2\"></i>Leaderboard\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\" data-bs-toggle=\"tab\" href=\"#realtime-tab\" role=\"tab\">\n                            <i class=\"ri-time-line me-2\"></i>Real-time Stats\n                        </a>\n                    </li>\n                    <li class=\"nav-item\">\n                        <a class=\"nav-link\" data-bs-toggle=\"tab\" href=\"#referrers-tab\" role=\"tab\">\n                            <i class=\"ri-group-line me-2\"></i>Top Referrers\n                        </a>\n                    </li>\n                </ul>\n\n                <!-- Tab Content -->\n                <div class=\"tab-content\">\n                    <!-- Leaderboard Tab -->\n                    <div class=\"tab-pane active\" id=\"leaderboard-tab\" role=\"tabpanel\">\n                        <div class=\"p-3\">\n                            <h6 class=\"mb-3\">Top Traders (Investment + Profit)</h6>\n                            <div id=\"leaderboard-content\">\n                                <div class=\"d-flex justify-content-center py-4\">\n                                    <div class=\"spinner-border text-primary\" role=\"status\">\n                                        <span class=\"visually-hidden\">Loading...</span>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n\n                    <!-- Real-time Stats Tab -->\n                    <div class=\"tab-pane\" id=\"realtime-tab\" role=\"tabpanel\">\n                        <div class=\"p-3\">\n                            <h6 class=\"mb-3\">Recent Activities (Last 24 Hours)</h6>\n                            <div id=\"realtime-content\">\n                                <div class=\"d-flex justify-content-center py-4\">\n                                    <div class=\"spinner-border text-primary\" role=\"status\">\n                                        <span class=\"visually-hidden\">Loading...</span>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n\n                    <!-- Top Referrers Tab -->\n                    <div class=\"tab-pane\" id=\"referrers-tab\" role=\"tabpanel\">\n                        <div class=\"p-3\">\n                            <h6 class=\"mb-3\">Top 10 Referrers</h6>\n                            <div id=\"referrers-content\">\n                                <div class=\"d-flex justify-content-center py-4\">\n                                    <div class=\"spinner-border text-primary\" role=\"status\">\n                                        <span class=\"visually-hidden\">Loading...</span>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n\n<style>\n/* Custom styles for live statistics */\n.live-stats-item {\n    border-left: 4px solid #405189;\n    transition: all 0.3s ease;\n}\n\n.live-stats-item:hover {\n    background-color: #f8f9fa;\n    border-left-color: #0ab39c;\n}\n\n.activity-item {\n    border-left: 3px solid #e9ecef;\n    transition: all 0.3s ease;\n}\n\n.activity-item.bought {\n    border-left-color: #0ab39c;\n}\n\n.activity-item.sold {\n    border-left-color: #f7b84b;\n}\n\n.leaderboard-rank {\n    width: 30px;\n    height: 30px;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-weight: bold;\n    font-size: 0.8rem;\n}\n\n.leaderboard-rank.rank-1 {\n    background: linear-gradient(45deg, #ffd700, #ffed4e);\n    color: #8b5a00;\n}\n\n.leaderboard-rank.rank-2 {\n    background: linear-gradient(45deg, #c0c0c0, #e8e8e8);\n    color: #6c757d;\n}\n\n.leaderboard-rank.rank-3 {\n    background: linear-gradient(45deg, #cd7f32, #d4941e);\n    color: #fff;\n}\n\n.leaderboard-rank.rank-other {\n    background-color: #f8f9fa;\n    color: #6c757d;\n    border: 2px solid #e9ecef;\n}\n\n.stats-badge {\n    font-size: 0.75rem;\n    padding: 0.25rem 0.5rem;\n}\n</style>\n\n<script>\n// Live Statistics JavaScript\nlet statisticsUpdateInterval;\n\n$(document).ready(function() {\n    // Load initial statistics\n    loadLiveStatistics();\n    \n    // Set up auto-refresh every 30 seconds\n    statisticsUpdateInterval = setInterval(loadLiveStatistics, 30000);\n    \n    // Handle tab switching\n    $('.nav-tabs a').on('shown.bs.tab', function(e) {\n        const target = $(e.target).attr(\"href\");\n        if (target === '#realtime-tab') {\n            loadRealtimeStats();\n        }\n    });\n});\n\nfunction loadLiveStatistics() {\n    $.ajax({\n        url: '{{ route(\"api.live-statistics\") }}',\n        type: 'GET',\n        success: function(response) {\n            updateLeaderboard(response.leaderboard);\n            updateRealtimeStats(response.realtime_stats);\n            updateTopReferrers(response.top_referrers);\n            updateLastUpdatedTime(response.last_updated);\n        },\n        error: function(xhr, status, error) {\n            console.error('Failed to load statistics:', error);\n            showErrorMessage();\n        }\n    });\n}\n\nfunction updateLeaderboard(data) {\n    let html = '';\n    \n    if (data.length === 0) {\n        html = '<div class=\"text-center text-muted py-4\">No leaderboard data available</div>';\n    } else {\n        data.forEach(function(user, index) {\n            const rank = index + 1;\n            const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';\n            const investment = parseFloat(user.total_investment_profit).toLocaleString('en-US', {minimumFractionDigits: 2});\n            \n            html += `\n                <div class=\"d-flex align-items-center py-3 px-3 live-stats-item mb-2 rounded\">\n                    <div class=\"leaderboard-rank ${rankClass} me-3\">\n                        ${rank}\n                    </div>\n                    <div class=\"flex-grow-1\">\n                        <h6 class=\"mb-1 fs-15\">${user.username}</h6>\n                        <p class=\"text-muted mb-0 fs-13\">${user.name || 'N/A'}</p>\n                    </div>\n                    <div class=\"text-end\">\n                        <h6 class=\"mb-0 fs-14 text-success\">Ksh ${investment}</h6>\n                        <small class=\"text-muted\">Total Investment + Profit</small>\n                    </div>\n                </div>\n            `;\n        });\n    }\n    \n    $('#leaderboard-content').html(html);\n}\n\nfunction updateRealtimeStats(data) {\n    let html = '';\n    \n    if (data.length === 0) {\n        html = '<div class=\"text-center text-muted py-4\">No recent activities</div>';\n    } else {\n        data.forEach(function(activity) {\n            const amount = parseFloat(activity.amount).toLocaleString('en-US', {minimumFractionDigits: 2});\n            const badgeClass = activity.type === 'bought' ? 'bg-success' : 'bg-warning';\n            const iconClass = activity.type === 'bought' ? 'ri-shopping-cart-line' : 'ri-money-dollar-circle-line';\n            \n            html += `\n                <div class=\"d-flex align-items-center py-3 px-3 activity-item ${activity.type} mb-2 rounded\">\n                    <div class=\"avatar-sm bg-light rounded-circle me-3 d-flex align-items-center justify-content-center\">\n                        <i class=\"${iconClass} fs-18 text-${activity.type === 'bought' ? 'success' : 'warning'}\"></i>\n                    </div>\n                    <div class=\"flex-grow-1\">\n                        <h6 class=\"mb-1 fs-14\">\n                            ${activity.username}\n                            <span class=\"badge ${badgeClass} stats-badge ms-2\">${activity.type.toUpperCase()}</span>\n                        </h6>\n                        <p class=\"text-muted mb-0 fs-13\">\n                            ${activity.trade_name} • Ticket: ${activity.ticket_no}\n                        </p>\n                    </div>\n                    <div class=\"text-end\">\n                        <h6 class=\"mb-0 fs-14\">Ksh ${amount}</h6>\n                        <small class=\"text-muted\">${activity.time}</small>\n                    </div>\n                </div>\n            `;\n        });\n    }\n    \n    $('#realtime-content').html(html);\n}\n\nfunction updateTopReferrers(data) {\n    let html = '';\n    \n    if (data.length === 0) {\n        html = '<div class=\"text-center text-muted py-4\">No referral data available</div>';\n    } else {\n        data.forEach(function(referrer, index) {\n            const rank = index + 1;\n            const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';\n            \n            html += `\n                <div class=\"d-flex align-items-center py-3 px-3 live-stats-item mb-2 rounded\">\n                    <div class=\"leaderboard-rank ${rankClass} me-3\">\n                        ${rank}\n                    </div>\n                    <div class=\"flex-grow-1\">\n                        <h6 class=\"mb-1 fs-15\">${referrer.username}</h6>\n                        <p class=\"text-muted mb-0 fs-13\">${referrer.name || 'N/A'}</p>\n                    </div>\n                    <div class=\"text-end\">\n                        <h6 class=\"mb-0 fs-14 text-primary\">${referrer.referral_count}</h6>\n                        <small class=\"text-muted\">Referrals</small>\n                    </div>\n                </div>\n            `;\n        });\n    }\n    \n    $('#referrers-content').html(html);\n}\n\nfunction updateLastUpdatedTime(timestamp) {\n    const lastUpdated = new Date(timestamp);\n    const now = new Date();\n    const diffMs = now - lastUpdated;\n    const diffSecs = Math.floor(diffMs / 1000);\n    \n    let timeText;\n    if (diffSecs < 60) {\n        timeText = 'Updated just now';\n    } else if (diffSecs < 3600) {\n        const mins = Math.floor(diffSecs / 60);\n        timeText = `Updated ${mins} min${mins > 1 ? 's' : ''} ago`;\n    } else {\n        timeText = `Updated ${lastUpdated.toLocaleTimeString()}`;\n    }\n    \n    $('#last-updated').text(timeText);\n}\n\nfunction showErrorMessage() {\n    const errorHtml = '<div class=\"text-center text-danger py-4\"><i class=\"ri-error-warning-line fs-24 mb-2\"></i><br>Failed to load statistics</div>';\n    $('#leaderboard-content').html(errorHtml);\n    $('#realtime-content').html(errorHtml);\n    $('#referrers-content').html(errorHtml);\n}\n\n// Clean up interval when page unloads\n$(window).on('beforeunload', function() {\n    if (statisticsUpdateInterval) {\n        clearInterval(statisticsUpdateInterval);\n    }\n});\n</script>
+<!-- Live Statistics Section -->
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card">
+            <div class="card-header border-0 align-items-center d-flex">
+                <h4 class="card-title mb-0 flex-grow-1">
+                    <i class="ri-pulse-line me-2"></i>Live Statistics
+                </h4>
+                <div class="flex-shrink-0">
+                    <small class="text-muted" id="last-updated">Updated just now</small>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <!-- Navigation Tabs -->
+                <ul class="nav nav-tabs nav-justified" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#leaderboard-tab" role="tab">
+                            <i class="ri-trophy-line me-2"></i>Leaderboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#realtime-tab" role="tab">
+                            <i class="ri-time-line me-2"></i>Real-time Stats
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#referrers-tab" role="tab">
+                            <i class="ri-group-line me-2"></i>Top Referrers
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Leaderboard Tab -->
+                    <div class="tab-pane active" id="leaderboard-tab" role="tabpanel">
+                        <div class="p-3">
+                            <h6 class="mb-3">Top Traders (Investment + Profit)</h6>
+                            <div id="leaderboard-content">
+                                <div class="d-flex justify-content-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Real-time Stats Tab -->
+                    <div class="tab-pane" id="realtime-tab" role="tabpanel">
+                        <div class="p-3">
+                            <h6 class="mb-3">Recent Activities (Last 24 Hours)</h6>
+                            <div id="realtime-content">
+                                <div class="d-flex justify-content-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Referrers Tab -->
+                    <div class="tab-pane" id="referrers-tab" role="tabpanel">
+                        <div class="p-3">
+                            <h6 class="mb-3">Top 10 Referrers</h6>
+                            <div id="referrers-content">
+                                <div class="d-flex justify-content-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Custom styles for live statistics */
+.live-stats-item {
+    border-left: 4px solid #405189;
+    transition: all 0.3s ease;
+}
+
+.live-stats-item:hover {
+    background-color: #f8f9fa;
+    border-left-color: #0ab39c;
+}
+
+.activity-item {
+    border-left: 3px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.activity-item.bought {
+    border-left-color: #0ab39c;
+}
+
+.activity-item.sold {
+    border-left-color: #f7b84b;
+}
+
+.leaderboard-rank {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.leaderboard-rank.rank-1 {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #8b5a00;
+}
+
+.leaderboard-rank.rank-2 {
+    background: linear-gradient(45deg, #c0c0c0, #e8e8e8);
+    color: #6c757d;
+}
+
+.leaderboard-rank.rank-3 {
+    background: linear-gradient(45deg, #cd7f32, #d4941e);
+    color: #fff;
+}
+
+.leaderboard-rank.rank-other {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.stats-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+</style>
+
+<script>
+// Live Statistics JavaScript
+let statisticsUpdateInterval;
+
+$(document).ready(function() {
+    // Load initial statistics
+    loadLiveStatistics();
+    
+    // Set up auto-refresh every 30 seconds
+    statisticsUpdateInterval = setInterval(loadLiveStatistics, 30000);
+    
+    // Handle tab switching
+    $('.nav-tabs a').on('shown.bs.tab', function(e) {
+        const target = $(e.target).attr("href");
+        if (target === '#realtime-tab') {
+            loadRealtimeStats();
+        }
+    });
+});
+
+function loadLiveStatistics() {
+    $.ajax({
+        url: '{{ route("api.live-statistics") }}',
+        type: 'GET',
+        success: function(response) {
+            updateLeaderboard(response.leaderboard);
+            updateRealtimeStats(response.realtime_stats);
+            updateTopReferrers(response.top_referrers);
+            updateLastUpdatedTime(response.last_updated);
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to load statistics:', error);
+            showErrorMessage();
+        }
+    });
+}
+
+function updateLeaderboard(data) {
+    let html = '';
+    
+    if (data.length === 0) {
+        html = '<div class="text-center text-muted py-4">No leaderboard data available</div>';
+    } else {
+        data.forEach(function(user, index) {
+            const rank = index + 1;
+            const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : 'rank-other';
+            const investment = parseFloat(user.total_investment_profit).toLocaleString('en-US', {minimumFractionDigits: 2});
+            
+            html += `
+                <div class="d-flex align-items-center py-3 px-3 live-stats-item mb-2 rounded">
+                    <div class="leaderboard-rank ${rankClass} me-3">
+                        ${rank}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fs-15">${user.username}</h6>
+                        <p class="text-muted mb-0 fs-13">${user.name || 'N/A'}</p>
+                    </div>
+                    <div class="text-end">
+                        <h6 class="mb-0 fs-14 text-success">Ksh ${investment}</h6>
+                        <small class="text-muted">Total Investment + Profit</small>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    $('#leaderboard-content').html(html);
+}
+
+function updateRealtimeStats(data) {
+    let html = '';
+    
+    if (data.length === 0) {
+        html = '<div class="text-center text-muted py-4">No recent activities</div>';
+    } else {
+        data.forEach(function(activity) {
+            const amount = parseFloat(activity.amount).toLocaleString('en-US', {minimumFractionDigits: 2});
+            const badgeClass = activity.type === 'bought' ? 'bg-success' : 'bg-warning';
+            const iconClass = activity.type === 'bought' ? 'ri-shopping-cart-line' : 'ri-money-dollar-circle-line';
+            
+            html += `
+                <div class="d-flex align-items-center py-3 px-3 activity-item ${activity.type} mb-2 rounded">
+                    <div class="avatar-sm bg-light rounded-circle me-3 d-flex align-items-center justify-content-center">
+                        <i class="${iconClass} fs-18 text-${activity.type === 'bought' ? 'success' : 'warning'}"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fs-14">
+                            ${activity.username}
+                            <span class="badge ${badgeClass} stats-badge ms-2">${activity.type.toUpperCase()}</span>
+                        </h6>
+                        <p class="text-muted mb-0 fs-13">
+                            ${activity.trade_name} • Ticket: ${activity.ticket_no}
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <h6 class="mb-0 fs-14">Ksh ${amount}</h6>
+                        <small class="text-muted">${activity.time}</small>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    $('#realtime-content').html(html);
+}
+
+function updateTopReferrers(data) {
+    let html = '';
+    
+    if (data.length === 0) {
+        html = '<div class="text-center text-muted py-4">No referral data available</div>';
+    } else {
+        data.forEach(function(referrer, index) {
+            const rank = index + 1;
+            const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+            
+            html += `
+                <div class="d-flex align-items-center py-3 px-3 live-stats-item mb-2 rounded">
+                    <div class="leaderboard-rank ${rankClass} me-3">
+                        ${rank}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1 fs-15">${referrer.username}</h6>
+                        <p class="text-muted mb-0 fs-13">${referrer.name || 'N/A'}</p>
+                    </div>
+                    <div class="text-end">
+                        <h6 class="mb-0 fs-14 text-primary">${referrer.referral_count}</h6>
+                        <small class="text-muted">Referrals</small>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    $('#referrers-content').html(html);
+}
+
+function updateLastUpdatedTime(timestamp) {
+    const lastUpdated = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - lastUpdated;
+    const diffSecs = Math.floor(diffMs / 1000);
+    
+    let timeText;
+    if (diffSecs < 60) {
+        timeText = 'Updated just now';
+    } else if (diffSecs < 3600) {
+        const mins = Math.floor(diffSecs / 60);
+        timeText = `Updated ${mins} min${mins > 1 ? 's' : ''} ago`;
+    } else {
+        timeText = `Updated ${lastUpdated.toLocaleTimeString()}`;
+    }
+    
+    $('#last-updated').text(timeText);
+}
+
+function showErrorMessage() {
+    const errorHtml = '<div class="text-center text-danger py-4"><i class="ri-error-warning-line fs-24 mb-2"></i><br>Failed to load statistics</div>';
+    $('#leaderboard-content').html(errorHtml);
+    $('#realtime-content').html(errorHtml);
+    $('#referrers-content').html(errorHtml);
+}
+
+// Clean up interval when page unloads
+$(window).on('beforeunload', function() {
+    if (statisticsUpdateInterval) {
+        clearInterval(statisticsUpdateInterval);
+    }
+});
+</script>

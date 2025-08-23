@@ -15,9 +15,24 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('sharematured:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/cron.log", true);
-        $schedule->command('paymentfailedshare:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/paymentfailedforshare.log", true);
-    $schedule->command('unblockTemporaryBlockedUsers:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/unblockTemporaryBlockedUsers.log", true);
+        // Traditional minute-based scheduling (commented out for second-level scheduling)
+        // $schedule->command('sharematured:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/cron.log", true);
+        // $schedule->command('paymentfailedshare:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/paymentfailedforshare.log", true);
+        // $schedule->command('unblockTemporaryBlockedUsers:cron')->everyTwoMinutes()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/unblockTemporaryBlockedUsers.log", true);
+        // $schedule->command('update-shares')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/update-shares.log", true);
+        
+        // Second-level scheduling: Run micro-scheduler every minute to handle second-level intervals
+        $schedule->command('schedule:micro --duration=60 --interval=1')
+                 ->everyMinute()
+                 ->timezone(env('APP_TIMEZONE'))
+                 ->sendOutputTo(storage_path()."/logs/micro-scheduler.log", true)
+                 ->description('Micro-scheduler for second-level command execution');
+                 
+        // Alternative: Individual second-level commands (if needed)
+        // These will run every minute but execute multiple times within that minute
+        $schedule->command('sharematured:cron')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/cron.log", true);
+        $schedule->command('paymentfailedshare:cron')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/paymentfailedforshare.log", true);
+        $schedule->command('unblockTemporaryBlockedUsers:cron')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/unblockTemporaryBlockedUsers.log", true);
         $schedule->command('update-shares')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/update-shares.log", true);
     }
 

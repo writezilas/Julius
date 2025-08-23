@@ -56,24 +56,32 @@ class UserSharePaymentController extends Controller
 
                 $payment                    = UserSharePayment::create($data);
 
-                if ($payment) {
-                    $user = User::find($request->receiver_id);
+            if ($payment) {
+                $user = User::find($request->receiver_id);
 
-                    // Save log for payment receiver
-                    $log = new Log();
-                    $log->remarks = "You received a payment from " . $currentUser->username;
-                    $log->type    = "payment";
-                    $log->value   = $amount;
-                    $log->user_id = $user->id;
-                    $payment->logs()->save($log);
+                // Reset payment failures for successful payment
+                try {
+                    $paymentFailureService = new \App\Services\PaymentFailureService();
+                    $paymentFailureService->resetPaymentFailures($currentUser->id);
+                } catch (\Exception $e) {
+                    \Log::error('Error resetting payment failures: ' . $e->getMessage());
+                }
 
-                    // Save log for payers
-                    $log = new Log();
-                    $log->remarks = "You made a payment for " . $user->username;
-                    $log->type    = "payment";
-                    $log->value   = $amount;
-                    $log->user_id = $currentUser->id;
-                    $payment->logs()->save($log);
+                // Save log for payment receiver
+                $log = new Log();
+                $log->remarks = "You received a payment from " . $currentUser->username;
+                $log->type    = "payment";
+                $log->value   = $amount;
+                $log->user_id = $user->id;
+                $payment->logs()->save($log);
+
+                // Save log for payers
+                $log = new Log();
+                $log->remarks = "You made a payment for " . $user->username;
+                $log->type    = "payment";
+                $log->value   = $amount;
+                $log->user_id = $currentUser->id;
+                $payment->logs()->save($log);
 
                     try {
                         Notification::send($user, new PaymentSentToSeller($payment));

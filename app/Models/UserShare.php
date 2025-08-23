@@ -6,11 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Http\Controllers\ChatController;
 
 class UserShare extends Model
 {
     use HasFactory;
     protected $guarded = [];
+    
+    // Model Events
+    protected static function booted()
+    {
+        // End conversations when share status changes to 'completed'
+        static::updated(function ($userShare) {
+            if ($userShare->isDirty('status') && $userShare->status === 'completed') {
+                try {
+                    ChatController::endConversationsForCompletedShares($userShare->id);
+                } catch (\Exception $e) {
+                    \Log::error('Error ending conversations for completed share: ' . $e->getMessage());
+                }
+            }
+        });
+    }
 
     public function trade(): BelongsTo
     {

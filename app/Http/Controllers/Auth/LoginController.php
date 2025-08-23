@@ -49,21 +49,22 @@ class LoginController extends Controller
 
         $user = User::where('email', $request->email)->first();
         if(@$user->status === 'block'){
-            toastr()->error("Your account is blocked, Kindly Contact support");
-            throw ValidationException::withMessages([
-                'email' => "Your account is blocked, Kindly Contact support",
-            ]);
-            
+            // Redirect to blocked account page
+            return redirect()->route('account.blocked', ['user' => $user->id]);
         }
 
         if(@$user->status === 'suspend'){
-            
-            $duration = Carbon::parse($user->suspended_until)->format('H:i:s');
-            toastr()->error("Your account is suspended for $duration time, Kindly Contact support");
-            throw ValidationException::withMessages([
-                'email' => "Your account is banned for $duration time, Kindly Contact support",
-            ]);
-            
+            // Check if suspension has expired
+            if($user->suspension_until && $user->suspension_until->isPast()) {
+                // Auto-unsuspend if suspension time has passed
+                $user->update([
+                    'status' => 'fine',
+                    'suspension_until' => null
+                ]);
+            } else {
+                // Show suspension page with countdown
+                return redirect()->route('account.suspended', ['user' => $user->id]);
+            }
         }
         if ($this->attemptLogin($request)) {
             
@@ -83,5 +84,43 @@ class LoginController extends Controller
         return $this->sendFailedLoginResponse($request);
    }
 
+   /**
+    * Show suspended account page with countdown
+    */
+   public function suspended(Request $request)
+   {
+       $user = User::findOrFail($request->user);
+       
+       // Double-check if user is actually suspended
+       if($user->status !== 'suspend' || !$user->suspension_until) {
+           return redirect()->route('login');
+       }
+       
+       // Check if suspension has expired
+       if($user->suspension_until->isPast()) {
+           $user->update([
+               'status' => 'fine',
+               'suspension_until' => null
+           ]);
+           return redirect()->route('login')->with('success', 'Your account suspension has expired. You can now log in.');
+       }
+       
+       return view('auth.suspended', compact('user'));
+   }
+
+   /**
+    * Show blocked account page
+    */
+   public function blocked(Request $request)
+   {
+       $user = User::findOrFail($request->user);
+       
+       // Double-check if user is actually blocked
+       if($user->status !== 'block') {
+           return redirect()->route('login');
+       }
+       
+       return view('auth.blocked', compact('user'));
+   }
 
 }

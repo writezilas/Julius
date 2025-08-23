@@ -36,6 +36,7 @@ class CronController extends Controller
                 $this->updateShareStatusAsFailed($pairedShares);
             }
             $this->checkUnPaidReffMatureUser();
+            $this->unsuspendExpiredUsers();
             DB::commit();
             return 1;
         }catch (\Exception $e) {
@@ -129,5 +130,34 @@ class CronController extends Controller
         }
         
         return 1;
+    }
+
+    /**
+     * Automatically unsuspend users whose suspension period has expired
+     */
+    public function unsuspendExpiredUsers()
+    {
+        try {
+            $expiredSuspensions = User::where('status', 'suspend')
+                ->where('suspension_until', '<', now())
+                ->whereNotNull('suspension_until')
+                ->get();
+            
+            foreach ($expiredSuspensions as $user) {
+                $user->update([
+                    'status' => 'fine',
+                    'suspension_until' => null
+                ]);
+                
+                \Log::info("Auto-unsuspended user: {$user->username} (ID: {$user->id})");
+            }
+            
+            if ($expiredSuspensions->count() > 0) {
+                \Log::info("Auto-unsuspended {$expiredSuspensions->count()} user(s) whose suspension period expired.");
+            }
+            
+        } catch (\Exception $e) {
+            \Log::error('Error in unsuspendExpiredUsers: ' . $e->getMessage());
+        }
     }
 }

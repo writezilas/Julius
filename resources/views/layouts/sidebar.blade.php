@@ -38,8 +38,8 @@
 
                 @canAny(['staff-index','role-index','customer-index'])
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarUsers" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['users.status']) }}" aria-controls="sidebarCustomer">
-                        <i class="ri-user-2-fill"></i> <span>@lang('User Management')</span>
+                    <a class="nav-link menu-link {{ areActiveRoutesBool(['users.status', 'admin.role.index', 'admin.role.permission', 'admin.staff.index']) ? 'active' : '' }}" href="#sidebarUsers" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['users.status']) }}" aria-controls="sidebarCustomer">
+                        <i class="ri-team-line"></i> <span>@lang('User Management')</span>
                     </a>
                     
                     <div class="collapse menu-dropdown {{ areActiveRoutesBool(['users.status', 'admin.role.index', 'admin.role.permission', 'admin.staff.index', 'admin.staff.create', 'admin.staff.edit']) ? 'show' : '' }}" id="sidebarUsers">
@@ -85,12 +85,8 @@
                 @endcanAny
                 @canAny(['allocate-share-to-user', 'transfer-share-from-user', 'allocate-share-history'])
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarShare"
-                       data-bs-toggle="collapse"
-                       role="button"
-                       aria-expanded="{{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) }}"
-                       aria-controls="sidebarShare">
-                        <i class="ri-share-box-fill"></i> <span>@lang('Share Managament')</span>
+                    <a class="nav-link menu-link {{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) ? 'active' : '' }}" href="#sidebarShare" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) }}" aria-controls="sidebarShare">
+                        <i class="ri-pie-chart-2-line"></i> <span>@lang('Share Management')</span>
                     </a>
                     <div class="collapse menu-dropdown {{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) ? 'show' : '' }}" id="sidebarShare">
                         <ul class="nav nav-sm flex-column">
@@ -115,12 +111,8 @@
                 @endcanAny
                 @canAny(['announcement-index', 'send-email', 'send-sms', 'support-index'])
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarCommunication"
-                       data-bs-toggle="collapse" role="button"
-                       aria-expanded="{{ areActiveRoutesBool(['announcement.create', 'email.create', 'sms.create', 'admin.support']) }}"
-                       aria-controls="sidebarCommunication"
-                    >
-                        <i class="ri-message-2-fill"></i> <span>@lang('Communications')</span>
+                    <a class="nav-link menu-link {{ areActiveRoutesBool(['announcement.create', 'email.create', 'sms.create', 'admin.support']) ? 'active' : '' }}" href="#sidebarCommunication" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['announcement.create', 'email.create', 'sms.create', 'admin.support']) }}" aria-controls="sidebarCommunication">
+                        <i class="ri-notification-3-line"></i> <span>@lang('Communications')</span>
                     </a>
                     <div class="collapse menu-dropdown {{ areActiveRoutesBool(['announcement.index', 'announcement.create', 'announcement.edit', 'email.create', 'sms.create', 'admin.support']) ? 'show' : '' }}" id="sidebarCommunication">
                         <ul class="nav nav-sm flex-column">
@@ -210,8 +202,7 @@
                     <a class="nav-link menu-link" href="#sidebarSettings" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['admin.updateTradingPrice', 'admin.setTaxRate', 'admin.setting.mail.create', 'admin.setting.sms.create', 'admin.general-setting']) }}" aria-controls="sidebarShare">
                         <i class="ri-settings-2-fill"></i> <span>@lang('Settings')</span>
                     </a>
-                    <div class="collapse menu-dropdown {{ areActiveRoutesBool(['admin.updateTradingPrice', 'admin.setTaxRate', 'admin.setting.mail.create', 'admin.setting.sms.create']) ? 'show' : '' }}" id="sidebarSettings">
-                    <div class="collapse menu-dropdown {{ areActiveRoutesBool(['admin.updateTradingPrice', 'admin.setTaxRate', 'admin.setting.mail.create', 'admin.setting.sms.create']) ? 'show' : '' }}" id="sidebarSettings">
+                    <div class="collapse menu-dropdown {{ areActiveRoutesBool(['admin.updateTradingPrice', 'admin.setTaxRate', 'admin.setting.mail.create', 'admin.setting.sms.create', 'admin.chat-settings.index']) ? 'show' : '' }}" id="sidebarSettings">
                         <ul class="nav nav-sm flex-column">
                             @can('general-setting-view')
                             <li class="nav-item">
@@ -243,6 +234,11 @@
                                 <a href="{{ route('admin.setting.mail.create') }}" class="nav-link {{ areActiveRoutes(['admin.setting.mail.create']) }}">@lang('Email api settings')</a>
                             </li>
                             @endcan
+                            <li class="nav-item">
+                                <a href="{{ route('admin.chat-settings.index') }}" class="nav-link {{ areActiveRoutes(['admin.chat-settings.index']) }}">
+                                    <i class="ri-chat-3-line me-1"></i>@lang('Chat Settings')
+                                </a>
+                            </li>
                             @can('payments-api-page-view')
                             <li class="nav-item">
                                 <a href="#" class="nav-link">@lang('Payment authentication apis')</a>

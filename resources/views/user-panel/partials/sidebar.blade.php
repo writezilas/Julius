@@ -68,6 +68,15 @@
                         <span>@lang('translation.donate_to_us')</span>
                     </a>
                 </li>  --}}
+                @if(auth()->user()->role_id == 2 && \App\Models\ChatSetting::isChatEnabled())
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('chat.index') }}">
+                        <i class="ri-chat-3-line"></i>
+                        <span>Chat</span>
+                        <span class="badge bg-danger chat-unread-count" id="sidebarChatBadge" style="display: none;">0</span>
+                    </a>
+                </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('users.support') }}">
                         <span>@lang('translation.support')</span>

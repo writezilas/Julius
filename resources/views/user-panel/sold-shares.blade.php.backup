@@ -1,0 +1,797 @@
+@extends('layouts.master')
+@php($pageTitle = __('translation.soldshares'))
+@section('title') {{$pageTitle}} @endsection
+
+@section('css')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+/* Enhanced Sold Shares Styles */
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stats-card.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.stats-card.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+.stats-card.info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+.stats-card.danger { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+.stats-card.purple { background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%); }
+.stats-card.orange { background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%); }
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    backdrop-filter: blur(10px);
+}
+
+.shares-container {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.filter-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.share-list-item {
+    background: white;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 1.5rem;
+}
+
+.share-list-item:hover {
+    background: rgba(102, 126, 234, 0.02);
+    transform: translateX(5px);
+}
+
+.share-list-item:last-child { border-bottom: none; }
+
+.share-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.share-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.share-details {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 120px;
+}
+
+.detail-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(102, 126, 234, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+    font-size: 0.875rem;
+}
+
+.detail-icon.success {
+    background: rgba(17, 153, 142, 0.1);
+    color: #11998e;
+}
+
+.countdown-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #11998e15, #38ef7d15);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+}
+
+.countdown-inline .countdown-timer {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #11998e;
+    margin: 0;
+}
+
+.countdown-progress-small {
+    width: 60px;
+    height: 4px;
+    background: rgba(17, 153, 142, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.countdown-progress-bar-small {
+    height: 100%;
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    border-radius: 2px;
+    transition: width 1s ease;
+    width: 0%;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-running { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+.status-matured { background: linear-gradient(135deg, #11998e, #38ef7d); color: white; }
+.status-completed { background: linear-gradient(135deg, #00b894, #00cec9); color: white; }
+.status-pending { background: linear-gradient(135deg, #74b9ff, #0984e3); color: white; }
+.status-pairing { background: linear-gradient(135deg, #fd79a8, #e84393); color: white; }
+.status-paired { background: linear-gradient(135deg, #00b894, #00cec9); color: white; }
+.status-failed { background: linear-gradient(135deg, #d63031, #e17055); color: white; }
+.status-unknown { background: linear-gradient(135deg, #636e72, #2d3436); color: white; }
+
+.action-btn {
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-details {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: white;
+}
+
+.btn-details:hover {
+    background: linear-gradient(135deg, #0f8b7f, #2dd471);
+    color: white;
+}
+
+.filter-input {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.filter-input:focus {
+    border-color: #11998e;
+    box-shadow: 0 0 0 3px rgba(17, 153, 142, 0.1);
+    outline: none;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #8e92a4;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.earning-badge {
+    background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pagination-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.pagination .page-link {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: #11998e;
+    padding: 0.75rem 1rem;
+    margin: 0 0.25rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #11998e, #38ef7d);
+    border-color: transparent;
+    color: white;
+}
+
+.pagination-info {
+    color: #8e92a4;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .stats-card { margin-bottom: 1rem; }
+    .share-details { gap: 1rem; }
+    .filter-section { padding: 1rem; }
+    .shares-container { padding: 1rem; }
+}
+</style>
+@endsection
+
+@section('content')
+    @component('components.breadcrumb')
+        @slot('li_1') @lang('translation.dashboard') @endslot
+        @slot('title') {{$pageTitle}} @endslot
+    @endcomponent
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-2 col-md-6">
+            <div class="card stats-card info">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-1">{{$totalSoldShares}}</h4>
+                            <p class="mb-0 opacity-75">Total Sold</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-6">
+            <div class="card stats-card warning">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-1">{{$runningShares}}</h4>
+                            <p class="mb-0 opacity-75">Running</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-6">
+            <div class="card stats-card success">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-1">{{$maturedShares}}</h4>
+                            <p class="mb-0 opacity-75">Matured</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-6">
+            <div class="card stats-card purple">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-1">${{number_format($totalInvestment, 2)}}</h4>
+                            <p class="mb-0 opacity-75">Investment</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-6">
+            <div class="card stats-card orange">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-1">${{number_format($totalEarnings, 2)}}</h4>
+                            <p class="mb-0 opacity-75">Earnings</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-2 col-md-6">
+            <div class="card stats-card danger">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="stat-icon me-3">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h4 class="mb-1">${{number_format($totalReturn, 2)}}</h4>
+                            <p class="mb-0 opacity-75">Total Return</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtering Section -->
+    <div class="filter-section">
+        <div class="row align-items-center">
+            <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+                <div class="position-relative">
+                    <i class="fas fa-search position-absolute" style="left: 1rem; top: 50%; transform: translateY(-50%); color: #8e92a4;"></i>
+                    <input type="text" class="form-control filter-input" id="searchInput" placeholder="Search by ticket number or share type..." style="padding-left: 3rem;">
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-6 mb-3 mb-lg-0">
+                <select class="form-control filter-input" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="running">Running</option>
+                    <option value="matured">Matured</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3 mb-lg-0">
+                <select class="form-control filter-input" id="amountFilter">
+                    <option value="">All Amounts</option>
+                    <option value="0-100">$0 - $100</option>
+                    <option value="100-500">$100 - $500</option>
+                    <option value="500-1000">$500 - $1,000</option>
+                    <option value="1000+">$1,000+</option>
+                </select>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <select class="form-control filter-input" id="dateFilter">
+                    <option value="">All Dates</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shares List Display -->
+    <div class="shares-container" id="sharesContainer">
+        @if($soldShares->count() > 0)
+            @foreach($soldShares as $share)
+                @php
+                    $shareStatus = 'unknown';
+                    $statusClass = 'status-unknown';
+                    $statusIcon = 'fas fa-question-circle';
+                    $statusText = 'Unknown';
+                    
+                    if ($share->status === 'pending') {
+                        $shareStatus = 'pending';
+                        $statusClass = 'status-pending';
+                        $statusIcon = 'fas fa-hourglass-half';
+                        $statusText = 'Pending';
+                    } elseif ($share->status === 'pairing') {
+                        $shareStatus = 'pairing';
+                        $statusClass = 'status-pairing';
+                        $statusIcon = 'fas fa-link';
+                        $statusText = 'Pairing';
+                    } elseif ($share->status === 'paired') {
+                        $shareStatus = 'paired';
+                        $statusClass = 'status-paired';
+                        $statusIcon = 'fas fa-handshake';
+                        $statusText = 'Paired';
+                    } elseif ($share->status === 'completed' && $share->is_ready_to_sell == 1) {
+                        $shareStatus = 'matured';
+                        $statusClass = 'status-matured';
+                        $statusIcon = 'fas fa-gem';
+                        $statusText = 'Share Matured';
+                    } elseif ($share->status === 'completed' && $share->is_ready_to_sell == 0) {
+                        $shareStatus = 'running';
+                        $statusClass = 'status-running';
+                        $statusIcon = 'fas fa-spinner fa-spin';
+                        $statusText = 'Running';
+                    } elseif ($share->status === 'failed') {
+                        $shareStatus = 'failed';
+                        $statusClass = 'status-failed';
+                        $statusIcon = 'fas fa-times-circle';
+                        $statusText = 'Failed';
+                    }
+                @endphp
+                
+                <div class="share-list-item share-item" 
+                     data-ticket="{{ $share->ticket_no }}" 
+                     data-status="{{ $shareStatus }}" 
+                     data-amount="{{ $share->share_will_get + $share->profit_share }}" 
+                     data-date="{{ $share->start_date }}">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <!-- Left Side: Share Info and Details -->
+                        <div class="flex-grow-1">
+                            <!-- Share Header -->
+                            <div class="share-meta mb-3">
+                                <div class="share-info">
+                                    <h5 class="mb-1 fw-bold">{{ $share->trade ? $share->trade->name : 'Trade Not Available' }}</h5>
+                                    <p class="text-muted mb-0">Ticket: <strong>{{ $share->ticket_no }}</strong> • ID: <strong>{{ $share->id }}</strong></p>
+                                </div>
+                            </div>
+
+                            <!-- Share Details -->
+                            <div class="share-details">
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-play-circle"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Start Date</small>
+                                        <strong>{{ $share->start_date ? date('d M Y', strtotime($share->start_date)) : 'N/A' }}</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-coins"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Investment</small>
+                                        <strong>${{ number_format($share->share_will_get, 2) }}</strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-icon success">
+                                        <i class="fas fa-arrow-trend-up"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Earning</small>
+                                        <strong class="text-success">
+                                            +${{ number_format($share->profit_share, 2) }}
+                                            @if($share->share_will_get > 0)
+                                                <span class="earning-badge ms-2">{{ number_format(($share->profit_share / $share->share_will_get) * 100, 1) }}%</span>
+                                            @else
+                                                <span class="earning-badge ms-2">0%</span>
+                                            @endif
+                                        </strong>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Total Return</small>
+                                        <strong class="text-primary h6">${{ number_format($share->share_will_get + $share->profit_share, 2) }}</strong>
+                                    </div>
+                                </div>
+                                
+                                <!-- Time Remaining -->
+                                <div class="detail-item">
+                                    @if($shareStatus === 'matured')
+                                        <div class="countdown-inline text-success">
+                                            <i class="fas fa-check-circle"></i>
+                                            <span><strong>Share Matured</strong></span>
+                                        </div>
+                                    @elseif($shareStatus === 'running' && $share->start_date)
+                                        <div class="countdown-inline">
+                                            <i class="fas fa-clock"></i>
+                                            <div>
+                                                <small class="text-muted d-block">Time Left</small>
+                                                <p class="countdown-timer" id="sold-share-timer{{ $share->id }}">Loading...</p>
+                                                <div class="countdown-progress-small">
+                                                    <div class="countdown-progress-bar-small" id="sold-progress{{ $share->id }}"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @elseif($shareStatus === 'failed')
+                                        <div class="countdown-inline text-danger">
+                                            <i class="fas fa-times-circle"></i>
+                                            <span><strong>Transaction Failed</strong></span>
+                                        </div>
+                                    @elseif($shareStatus === 'pending')
+                                        <div class="countdown-inline text-info">
+                                            <i class="fas fa-hourglass-half"></i>
+                                            <span><strong>Processing</strong></span>
+                                        </div>
+                                    @elseif($shareStatus === 'pairing')
+                                        <div class="countdown-inline text-primary">
+                                            <i class="fas fa-link"></i>
+                                            <span><strong>Finding Match</strong></span>
+                                        </div>
+                                    @elseif($shareStatus === 'paired')
+                                        <div class="countdown-inline text-success">
+                                            <i class="fas fa-handshake"></i>
+                                            <span><strong>Matched with Buyer</strong></span>
+                                        </div>
+                                    @else
+                                        <div class="countdown-inline text-muted">
+                                            <i class="fas fa-question-circle"></i>
+                                            <span><strong>Status Unknown</strong></span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side: Status and Actions -->
+                        <div class="d-flex flex-column align-items-center gap-3" style="min-width: 200px;">
+                            <!-- Status Badge -->
+                            <div>
+                                <span class="status-badge {{ $statusClass }}">
+                                    <i class="{{ $statusIcon }}"></i>
+                                    {{ $statusText }}
+                                </span>
+                                
+                                @if($shareStatus === 'matured')
+                                    <small class="d-block text-success mt-1">
+                                        <i class="fas fa-check-circle"></i> Ready for sale
+                                    </small>
+                                @elseif($shareStatus === 'running')
+                                    <small class="d-block text-warning mt-1">
+                                        <i class="fas fa-clock"></i> Still maturing
+                                    </small>
+                                @elseif($shareStatus === 'failed')
+                                    <small class="d-block text-danger mt-1">
+                                        <i class="fas fa-exclamation-triangle"></i> Transaction failed
+                                    </small>
+                                @endif
+                            </div>
+                            
+                            <!-- View Details Button -->
+                            <div>
+                                <a href="{{ route('sold-share.view', $share->id) }}" class="action-btn btn-details">
+                                    <i class="fas fa-eye"></i>
+                                    View Details
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @else
+            <div class="empty-state">
+                <i class="fas fa-chart-pie"></i>
+                <h4>No Sold Shares Found</h4>
+                <p>You don't have any sold shares yet. Your completed shares will appear here once they're ready for trading!</p>
+                <a href="{{ route('users.bought_shares') }}" class="action-btn btn-details">
+                    <i class="fas fa-arrow-left"></i>
+                    View Bought Shares
+                </a>
+            </div>
+        @endif
+    </div>
+
+    <!-- Pagination -->
+    @if($soldShares->count() > 0)
+        <div class="pagination-container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div class="pagination-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Showing {{ $soldShares->firstItem() }} to {{ $soldShares->lastItem() }} of {{ $soldShares->total() }} shares
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="pagination-info">
+                        Page {{ $soldShares->currentPage() }} of {{ $soldShares->lastPage() }}
+                    </div>
+                    <nav>
+                        {{ $soldShares->links('pagination::bootstrap-4') }}
+                    </nav>
+                </div>
+            </div>
+        </div>
+    @endif
+
+@endsection
+
+@section('script')
+<script>
+// Initialize countdown timers for running shares
+@if($soldShares->count() > 0)
+    @foreach($soldShares as $singleShare)
+        @if($singleShare->is_ready_to_sell == 0 && $singleShare->start_date && $singleShare->period)
+            getSoldShareCounterTime('{{ date('Y-m-d H:i:s', strtotime($singleShare->start_date . ' +' . $singleShare->period . ' days')) }}', 'sold-share-timer{{ $singleShare->id }}', {{ $singleShare->id }});
+        @endif
+    @endforeach
+@endif
+
+function getSoldShareCounterTime(startTime, id, shareId) {
+    var countDownDate = new Date(startTime + ' UTC').getTime();
+    var totalTime = countDownDate - new Date().getTime();
+
+    var x = setInterval(function() {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        
+        var progressPercent = Math.max(0, Math.min(100, ((totalTime - distance) / totalTime) * 100));
+        var progressBar = document.getElementById('sold-progress' + shareId);
+        if (progressBar) {
+            progressBar.style.width = progressPercent + '%';
+        }
+
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        var timerElement = document.getElementById(id);
+        if (timerElement) {
+            if (distance > 0) {
+                var timeString = '';
+                if (days > 0) timeString += days + 'd ';
+                if (hours > 0) timeString += hours + 'h ';
+                if (minutes > 0) timeString += minutes + 'm ';
+                timeString += seconds + 's';
+                
+                timerElement.innerHTML = timeString;
+                
+                if (distance < 86400000) {
+                    timerElement.style.color = '#e74c3c';
+                } else if (distance < 604800000) {
+                    timerElement.style.color = '#f39c12';
+                }
+            } else {
+                clearInterval(x);
+                timerElement.innerHTML = "Share matured";
+                timerElement.style.color = '#11998e';
+                if (progressBar) {
+                    progressBar.style.width = '100%';
+                }
+            }
+        }
+    }, 1000);
+}
+
+// Filtering functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const amountFilter = document.getElementById('amountFilter');
+    const dateFilter = document.getElementById('dateFilter');
+    const shareItems = document.querySelectorAll('.share-item');
+
+    function filterShares() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedStatus = statusFilter.value;
+        const selectedAmount = amountFilter.value;
+        const selectedDate = dateFilter.value;
+        
+        let visibleCount = 0;
+
+        shareItems.forEach(function(item) {
+            const ticket = item.getAttribute('data-ticket').toLowerCase();
+            const status = item.getAttribute('data-status');
+            const amount = parseFloat(item.getAttribute('data-amount'));
+            const date = new Date(item.getAttribute('data-date'));
+            const today = new Date();
+            
+            let showItem = true;
+
+            if (searchTerm && !ticket.includes(searchTerm) && 
+                !item.querySelector('.share-info h5').textContent.toLowerCase().includes(searchTerm)) {
+                showItem = false;
+            }
+
+            if (selectedStatus && status !== selectedStatus) {
+                showItem = false;
+            }
+
+            if (selectedAmount) {
+                switch (selectedAmount) {
+                    case '0-100':
+                        if (amount > 100) showItem = false;
+                        break;
+                    case '100-500':
+                        if (amount < 100 || amount > 500) showItem = false;
+                        break;
+                    case '500-1000':
+                        if (amount < 500 || amount > 1000) showItem = false;
+                        break;
+                    case '1000+':
+                        if (amount < 1000) showItem = false;
+                        break;
+                }
+            }
+
+            if (selectedDate && date) {
+                const diffTime = today - date;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                switch (selectedDate) {
+                    case 'today':
+                        if (diffDays > 1) showItem = false;
+                        break;
+                    case 'week':
+                        if (diffDays > 7) showItem = false;
+                        break;
+                    case 'month':
+                        if (diffDays > 30) showItem = false;
+                        break;
+                }
+            }
+
+            if (showItem) {
+                item.style.display = 'block';
+                setTimeout(() => item.style.opacity = '1', 10);
+                visibleCount++;
+            } else {
+                item.style.opacity = '0';
+                setTimeout(() => item.style.display = 'none', 300);
+            }
+        });
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterShares);
+    if (statusFilter) statusFilter.addEventListener('change', filterShares);
+    if (amountFilter) amountFilter.addEventListener('change', filterShares);
+    if (dateFilter) dateFilter.addEventListener('change', filterShares);
+
+    shareItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            item.style.transition = 'all 0.3s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+});
+</script>
+@endsection

@@ -10,7 +10,17 @@
     <div class="col-lg-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="card-title mb-0">{{$pageTitle}}</h5>
+                <div>
+                    <h5 class="card-title mb-0">{{$pageTitle}}</h5>
+                    @php
+                        try {
+                            $appTimezone = get_gs_value('app_timezone') ?? 'UTC';
+                        } catch (Exception $e) {
+                            $appTimezone = 'UTC';
+                        }
+                    @endphp
+                    <small class="text-muted">All times shown in {{ $appTimezone }} timezone</small>
+                </div>
                 @can('market-create')
                 <a href="{{ route('admin.markets.create') }}" class="btn btn-primary">
                     <i class="ri-add-box-fill"></i> New
@@ -34,7 +44,20 @@
                         @foreach($markets as $market)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
-                            <td>{{$market->open_time}}</td>
+                            <td>{{$market->open_time}} 
+                                @php
+                                    $isMarketOpen = false;
+                                    try {
+                                        $isMarketOpen = $market->isOpen();
+                                    } catch (Exception $e) {
+                                        // Silently handle any timezone or other errors
+                                        $isMarketOpen = false;
+                                    }
+                                @endphp
+                                @if($isMarketOpen)
+                                    <span class="badge bg-success">Open Now</span>
+                                @endif
+                            </td>
                             <td>{{$market->close_time}}</td>
                             <td>{{\Carbon\Carbon::parse($market->created_at)}}</td>
                             @canAny(['market-edit', 'market-delete'])

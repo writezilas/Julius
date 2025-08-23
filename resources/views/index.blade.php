@@ -8,6 +8,266 @@
         width: 200px;
         float: right;
     }
+    
+    /* Enhanced Dashboard Styling */
+    .dashboard-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        color: white;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+    }
+    
+    .welcome-text {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .welcome-subtitle {
+        opacity: 0.9;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .stat-card.success { border-left-color: #28a745; }
+    .stat-card.primary { border-left-color: #007bff; }
+    .stat-card.warning { border-left-color: #ffc107; }
+    .stat-card.danger { border-left-color: #dc3545; }
+    .stat-card.info { border-left-color: #17a2b8; }
+    
+    .stat-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2d3436;
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: #636e72;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
+    }
+    
+    .section-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border: none;
+        overflow: hidden;
+    }
+    
+    .section-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        padding: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 0;
+    }
+    
+    .metric-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    
+    .icon-success { background: rgba(40, 167, 69, 0.1); color: #28a745; }
+    .icon-primary { background: rgba(0, 123, 255, 0.1); color: #007bff; }
+    .icon-warning { background: rgba(255, 193, 7, 0.1); color: #ffc107; }
+    .icon-danger { background: rgba(220, 53, 69, 0.1); color: #dc3545; }
+    .icon-info { background: rgba(23, 162, 184, 0.1); color: #17a2b8; }
+    
+    .trade-category-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border-left: 3px solid #e9ecef;
+    }
+    
+    .trade-category-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+        border-left-color: #667eea;
+        transform: translateX(5px);
+    }
+    
+    .category-name {
+        font-weight: 600;
+        color: #2d3436;
+        font-size: 1rem;
+    }
+    
+    .category-date {
+        font-size: 0.85rem;
+        color: #74b9ff;
+    }
+    
+    .category-stat {
+        font-weight: 600;
+        color: #2d3436;
+    }
+    
+    .category-stat-label {
+        font-size: 0.8rem;
+        color: #636e72;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .trader-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        object-fit: cover;
+        margin-right: 1rem;
+    }
+    
+    .trader-name {
+        font-weight: 600;
+        color: #2d3436;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+    
+    .trader-name:hover {
+        color: #667eea;
+    }
+    
+    .recent-activity-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+        margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+    }
+    
+    .activity-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    
+    .earning-stats {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 0;
+        border: none;
+    }
+    
+    .earning-stats .border-dashed {
+        border-color: rgba(255,255,255,0.2) !important;
+    }
+    
+    .earning-stats h5, .earning-stats p {
+        color: white;
+    }
+    
+    .btn-enhanced {
+        border-radius: 8px;
+        font-weight: 500;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-enhanced:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        font-weight: 500;
+    }
+    
+    .progress-enhanced {
+        height: 8px;
+        border-radius: 4px;
+        background: rgba(0,0,0,0.1);
+    }
+    
+    .progress-enhanced .progress-bar {
+        border-radius: 4px;
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.6s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .pulse {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    .floating {
+        animation: floating 3s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
 </style>
 @endsection
 @section('content')
@@ -21,135 +281,115 @@
         <div class="h-100">
             @can('view-analytic')
                 
-                <div class="row mb-3 pb-1">
-                    <div class="col-12">
-                        <div class="d-flex align-items-lg-center flex-lg-row flex-column">
-                            <div class="flex-grow-1">
-                                <h4 class="fs-16 mb-1">Good Morning, {{auth()->user()->name}}!</h4>
-                                <p class="text-muted mb-0">Here's what's happening with your store
-                                    today.</p>
+                <!-- Enhanced Welcome Header -->
+                <div class="dashboard-header fade-in mb-4">
+                    <div class="d-flex align-items-lg-center flex-lg-row flex-column">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="metric-icon icon-primary floating me-3">
+                                    <i class="ri-dashboard-3-line"></i>
+                                </div>
+                                <div>
+                                    <h2 class="welcome-text mb-0">Welcome back, {{auth()->user()->name}}!</h2>
+                                    <p class="welcome-subtitle mb-0">Here's your trading overview and platform insights</p>
+                                </div>
                             </div>
-                            <div class="mt-3 mt-lg-0">
-                                <form action="javascript:void(0);">
-                                    <div class="row g-3 mb-0 align-items-center">
-                                        <div class="col-sm-auto">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control border-0 dash-filter-picker shadow" data-provider="flatpickr" data-range-date="true" data-date-format="d M, Y" data-deafult-date="01 Jan 2022 to 31 Jan 2022">
-                                                <div class="input-group-text bg-primary border-primary text-white">
-                                                    <i class="ri-calendar-2-line"></i>
-                                                </div>
-                                            </div>
+                        </div>
+                        <div class="mt-3 mt-lg-0">
+                            <div class="row g-3 mb-0 align-items-center">
+                                <div class="col-sm-auto">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control border-0 dash-filter-picker" data-provider="flatpickr" data-range-date="true" data-date-format="d M, Y" data-deafult-date="01 Jan 2022 to 31 Jan 2022" style="background: rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                                        <div class="input-group-text" style="background: rgba(255,255,255,0.2); border: none; color: white;">
+                                            <i class="ri-calendar-2-line"></i>
                                         </div>
-                                        <!--end col-->
-                                        {{-- <div class="col-auto">
-                                            <button type="button" class="btn btn-soft-success"><i
-                                                    class="ri-add-circle-line align-middle me-1"></i>
-                                                Add Product</button>
-                                        </div> --}}
-                                        <!--end col-->
-                                        <div class="col-auto">
-                                            <button type="button" class="btn btn-soft-info btn-icon waves-effect waves-light layout-rightside-btn"><i class="ri-pulse-line"></i></button>
-                                        </div>
-                                        <!--end col-->
                                     </div>
-                                    <!--end row-->
-                                </form>
+                                </div>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-light btn-icon waves-effect waves-light layout-rightside-btn" style="border-radius: 8px;">
+                                        <i class="ri-pulse-line"></i>
+                                    </button>
+                                </div>
                             </div>
-                        </div><!-- end card header -->
+                        </div>
                     </div>
-                    <!--end col-->
                 </div>
                 <!--end row-->
 
-                <div class="row">
+                <!-- Enhanced Trade Statistics Cards -->
+                <div class="row fade-in">
                     @foreach($trades as $trade)
                     @php
                     $totalShares = $trade->userShares->where('status', 'completed')->sum('share_will_get');
                     $totalProfit = $trade->userShares->where('status', 'completed')->sum('profit_share');
-
-                    $totalRemainShares = $trade->userShares->where('status', 'completed')->sum('total_share_count')
+                    $totalRemainShares = $trade->userShares->where('status', 'completed')->sum('total_share_count');
                     @endphp
-                    <div class="col-xl-6">
-                        <div class="card">
-                            <div class="card-header border-0 align-items-center d-flex">
-                                <h4 class="card-title mb-0 flex-grow-1">
-                                    {{ $trade->name }}
-                                </h4>
+                    <div class="col-xl-6 mb-4">
+                        <div class="section-card">
+                            <div class="card-header">
+                                <div class="d-flex align-items-center">
+                                    <div class="metric-icon icon-primary me-3">
+                                        <i class="ri-line-chart-line"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="section-title mb-0">{{ $trade->name }}</h4>
+                                        <small class="text-muted">Trading Overview</small>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body p-2 pb-0">
-                                <div class="row">
-                                    <div class="col-xl-6 col-md-6">
-                                        <!-- card -->
-                                        <div class="card card-animate border">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1 overflow-hidden">
-                                                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-                                                            Total bought shares
-                                                        </p>
-                                                    </div>
+                            <div class="card-body p-3">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="stat-card success">
+                                            <div class="d-flex align-items-center">
+                                                <div class="metric-icon icon-success me-3">
+                                                    <i class="ri-shopping-bag-line"></i>
                                                 </div>
-                                                <div class="mt-2">
-                                                    <h4 class="fs-22 fw-semibold ff-secondary mb-2">
+                                                <div>
+                                                    <div class="stat-number pulse">
                                                         <span class="counter-value" data-target="{{ $totalShares + $totalProfit }}">0</span>
-                                                    </h4>
-                                                </div>
-                                                {{-- <div>--}}
-                                                {{-- <a href="" class="text-decoration-underline">@lang('View all')</a>--}}
-                                                {{-- </div>--}}
-                                            </div><!-- end card body -->
-                                        </div><!-- end card -->
-                                    </div><!-- end col -->
-                                    <div class="col-xl-6 col-md-6">
-                                        <!-- card -->
-                                        <div class="card card-animate border">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1 overflow-hidden">
-                                                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-                                                            Total Sold shares
-                                                        </p>
                                                     </div>
+                                                    <div class="stat-label">Bought Shares</div>
                                                 </div>
-                                                <div class="mt-2">
-                                                    <h4 class="fs-22 fw-semibold ff-secondary mb-2">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="stat-card info">
+                                            <div class="d-flex align-items-center">
+                                                <div class="metric-icon icon-info me-3">
+                                                    <i class="ri-exchange-line"></i>
+                                                </div>
+                                                <div>
+                                                    <div class="stat-number pulse">
                                                         <span class="counter-value" data-target="{{ ($totalShares + $totalProfit) - $totalRemainShares }}">0</span>
-                                                    </h4>
-                                                </div>
-                                                {{-- <div>--}}
-                                                {{-- <a href="" class="text-decoration-underline">@lang('View all')</a>--}}
-                                                {{-- </div>--}}
-                                            </div><!-- end card body -->
-                                        </div><!-- end card -->
-                                    </div><!-- end col -->
-                                    <div class="col-xl-6 col-md-6">
-                                        <!-- card -->
-                                        <div class="card card-animate border">
-                                            <div class="card-body">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-grow-1 overflow-hidden">
-                                                        <p class="text-uppercase fw-medium text-muted text-truncate mb-0">
-                                                            Total Remain shares
-                                                        </p>
                                                     </div>
+                                                    <div class="stat-label">Sold Shares</div>
                                                 </div>
-                                                <div class="mt-2">
-                                                    <h4 class="fs-22 fw-semibold ff-secondary mb-2"><span class="counter-value" data-target="{{ $totalRemainShares }}">0</span>
-                                                    </h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="stat-card warning">
+                                            <div class="d-flex align-items-center">
+                                                <div class="metric-icon icon-warning me-3">
+                                                    <i class="ri-stack-line"></i>
                                                 </div>
-                                                {{-- <div>--}}
-                                                {{-- <a href="" class="text-decoration-underline">@lang('View all')</a>--}}
-                                                {{-- </div>--}}
-                                            </div><!-- end card body -->
-                                        </div><!-- end card -->
-                                    </div><!-- end col -->
+                                                <div>
+                                                    <div class="stat-number pulse">
+                                                        <span class="counter-value" data-target="{{ $totalRemainShares }}">0</span>
+                                                    </div>
+                                                    <div class="stat-label">Remaining</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     @endforeach
-
-                </div> <!-- end row-->
+                </div>
 
                 <div class="row">
                     <div class="col-xl-12">
@@ -246,7 +486,7 @@
                                         <tbody>
                                             @foreach($topCategory as $key => $top)
                                             @php
-                                            $totalRemainShares = $top->userShares->where('status', 'completed')->sum('total_share_count')
+                                            $totalRemainShares = $top->userShares->where('status', 'completed')->sum('total_share_count');
                                             @endphp
                                             <tr>
                                                 <td>
@@ -401,7 +641,7 @@
                         </div> <!-- .card-->
                     </div> <!-- .col-->
                 </div> <!-- end row-->
-                `
+                
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card">
@@ -464,7 +704,7 @@
                 </div> <!-- end row-->
 
                 <!-- Live Statistics Section -->
-                @include('components.live-statistics')
+                {{-- @include('components.live-statistics') --}}
 
             @endcan
             @can('view-share-pending-confirmation')

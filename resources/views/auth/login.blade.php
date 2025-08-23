@@ -39,6 +39,27 @@
                         <div class="card-body p-4">
                             <div class="text-center mt-2">
                                 <h5 class="text-primary">Welcome Back !</h5>
+                                
+                                @if(session('suspension_message'))
+                                <div class="alert alert-warning alert-dismissible fade show mt-3" role="alert">
+                                    <i class="ri-alert-line me-2"></i>
+                                    <strong>Account Suspended!</strong><br>
+                                    {{ session('suspension_message') }}
+                                    @if(session('suspension_until'))
+                                        <br><small class="text-muted">Suspended until: {{ \Carbon\Carbon::parse(session('suspension_until'))->format('F d, Y \a\t H:i') }}</small>
+                                    @endif
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                @endif
+                                
+                                @if(session('auto_logged_out'))
+                                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                    <i class="ri-logout-circle-line me-2"></i>
+                                    <strong>Automatically Logged Out!</strong><br>
+                                    You have been logged out due to account suspension for consecutive payment failures.
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                @endif
                             </div>
                             <div class="p-2 mt-4">
                                 <form action="{{ route('login') }}" method="POST">
