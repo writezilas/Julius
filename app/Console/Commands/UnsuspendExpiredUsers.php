@@ -30,7 +30,7 @@ class UnsuspendExpiredUsers extends Command
         $this->info('Checking for expired user suspensions...');
         
         // Find suspended users whose suspension time has expired
-        $expiredSuspensions = User::where('status', 'suspend')
+        $expiredSuspensions = User::whereIn('status', ['suspend', 'suspended'])
             ->where('suspension_until', '<', now())
             ->whereNotNull('suspension_until')
             ->get();
@@ -72,8 +72,9 @@ class UnsuspendExpiredUsers extends Command
         foreach ($expiredSuspensions as $user) {
             try {
                 $user->update([
-                    'status' => 'fine',
-                    'suspension_until' => null
+                    'status' => 'active',
+                    'suspension_until' => null,
+                    'suspension_reason' => null
                 ]);
                 
                 $this->line("✓ Unsuspended: {$user->username} ({$user->email})");

@@ -30,15 +30,19 @@
                         @forelse($allocateShares as $share)
                         <tr>
                             <td>{{$loop->iteration}}</td>
-                            <td>{{ $share->userShare->trade->name }}</td>
-                            <td>{{ $share->userShare->user->username }}</td>
+                            <td>{{ $share->userShare && $share->userShare->trade ? $share->userShare->trade->name : 'N/A' }}</td>
+                            <td>{{ $share->userShare && $share->userShare->user ? $share->userShare->user->username : 'N/A' }}</td>
                             <td>{{ $share->shares }}</td>
                             <td>{{ \Carbon\Carbon::parse($share->created_at) }}</td>
                             <td>
                                 @can('allocate-share-to-user-history-delete')
+                                @if($share->userShare)
                                 <a href="{{ route('admin.allocate.share.destroy', $share->user_share_id) }}" onclick="return confirm('Are you sure want to remove the allocate share date? you can not restore it.')" class="btn btn-sm btn-danger">
                                     Delete
                                 </a>
+                                @else
+                                <span class="badge bg-warning">Orphaned Record</span>
+                                @endif
                                 @endcan
                             </td>
                         </tr>

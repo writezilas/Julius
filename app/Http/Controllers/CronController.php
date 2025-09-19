@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TradePeriod;
 use App\Models\User;
 use App\Models\UserShare;
+use App\Services\PaymentFailureService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,15 +54,19 @@ class CronController extends Controller
         foreach ($tradePeriods as $period) {
         
             $latestShares = $shares->where('period', $period->days)
-                ->where('created_at', '<=', now()->subMinutes($period->days));
+                ->where('start_date', '<=', now()->subDays($period->days)->format('Y/m/d H:i:s'));
             
             foreach($latestShares as $share){
                 $share->is_ready_to_sell = 1;
                 $per     = $period->percentage;
-                $earning = ($share->share_will_get * $per / 100) * $share->trade->price;
+                // Calculate profit based on original share amount, not total_share_count
+                $earning = ($share->share_will_get * $per / 100);
                 $share->profit_share = $earning;
-                $share->increment('total_share_count', $earning);
+                // Don't add profit to total_share_count to maintain consistency
+                // Profit is tracked separately in profit_share column
                 $share->save();
+                
+                \Log::info('Share marked as ready to sell - ID: ' . $share->id . ', User: ' . $share->user_id . ', Profit: ' . $earning);
             }   
         }
         
@@ -69,11 +74,26 @@ class CronController extends Controller
     }
 
     public function updateShareStatusAsFailed($shares) {
-        $bought_time = get_gs_value('bought_time') ?: 180; // Default 3 hours (180 minutes)
+        $paymentFailureService = new PaymentFailureService();
         
         foreach ($shares as $key => $share) {
-            // Check if the payment timeout has been reached
-            if ($share->created_at->addMinutes($bought_time)->isPast()) {
+            // Use stored deadline instead of current admin setting to ensure consistency
+            $deadlineMinutes = $share->payment_deadline_minutes ?? get_gs_value('bought_time') ?? 60;
+            
+            // CRITICAL FIX: Don't mark as failed if payment was submitted (timer paused)
+            if ($share->timer_paused) {
+                \Log::info('Skipping share ' . $share->ticket_no . ' - payment submitted, timer paused');
+                continue; // Skip this share - payment was submitted
+            }
+            
+            // Additional check: if there are payment records, don't mark as failed
+            if ($share->payments()->exists()) {
+                \Log::info('Skipping share ' . $share->ticket_no . ' - payment records found');
+                continue; // Skip this share - payments exist
+            }
+            
+            // Check if the payment timeout has been reached (only for shares without payments)
+            if ($share->created_at->addMinutes($deadlineMinutes)->isPast()) {
                 $share->status = 'failed';
                 $share->save();
                 
@@ -102,6 +122,24 @@ class CronController extends Controller
                     \Log::info('Allocated ' . $paidSharesSum . ' shares to buyer (User ID: ' . $share->user_id . ') for partially paid transaction');
                 } else {
                     \Log::info('No shares allocated to buyer (User ID: ' . $share->user_id . ') - no payments were made within timeout period');
+                    
+                    // CRITICAL FIX: Handle payment failure tracking and suspension logic
+                    // This was the missing piece that caused Danny not to be suspended
+                    try {
+                        $reason = "Payment timeout - no payments made within {$bought_time} minutes (CronController)";
+                        $result = $paymentFailureService->handlePaymentFailure(
+                            $share->user_id, 
+                            $reason
+                        );
+                        
+                        if ($result['suspended']) {
+                            \Log::warning('User suspended due to payment failure: User ID ' . $share->user_id . ' (Level ' . $result['suspension_level'] . ', Duration: ' . $result['suspension_duration_hours'] . 'h)');
+                        } else {
+                            \Log::info('Payment failure recorded for User ID ' . $share->user_id . ' (Consecutive failures: ' . $result['consecutive_failures'] . ')');
+                        }
+                    } catch (\Exception $e) {
+                        \Log::error('Error handling payment failure for User ID ' . $share->user_id . ': ' . $e->getMessage());
+                    }
                 }
             }
         }
@@ -138,15 +176,16 @@ class CronController extends Controller
     public function unsuspendExpiredUsers()
     {
         try {
-            $expiredSuspensions = User::where('status', 'suspend')
+            $expiredSuspensions = User::whereIn('status', ['suspend', 'suspended'])
                 ->where('suspension_until', '<', now())
                 ->whereNotNull('suspension_until')
                 ->get();
             
             foreach ($expiredSuspensions as $user) {
                 $user->update([
-                    'status' => 'fine',
-                    'suspension_until' => null
+                    'status' => 'active',
+                    'suspension_until' => null,
+                    'suspension_reason' => null
                 ]);
                 
                 \Log::info("Auto-unsuspended user: {$user->username} (ID: {$user->id})");

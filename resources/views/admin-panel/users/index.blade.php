@@ -34,7 +34,7 @@
                                     <td>{{$user->name}}</td>
                                     <td>{{$user->username}}</td>
                                     <td>{{$user->email}}</td>
-                                    <td>{{$user->role->name}}</td>
+                                    <td>{{$user->role ? $user->role->name : 'No Role Assigned'}}</td>
                                     <td>{{\Carbon\Carbon::parse($user->created_at)}}</td>
                                     @can('customer-view')
                                     <td>

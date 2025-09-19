@@ -71,6 +71,26 @@
                                     <small class="form-text text-muted">Time in {{ $appTimezone }} timezone</small>
                                 </div>
                             </div>
+                            
+                            <div class="col-lg-12">
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="is_active" value="1" 
+                                               {{ (isset($market) ? $market->is_active : true) ? 'checked' : '' }}
+                                               id="marketActiveToggle">
+                                        <label class="form-check-label" for="marketActiveToggle">
+                                            <strong>Market Status</strong>
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">Toggle to activate or deactivate the market</small>
+                                    @error('is_active')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
                            
                             @can('market-update')
                             <div class="col-lg-12">

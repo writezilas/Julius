@@ -1,6 +1,6 @@
 <!doctype html >
 
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{ auth()->check() && auth()->user()->role_id != 2 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-mode="{{auth()->check() ? auth()->user()->mode : 'light' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{ auth()->check() && auth()->user()->role_id != 2 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-mode="{{auth()->check() && auth()->user()->mode ? auth()->user()->mode : 'light' }}">
 
 <head>
     <meta charset="utf-8" />
@@ -53,16 +53,18 @@
     @include('layouts.vendor-scripts')
     
     @auth
-    <!-- Suspension Monitor -->
+    <!-- User Status Monitor -->
     <script>
         window.Laravel = {
             user: {
                 id: {{ auth()->user()->id }},
-                username: '{{ auth()->user()->username }}'
+                username: '{{ auth()->user()->username }}',
+                status: '{{ auth()->user()->status }}'
             }
         };
     </script>
     <script src="{{ asset('assets/js/suspension-monitor.js') }}"></script>
+    <script src="{{ asset('assets/js/user-status-monitor.js') }}"></script>
     
     @if(auth()->user()->role_id === 2)
     <!-- Global chat unread count functionality -->

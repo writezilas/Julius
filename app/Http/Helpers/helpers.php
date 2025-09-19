@@ -63,22 +63,53 @@ if (!function_exists('areActiveRoutesBool')) {
 if (!function_exists('checkAvailableSharePerTrade')) {
     function checkAvailableSharePerTrade($tradeId)
     {
-        return  \App\Models\UserShare::whereTradeId($tradeId)
+        // Get the trade info for better logging
+        $trade = \App\Models\Trade::find($tradeId);
+        $tradeName = $trade ? $trade->name : 'Unknown Trade';        
+        
+        $query = \App\Models\UserShare::whereTradeId($tradeId)
             ->whereStatus('completed')
             ->where('is_ready_to_sell', 1)
-            ->where('user_id', '!=', auth()->user()->id)
-            ->whereHas('user', function ($query) {
-                $query->whereIn('status', ['pending', 'fine']);
-            })->sum('total_share_count');
-
-        $shareCount = 0;
-        foreach ($userShares as $userShare) {
-            //            if(\Carbon\Carbon::parse($userShare->start_date)->addDays($userShare->period) < \Carbon\Carbon::now()) {
-            $shareCount += $userShare->total_share_count;
-            //            }
+            ->where('total_share_count', '>', 0); // Only shares with available count
+        
+        // Exclude current user if authenticated
+        $userId = null;
+        $userName = 'Guest';
+        if (auth()->check()) {
+            $userId = auth()->user()->id;
+            $userName = auth()->user()->name;
+            $query->where('user_id', '!=', $userId);
+            
+            // Log this for debugging
+            \Illuminate\Support\Facades\Log::debug("Market availability check", [
+                'user_id' => $userId,
+                'user_name' => $userName,
+                'trade_id' => $tradeId,
+                'trade_name' => $tradeName,
+                'exclude_own_shares' => true
+            ]);
         }
-
-        return $shareCount;
+        
+        // Check for users with active status (not suspended/banned)
+        $query->whereHas('user', function ($subQuery) {
+            $subQuery->whereIn('status', ['active', 'pending', 'fine']);
+        });
+        
+        // Get the total count
+        $total = $query->sum('total_share_count');
+        
+        // Log the result for debugging
+        if (auth()->check()) {
+            \Illuminate\Support\Facades\Log::debug("Market availability result", [
+                'user_id' => $userId,
+                'user_name' => $userName,
+                'trade_id' => $tradeId,
+                'trade_name' => $tradeName,
+                'available_shares' => $total
+            ]);
+        }
+        
+        return $total;
     }
 }
 
@@ -92,38 +123,96 @@ if (!function_exists('formatPrice')) {
 if (!function_exists('updateMaturedShareStatus')) {
     function updateMaturedShareStatus()
     {
-        $shares = \App\Models\UserShare::whereStatus('completed')->whereNotNull('start_date')->where('is_ready_to_sell', 0)->get();
-        $paymentFailureService = new \App\Services\PaymentFailureService();
+        // Find shares that are in completed status and ready for investment maturity checking
+        $shares = \App\Models\UserShare::whereStatus('completed')
+            ->whereNotNull('start_date')
+            ->where('is_ready_to_sell', 0)
+            ->get();
+            
+        $enhancedTimerService = new \App\Services\EnhancedTimerManagementService();
 
         foreach ($shares as $key => $share) {
-            // Skip paused shares
-            if ($share->timer_paused) {
-                continue;
-            }
+            // For purchased shares, use the new selling timer system
+            if ($share->get_from === 'purchase') {
+                // Check if selling timer has been started
+                if (!$share->selling_started_at) {
+                    // Selling timer should be started by payment confirmation, not here
+                    // If share is completed but no selling timer, it means payment was confirmed but timer wasn't started
+                    \Log::warning("Purchased share {$share->ticket_no} is completed but has no selling timer - payment confirmation may have failed to start timer");
+                    continue; // Skip this share until selling timer is properly started
+                }
+                
+                // Check if share should mature using selling timer
+                if ($enhancedTimerService->shouldShareMature($share)) {
+                    $profit = calculateProfitOfShare($share);
 
-            // Get adjusted timer to account for paused duration
-            $timerInfo = $paymentFailureService->getAdjustedShareTimer($share);
-            $adjustedEndTime = $timerInfo['adjusted_end_time'];
+                    // Mature the share
+                    $share->is_ready_to_sell = 1;
+                    $share->matured_at = date_format(now(), "Y/m/d H:i:s");
+                    $share->profit_share = $profit;
+                    $share->total_share_count = $share->total_share_count + $profit;
+                    
+                    // Clean up legacy timer fields but keep selling timer data
+                    $share->timer_paused = 0;
+                    $share->timer_paused_at = null;
+                    
+                    $share->save();
 
-            if ($adjustedEndTime && $adjustedEndTime < \Carbon\Carbon::now()) {
+                    $profitHistoryData = [
+                        'user_share_id' => $share->id,
+                        'shares' => $profit,
+                    ];
 
-                $profit = calculateProfitOfShare($share);
+                    \App\Models\UserProfitHistory::create($profitHistoryData);
 
-                $share->is_ready_to_sell = 1;
-                $share->matured_at = date_format(now(), "Y/m/d H:i:s");
-                $share->profit_share = $profit;
-                $share->total_share_count = $share->total_share_count + $profit;
-                $share->save();
+                    Log::info('Share matured using new selling timer system: ' . $share->id, [
+                        'ticket_no' => $share->ticket_no,
+                        'user_id' => $share->user_id,
+                        'profit_added' => $profit,
+                        'selling_started_at' => $share->selling_started_at,
+                        'timer_type' => 'selling_timer'
+                    ]);
+                }
+            } else {
+                // For admin-allocated shares, use legacy timer system
+                // Skip paused shares (legacy behavior)
+                if ($share->timer_paused) {
+                    continue;
+                }
 
+                // Get adjusted timer to account for paused duration (legacy)
+                $paymentFailureService = new \App\Services\PaymentFailureService();
+                $timerInfo = $paymentFailureService->getAdjustedShareTimer($share);
+                $adjustedEndTime = $timerInfo['adjusted_end_time'];
 
-                $profitHistoryData = [
-                    'user_share_id' => $share->id,
-                    'shares' => $profit,
-                ];
+                if ($adjustedEndTime && $adjustedEndTime < \Carbon\Carbon::now()) {
+                    $profit = calculateProfitOfShare($share);
 
-                \App\Models\UserProfitHistory::create($profitHistoryData);
+                    $share->is_ready_to_sell = 1;
+                    $share->matured_at = date_format(now(), "Y/m/d H:i:s");
+                    $share->profit_share = $profit;
+                    $share->total_share_count = $share->total_share_count + $profit;
+                    
+                    // Reset timer state
+                    $share->timer_paused = 0;
+                    $share->timer_paused_at = null;
+                    
+                    $share->save();
 
-                Log::info('Share update as ready to sell (adjusted for pause): ' . $share->id);
+                    $profitHistoryData = [
+                        'user_share_id' => $share->id,
+                        'shares' => $profit,
+                    ];
+
+                    \App\Models\UserProfitHistory::create($profitHistoryData);
+
+                    Log::info('Share matured using legacy timer system: ' . $share->id, [
+                        'ticket_no' => $share->ticket_no,
+                        'user_id' => $share->user_id,
+                        'profit_added' => $profit,
+                        'timer_type' => 'legacy_timer'
+                    ]);
+                }
             }
         }
     }
@@ -142,11 +231,16 @@ if (!function_exists('calculateProfitOfShare')) {
 if (!function_exists('updatePaymentFailedShareStatus')) {
     function updatePaymentFailedShareStatus()
     {
-        $shares = \App\Models\UserShare::whereStatus('paired')->whereNull('start_date')->get();
+        // Get all paired shares that might have expired payment deadlines - remove the whereNull('start_date') restriction
+        $shares = \App\Models\UserShare::whereStatus('paired')->where('balance', 0)->get();
         $paymentFailureService = new \App\Services\PaymentFailureService();
 
         foreach ($shares as $key => $share) {
-            if (\Carbon\Carbon::parse($share->created_at)->addHours(3) < \Carbon\Carbon::now()) {
+            // Use individual payment_deadline_minutes instead of hardcoded 3 hours
+            $deadlineMinutes = $share->payment_deadline_minutes ?? 60; // fallback to 60 minutes if not set
+            $timeoutTime = \Carbon\Carbon::parse($share->created_at)->addMinutes($deadlineMinutes);
+            
+            if ($timeoutTime < \Carbon\Carbon::now()) {
 
                 $share->status = 'failed';
                 $share->save();
@@ -155,24 +249,24 @@ if (!function_exists('updatePaymentFailedShareStatus')) {
                 try {
                     $result = $paymentFailureService->handlePaymentFailure(
                         $share->user_id, 
-                        'Payment timeout - share failed after 3 hours'
+                        'Payment timeout - share failed after ' . $deadlineMinutes . ' minutes (no payment made)'
                     );
                     
                     if ($result['suspended']) {
-                        Log::warning('User suspended due to payment failure: ' . $share->user->username);
+                        \Illuminate\Support\Facades\Log::warning('User suspended due to payment failure: ' . $share->user->username);
                     }
                 } catch (\Exception $e) {
-                    Log::error('Error handling payment failure: ' . $e->getMessage());
+                    \Illuminate\Support\Facades\Log::error('Error handling payment failure: ' . $e->getMessage());
                 }
 
                 foreach ($share->pairedShares as $pairedShare) {
-                    $userShare = UserShare::findOrFail($pairedShare->paired_user_share_id);
+                    $userShare = \App\Models\UserShare::findOrFail($pairedShare->paired_user_share_id);
                     $userShare->hold_quantity -= $pairedShare->share;
                     $userShare->total_share_count += $pairedShare->share;
                     $userShare->save();
                 }
 
-                Log::info('Payment failed share status update successfully: ' . $share->id);
+                \Illuminate\Support\Facades\Log::info('Payment failed share status updated successfully: ' . $share->id . ' (deadline: ' . $deadlineMinutes . ' minutes)');
             }
         }
     }
@@ -282,6 +376,7 @@ if (!function_exists('get_markets')) {
     function get_markets()
     {
         return Market::select('open_time', 'close_time')
+                ->where('is_active', true)
                 ->orderBy('open_time')->get();
     }
 }
@@ -400,6 +495,28 @@ if (!function_exists('createRefferalBonus')) {
         Invoice::create($invoiceData);
     }
 }
+if (!function_exists('calculateTradeProgressPercentage')) {
+    /**
+     * Calculate the progress percentage for a trade using the centralized service
+     * This replaces any inline progress calculation logic and ensures consistency
+     * 
+     * @param int $tradeId
+     * @return float
+     */
+    function calculateTradeProgressPercentage(int $tradeId): float
+    {
+        try {
+            $progressService = new \App\Services\ProgressCalculationService();
+            $progressData = $progressService->computeTradeProgress($tradeId);
+            
+            return $progressData['progress_percentage'] ?? 0.0;
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error calculating progress percentage for trade {$tradeId}: " . $e->getMessage());
+            return 0.0;
+        }
+    }
+}
+
 if(!function_exists('send_sms')){
     function send_sms($sms){
 

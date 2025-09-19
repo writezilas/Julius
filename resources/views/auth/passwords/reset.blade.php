@@ -2,122 +2,645 @@
 @section('title')
     @lang('translation.password-reset')
 @endsection
+
+@section('css')
+<style>
+    /* Enhanced Password Reset Form Page Styles - Consistent with Login */
+    .auth-page-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .auth-one-bg {
+        position: relative;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .auth-one-bg::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/><circle cx="25" cy="25" r="0.5" fill="%23ffffff" opacity="0.05"/><circle cx="75" cy="75" r="0.8" fill="%23ffffff" opacity="0.08"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>')
+        opacity: 0.3;
+        animation: float 20s infinite linear;
+    }
+    
+    @keyframes float {
+        0% { transform: translateX(-100px); }
+        100% { transform: translateX(100px); }
+    }
+    
+    .bg-overlay {
+        background: rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    .auth-logo {
+        transition: transform 0.3s ease;
+    }
+    
+    .auth-logo:hover {
+        transform: scale(1.05);
+    }
+    
+    .auth-card {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        box-shadow: 0 25px 45px rgba(0, 0, 0, 0.1), 0 15px 35px rgba(0, 0, 0, 0.05);
+        transition: all 0.4s ease;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .auth-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    .auth-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 35px 55px rgba(0, 0, 0, 0.15), 0 25px 45px rgba(0, 0, 0, 0.08);
+    }
+    
+    .auth-card .card-body {
+        padding: 2.5rem 2rem;
+    }
+    
+    .welcome-title {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    
+    .welcome-subtitle {
+        color: #6c757d;
+        text-align: center;
+        margin-bottom: 2rem;
+        font-size: 0.95rem;
+    }
+    
+    .reset-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+        color: #667eea;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4);
+        }
+        50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+        }
+    }
+    
+    .form-floating {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-floating .form-control {
+        height: 58px;
+        padding: 1rem 1rem 0.25rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        background-color: #fff;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    
+    .form-floating .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .form-floating .form-control:not(:placeholder-shown),
+    .form-floating .form-control:focus {
+        padding-top: 1.625rem;
+        padding-bottom: 0.625rem;
+    }
+    
+    .form-floating label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        padding: 1rem;
+        pointer-events: none;
+        border: 2px solid transparent;
+        transform-origin: 0 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        font-weight: 500;
+        color: #6c757d;
+    }
+    
+    .form-floating .form-control:focus ~ label,
+    .form-floating .form-control:not(:placeholder-shown) ~ label {
+        opacity: 0.75;
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        color: #667eea;
+    }
+    
+    .password-input-group {
+        position: relative;
+    }
+    
+    .password-toggle-btn {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        z-index: 5;
+    }
+    
+    .password-toggle-btn:hover {
+        background-color: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+    }
+    
+    .reset-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 12px;
+        padding: 0.875rem 2rem;
+        font-weight: 600;
+        font-size: 1rem;
+        letter-spacing: 0.025em;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 56px;
+    }
+    
+    .reset-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .reset-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+    
+    .reset-btn:hover::before {
+        left: 100%;
+    }
+    
+    .reset-btn:active {
+        transform: translateY(0);
+    }
+    
+    .reset-btn:focus {
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+    }
+    
+    .reset-btn .btn-loading {
+        display: none;
+    }
+    
+    .reset-btn.loading .btn-text {
+        display: none;
+    }
+    
+    .reset-btn.loading .btn-loading {
+        display: inline-block;
+    }
+    
+    .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .signin-link {
+        text-align: center;
+        margin-top: 2rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.95rem;
+    }
+    
+    .signin-link a {
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+    }
+    
+    .signin-link a:hover {
+        border-bottom-color: #fff;
+        color: #fff;
+    }
+    
+    .footer {
+        background: transparent;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .footer .text-muted {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    .footer a {
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .footer a:hover {
+        color: #fff;
+    }
+    
+    /* Invalid feedback styling */
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: none;
+    }
+    
+    .form-control.is-invalid:focus {
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+    }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .auth-card {
+            margin: 1rem;
+            border-radius: 16px;
+        }
+        
+        .auth-card .card-body {
+            padding: 2rem 1.5rem;
+        }
+        
+        .welcome-title {
+            font-size: 1.5rem;
+        }
+        
+        .form-floating .form-control {
+            height: 54px;
+        }
+        
+        .reset-btn {
+            height: 52px;
+            font-size: 0.95rem;
+        }
+        
+        .reset-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 1.8rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .auth-card {
+            margin: 0.5rem;
+            border-radius: 12px;
+        }
+        
+        .auth-card .card-body {
+            padding: 1.5rem 1.25rem;
+        }
+        
+        .welcome-title {
+            font-size: 1.35rem;
+        }
+    }
+    
+    /* Animation for form elements */
+    .form-floating {
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    .form-floating:nth-child(1) { animation-delay: 0.2s; }
+    .form-floating:nth-child(2) { animation-delay: 0.25s; }
+    .form-floating:nth-child(3) { animation-delay: 0.3s; }
+    .reset-btn { animation-delay: 0.35s; }
+    
+    @keyframes fadeInUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-    <div class="auth-page-wrapper pt-5">
-        <!-- auth page bg -->
-        <div class="auth-one-bg-position auth-one-bg" id="auth-particles">
-            <div class="bg-overlay"></div>
-
-            <div class="shape">
-                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
-                    viewBox="0 0 1440 120">
-                    <path d="M 0,36 C 144,53.6 432,123.2 720,124 C 1008,124.8 1296,56.8 1440,40L1440 140L0 140z"></path>
-                </svg>
-            </div>
+<div class="auth-page-wrapper">
+    <!-- auth page bg -->
+    <div class="auth-one-bg-position auth-one-bg" id="auth-particles">
+        <div class="bg-overlay"></div>
+        <div class="shape">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1440 120">
+                <path d="M 0,36 C 144,53.6 432,123.2 720,124 C 1008,124.8 1296,56.8 1440,40L1440 140L0 140z"></path>
+            </svg>
         </div>
-
-        <!-- auth page content -->
-        <div class="auth-page-content">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="text-center mt-sm-5 mb-4 text-white-50">
-                            <div>
-                                <a href="index" class="d-inline-block auth-logo">
-                                    <img src="{{ URL::asset('assets/images/autobidder_dark.png') }}" alt="" height="20">
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- end row -->
-
-                <div class="row justify-content-center">
-                    <div class="col-md-8 col-lg-6 col-xl-5">
-                        <div class="card mt-4">
-
-                            <div class="card-body p-4">
-                                <div class="text-center mt-2">
-                                    <h5 class="text-primary">Forgot Password?</h5>
-                                    <p class="text-muted">Submit with new password and confirm password to change.</p>
-
-                                    <lord-icon src="https://cdn.lordicon.com/rhvddzym.json" trigger="loop"
-                                        colors="primary:#0ab39c" class="avatar-xl">
-                                    </lord-icon>
-
-                                </div>
-                                <div class="p-2">
-                                    <form class="form-horizontal" method="POST" action="{{ route('password.update') }}">
-                                        @csrf
-                                        <input type="hidden" name="token" value="{{ $token }}">
-                                        <div class="mb-3">
-                                            <label for="useremail" class="form-label">Email</label>
-                                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="useremail" name="email" placeholder="Enter email" value="{{ $email ?? old('email') }}" id="email">
-                                            @error('email')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                            @enderror
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="userpassword">Password</label>
-                                            <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="userpassword" placeholder="Enter password">
-                                            @error('password')
-                                            <span class="invalid-feedback" role="alert">
-                                                <strong>{{ $message }}</strong>
-                                            </span>
-                                            @enderror
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="userpassword">Confirm Password</label>
-                                            <input id="password-confirm" type="password" name="password_confirmation" class="form-control" placeholder="Enter confirm password">
-                                        </div>
-
-                                        <div class="text-end">
-                                            <button class="btn btn-primary w-md waves-effect waves-light" type="submit">Reset</button>
-                                        </div>
-
-                                    </form><!-- end form -->
-                                </div>
-                            </div>
-                            <!-- end card body -->
-                        </div>
-                        <!-- end card -->
-
-                        <div class="mt-4 text-center">
-                            <p class="mb-0">Wait, I remember my password... <a href="{{ route('login') }}"
-                                    class="fw-semibold text-primary text-decoration-underline"> Click here </a> </p>
-                        </div>
-
-                    </div>
-                </div>
-                <!-- end row -->
-            </div>
-            <!-- end container -->
-        </div>
-        <!-- end auth page content -->
-
-        <!-- footer -->
-        <footer class="footer">
-            <div class="container">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="text-center">
-                            {{ date('Y') }} {{env('APP_NAME', 'Auto Bidder')}}. Crafted with <i
-                                class="mdi mdi-heart text-danger"></i> <a href="http://md-uzair.com/">Md Uzair</a></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-        <!-- end Footer -->
-        <!-- end Footer -->
     </div>
-    <!-- end auth-page-wrapper -->
+
+    <!-- auth page content -->
+    <div class="auth-page-content">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center mt-sm-5 mb-4 text-white">
+                        <div>
+                            <a href="index" class="d-inline-block auth-logo">
+                                <img src="{{ URL::asset('assets/images/autobidder_light.png') }}" alt="Auto Bidder Logo" height="32">
+                            </a>
+                        </div>
+                        <p class="mt-3 fs-16 fw-medium opacity-75">Your Preferred Trading Partner</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6 col-xl-5">
+                    <div class="card auth-card mt-4">
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div class="reset-icon">
+                                    <i class="ri-key-2-line"></i>
+                                </div>
+                                <h2 class="welcome-title">Reset Password</h2>
+                                <p class="welcome-subtitle">Enter your new password below to reset your account</p>
+                            </div>
+                            
+                            <form class="form-horizontal" method="POST" action="{{ route('password.update') }}" id="resetPasswordForm">
+                                @csrf
+                                <input type="hidden" name="token" value="{{ $token }}">
+                                
+                                <div class="form-floating">
+                                    <input type="email" 
+                                           class="form-control @error('email') is-invalid @enderror" 
+                                           id="useremail" 
+                                           name="email" 
+                                           placeholder="Enter your email" 
+                                           value="{{ $email ?? old('email') }}"
+                                           readonly>
+                                    <label for="useremail">Email Address</label>
+                                    @error('email')
+                                        <div class="invalid-feedback">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-floating password-input-group">
+                                    <input type="password" 
+                                           class="form-control @error('password') is-invalid @enderror" 
+                                           name="password" 
+                                           id="userpassword" 
+                                           placeholder="Enter your new password"
+                                           required>
+                                    <label for="userpassword">New Password</label>
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('userpassword', 'passwordIcon1')" tabindex="-1">
+                                        <i class="ri-eye-fill" id="passwordIcon1"></i>
+                                    </button>
+                                    @error('password')
+                                        <div class="invalid-feedback">
+                                            <strong>{{ $message }}</strong>
+                                        </div>
+                                    @enderror
+                                </div>
+
+                                <div class="form-floating password-input-group">
+                                    <input type="password" 
+                                           id="password-confirm" 
+                                           name="password_confirmation" 
+                                           class="form-control" 
+                                           placeholder="Confirm your new password"
+                                           required>
+                                    <label for="password-confirm">Confirm New Password</label>
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password-confirm', 'passwordIcon2')" tabindex="-1">
+                                        <i class="ri-eye-fill" id="passwordIcon2"></i>
+                                    </button>
+                                </div>
+
+                                <button type="submit" class="btn reset-btn" id="resetPasswordBtn">
+                                    <span class="btn-text">Reset Password</span>
+                                    <span class="btn-loading">
+                                        <span class="spinner"></span>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="signin-link">
+                        <p class="mb-0">Remember your password? <a href="{{ route('login') }}">Sign in here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="text-center">
+                        <p class="mb-0 text-muted">&copy; <script>document.write(new Date().getFullYear())</script> {{env('APP_NAME', 'Auto Bidder')}}. Crafted with <i class="mdi mdi-heart text-danger"></i> by <a href="#">Our Team</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
 @endsection
 @section('script')
-    <script src="{{ URL::asset('assets/libs/particles.js/particles.js.min.js') }}"></script>
-    <script src="{{ URL::asset('assets/js/pages/particles.app.js') }}"></script>
+<script src="{{ URL::asset('assets/libs/particles.js/particles.js.min.js') }}"></script>
+<script src="{{ URL::asset('assets/js/pages/particles.app.js') }}"></script>
+
+<script>
+// Enhanced password reset form functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('resetPasswordForm');
+    const resetBtn = document.getElementById('resetPasswordBtn');
+    const passwordInput = document.getElementById('userpassword');
+    const confirmPasswordInput = document.getElementById('password-confirm');
+    
+    // Form validation
+    function validateForm() {
+        let isValid = true;
+        
+        // Password validation
+        if (!passwordInput.value) {
+            showFieldError(passwordInput, 'New password is required');
+            isValid = false;
+        } else if (passwordInput.value.length < 8) {
+            showFieldError(passwordInput, 'Password must be at least 8 characters');
+            isValid = false;
+        } else {
+            clearFieldError(passwordInput);
+        }
+        
+        // Confirm password validation
+        if (!confirmPasswordInput.value) {
+            showFieldError(confirmPasswordInput, 'Password confirmation is required');
+            isValid = false;
+        } else if (passwordInput.value !== confirmPasswordInput.value) {
+            showFieldError(confirmPasswordInput, 'Passwords do not match');
+            isValid = false;
+        } else {
+            clearFieldError(confirmPasswordInput);
+        }
+        
+        return isValid;
+    }
+    
+    function showFieldError(field, message) {
+        field.classList.add('is-invalid');
+        let feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (!feedback) {
+            feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            field.parentNode.appendChild(feedback);
+        }
+        feedback.innerHTML = '<strong>' + message + '</strong>';
+    }
+    
+    function clearFieldError(field) {
+        field.classList.remove('is-invalid');
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+        if (feedback && !feedback.querySelector('strong')) {
+            feedback.remove();
+        }
+    }
+    
+    // Real-time validation
+    confirmPasswordInput.addEventListener('blur', function() {
+        if (this.value && passwordInput.value) {
+            if (passwordInput.value !== this.value) {
+                showFieldError(this, 'Passwords do not match');
+            } else {
+                clearFieldError(this);
+            }
+        }
+    });
+    
+    passwordInput.addEventListener('input', function() {
+        if (confirmPasswordInput.value) {
+            if (this.value !== confirmPasswordInput.value) {
+                showFieldError(confirmPasswordInput, 'Passwords do not match');
+            } else {
+                clearFieldError(confirmPasswordInput);
+            }
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        if (!validateForm()) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Show loading state
+        resetBtn.classList.add('loading');
+        resetBtn.disabled = true;
+        
+        // Add a timeout to prevent infinite loading
+        setTimeout(function() {
+            if (resetBtn.classList.contains('loading')) {
+                resetBtn.classList.remove('loading');
+                resetBtn.disabled = false;
+            }
+        }, 10000);
+    });
+    
+    // Enhanced keyboard navigation
+    passwordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmPasswordInput.focus();
+        }
+    });
+    
+    confirmPasswordInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (validateForm()) {
+                form.submit();
+            }
+        }
+    });
+});
+
+// Enhanced password toggle function
+function togglePassword(inputId, iconId) {
+    const passwordInput = document.getElementById(inputId);
+    const toggleIcon = document.getElementById(iconId);
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.className = 'ri-eye-off-fill';
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.className = 'ri-eye-fill';
+    }
+    
+    // Brief focus animation
+    passwordInput.focus();
+}
+</script>
 @endsection

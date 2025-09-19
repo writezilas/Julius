@@ -5,19 +5,19 @@
         <!-- Dark Logo-->
         <a href="{{ route('user.dashboard') }}" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
             </span>
             <span class="logo-lg">
-                <img src="{{ URL::asset('assets/images/autobidder_dark.png') }}" alt="" height="17">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
             </span>
         </a>
         <!-- Light Logo-->
         <a href="{{ route('user.dashboard') }}" class="logo logo-light">
             <span class="logo-sm">
-                <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
             </span>
             <span class="logo-lg">
-                <img src="{{ URL::asset('assets/images/autobidder_light.png') }}" alt="" height="17">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">

@@ -44,6 +44,97 @@ $pageTitle = __('translation.soldshares');
 .countdown-timer.matured {
     color: #27ae60;
 }
+
+/* Flip Card Timer Styles */
+.flip-timer {
+    display: inline-flex;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.flip-card {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 1px;
+}
+
+.flip-card-inner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 4px;
+    padding: 3px 6px;
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    position: relative;
+    min-width: 24px;
+    min-height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flip-card-inner::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(0, 0, 0, 0.15);
+    transform: translateY(-50%);
+}
+
+.flip-card-number {
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Arial', sans-serif;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    line-height: 1;
+}
+
+.flip-card-label {
+    color: #6c757d;
+    font-size: 0.5rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    margin-top: 1px;
+    letter-spacing: 0.3px;
+}
+
+.timer-separator {
+    color: #6c757d;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0 2px;
+    align-self: flex-start;
+    margin-top: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .flip-card-inner {
+        min-width: 20px;
+        min-height: 18px;
+        padding: 2px 4px;
+    }
+    
+    .flip-card-number {
+        font-size: 0.65rem;
+    }
+    
+    .flip-card-label {
+        font-size: 0.45rem;
+    }
+    
+    .flip-timer {
+        gap: 2px;
+    }
+}
 </style>
 @endsection
 
@@ -111,7 +202,7 @@ $pageTitle = __('translation.soldshares');
                             <i class="fas fa-coins"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h4 class="mb-1">${{number_format($totalInvestment ?? 0, 2)}}</h4>
+                            <h4 class="mb-1">KSH {{number_format($totalInvestment ?? 0, 2)}}</h4>
                             <p class="mb-0 opacity-75">Investment</p>
                         </div>
                     </div>
@@ -127,7 +218,7 @@ $pageTitle = __('translation.soldshares');
                             <i class="fas fa-trophy"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h4 class="mb-1">${{number_format($totalEarnings ?? 0, 2)}}</h4>
+                            <h4 class="mb-1">KSH {{number_format($totalEarnings ?? 0, 2)}}</h4>
                             <p class="mb-0 opacity-75">Earnings</p>
                         </div>
                     </div>
@@ -143,7 +234,7 @@ $pageTitle = __('translation.soldshares');
                             <i class="fas fa-wallet"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h4 class="mb-1">${{number_format($totalReturn ?? 0, 2)}}</h4>
+                            <h4 class="mb-1">KSH {{number_format($totalReturn ?? 0, 2)}}</h4>
                             <p class="mb-0 opacity-75">Total Return</p>
                         </div>
                     </div>
@@ -184,40 +275,43 @@ $pageTitle = __('translation.soldshares');
                                         <td>{{ $share->ticket_no ?? 'N/A' }}</td>
                                         <td>{{ $share->trade ? $share->trade->name : 'Trade Not Available' }}</td>
                                         <td>{{ $share->start_date ? date('d M Y', strtotime($share->start_date)) : 'N/A' }}</td>
-                                        <td>${{ number_format($share->share_will_get ?? 0, 2) }}</td>
-                                        <td>${{ number_format($share->profit_share ?? 0, 2) }}</td>
-                                        <td>${{ number_format(($share->share_will_get ?? 0) + ($share->profit_share ?? 0), 2) }}</td>
+                                        <td>KSH {{ number_format($share->share_will_get ?? 0, 2) }}</td>
+                                        <td>KSH {{ number_format($share->profit_share ?? 0, 2) }}</td>
+                                        <td>KSH {{ number_format(($share->share_will_get ?? 0) + ($share->profit_share ?? 0), 2) }}</td>
                                         <td>
                                             @php
-                                                $status = 'pending';
-                                                $statusClass = 'bg-secondary';
-                                                if (isset($share->status)) {
-                                                    if ($share->status === 'completed' && isset($share->is_ready_to_sell) && $share->is_ready_to_sell == 1) {
-                                                        $status = 'Matured';
-                                                        $statusClass = 'bg-success';
-                                                    } elseif ($share->status === 'completed') {
-                                                        $status = 'Running';
-                                                        $statusClass = 'bg-info';
-                                                    } elseif ($share->status === 'failed') {
-                                                        $status = 'Failed';
-                                                        $statusClass = 'bg-danger';
-                                                    }
-                                                }
+                                                $shareStatusService = app(\App\Services\ShareStatusService::class);
+                                                $statusInfo = $shareStatusService->getShareStatus($share, 'sold');
                                             @endphp
-                                            <span class="badge {{ $statusClass }}">
-                                                {{ $status }}
+                                            <span class="badge {{ $statusInfo['class'] }}" title="{{ $statusInfo['description'] }}">
+                                                {{ $statusInfo['status'] }}
                                             </span>
                                         </td>
                                         <td>
-                                            @if(isset($share->is_ready_to_sell) && $share->is_ready_to_sell == 1)
-                                                <span class="countdown-timer matured">Share Matured</span>
-                                            @else
+                                            @php
+                                                $shareStatusService = app(\App\Services\ShareStatusService::class);
+                                                $timeInfo = $shareStatusService->getTimeRemaining($share, 'sold');
+                                            @endphp
+                                            
+                                            @if($timeInfo['text'] === 'timer-active')
                                                 <span class="countdown-timer" id="sold-share-timer{{ $share->id ?? 0 }}">Loading...</span>
+                                            @else
+                                                <span class="{{ $timeInfo['class'] }}" style="color: {{ $timeInfo['color'] }}; font-weight: bold;">{{ $timeInfo['text'] }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a href="{{ route('sold-share.view', $share->id ?? 1) }}" class="btn btn-info btn-sm">Details</a>
+                                                @php
+                                                    $shareStatusService = app(\App\Services\ShareStatusService::class);
+                                                    $shouldUnlock = $shareStatusService->shouldUnlockDetailsButton($share);
+                                                @endphp
+                                                @if($shouldUnlock)
+                                                    <a href="{{ route('sold-share.view', $share->id ?? 1) }}" class="btn btn-info btn-sm">Details</a>
+                                                @else
+                                                    <button type="button" class="btn btn-secondary btn-sm" disabled title="Details will be available once the share matures">
+                                                        <i class="ri-lock-line align-middle me-1"></i>Details
+                                                    </button>
+                                                @endif
                                             </div>
                                         </td>
                                     </tr>
@@ -274,41 +368,102 @@ $pageTitle = __('translation.soldshares');
 @endif
 
 function getSoldShareCounterTime(startTime, id, shareId) {
-    var countDownDate = new Date(startTime + ' UTC').getTime();
-
-    var x = setInterval(function() {
-        var now = new Date().getTime();
-        var distance = countDownDate - now;
-
-        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        var timerElement = document.getElementById(id);
-        if (timerElement) {
-            if (distance > 0) {
-                var timeString = '';
-                if (days > 0) timeString += days + 'd ';
-                if (hours > 0) timeString += hours + 'h ';
-                if (minutes > 0) timeString += minutes + 'm ';
-                timeString += seconds + 's';
-                
-                timerElement.innerHTML = timeString;
-                
-                // Change color based on time remaining
-                if (distance < 86400000) { // Less than 1 day
-                    timerElement.style.color = '#e74c3c';
-                } else if (distance < 604800000) { // Less than 1 week
-                    timerElement.style.color = '#f39c12';
-                }
-            } else {
-                clearInterval(x);
-                timerElement.innerHTML = 'Share Matured';
-                timerElement.className = 'countdown-timer matured';
-            }
+    try {
+        // Debug logging
+        console.log('Initializing timer for:', {startTime, id, shareId});
+        
+        var countDownDate = new Date(startTime).getTime();
+        
+        // Validate date
+        if (isNaN(countDownDate)) {
+            console.error('Invalid date for timer:', startTime);
+            return;
         }
-    }, 1000);
+        
+        var timerElement = document.getElementById(id);
+        if (!timerElement) {
+            console.error('Timer element not found:', id);
+            return;
+        }
+
+        var x = setInterval(function() {
+            try {
+                var now = new Date().getTime();
+                var distance = countDownDate - now;
+
+                var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                var timerElement = document.getElementById(id);
+                if (timerElement) {
+                    if (distance > 0) {
+                        // Create flip-card timer structure
+                        var flipTimerHTML = '<div class="flip-timer">';
+                        
+                        // Days
+                        if (days > 0) {
+                            flipTimerHTML += '<div class="flip-card">';
+                            flipTimerHTML += '<div class="flip-card-inner">';
+                            flipTimerHTML += '<span class="flip-card-number">' + String(days).padStart(2, '0') + '</span>';
+                            flipTimerHTML += '</div>';
+                            flipTimerHTML += '<span class="flip-card-label">Days</span>';
+                            flipTimerHTML += '</div>';
+                        }
+                        
+                        // Hours
+                        if (hours > 0 || days > 0) {
+                            flipTimerHTML += '<div class="flip-card">';
+                            flipTimerHTML += '<div class="flip-card-inner">';
+                            flipTimerHTML += '<span class="flip-card-number">' + String(hours).padStart(2, '0') + '</span>';
+                            flipTimerHTML += '</div>';
+                            flipTimerHTML += '<span class="flip-card-label">Hours</span>';
+                            flipTimerHTML += '</div>';
+                        }
+                        
+                        // Minutes
+                        flipTimerHTML += '<div class="flip-card">';
+                        flipTimerHTML += '<div class="flip-card-inner">';
+                        flipTimerHTML += '<span class="flip-card-number">' + String(minutes).padStart(2, '0') + '</span>';
+                        flipTimerHTML += '</div>';
+                        flipTimerHTML += '<span class="flip-card-label">Minutes</span>';
+                        flipTimerHTML += '</div>';
+                        
+                        // Seconds
+                        flipTimerHTML += '<div class="flip-card">';
+                        flipTimerHTML += '<div class="flip-card-inner">';
+                        flipTimerHTML += '<span class="flip-card-number">' + String(seconds).padStart(2, '0') + '</span>';
+                        flipTimerHTML += '</div>';
+                        flipTimerHTML += '<span class="flip-card-label">Seconds</span>';
+                        flipTimerHTML += '</div>';
+                        
+                        flipTimerHTML += '</div>';
+                        
+                        timerElement.innerHTML = flipTimerHTML;
+                        timerElement.className = 'countdown-timer'; // Remove any color styling since flip cards handle it
+                    } else {
+                        clearInterval(x);
+                        timerElement.innerHTML = 'Share Matured';
+                        timerElement.className = 'countdown-timer matured';
+                        timerElement.style.color = '#27ae60'; // Green
+                        console.log('Timer completed for share:', shareId);
+                    }
+                } else {
+                    console.warn('Timer element disappeared:', id);
+                    clearInterval(x);
+                }
+            } catch (error) {
+                console.error('Timer update error:', error);
+                clearInterval(x);
+            }
+        }, 1000);
+        
+        console.log('Timer started successfully for share:', shareId);
+        
+    } catch (error) {
+        console.error('Timer initialization error:', error);
+    }
 }
 </script>
 @endsection

@@ -23,6 +23,11 @@ class UserSharePayment extends Model
     {
         return $this->belongsTo(UserSharePair::class, 'user_share_pair_id', 'id');
     }
+    
+    public function sharePair()
+    {
+        return $this->belongsTo(UserSharePair::class, 'user_share_pair_id', 'id');
+    }
     public function logs()
     {
         return $this->morphMany(Log::class, 'logable');

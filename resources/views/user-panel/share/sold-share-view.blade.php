@@ -26,20 +26,68 @@
     @endcomponent
 
     @php
-        $pairedShares = \App\Models\UserSharePair::where('paired_user_share_id', $share->id)->orderBy('id', 'desc')->get();
-        $totalBuyers = $pairedShares->count();
+        // Use ShareStatusService for consistent status across all pages
+        $shareStatusService = app(\App\Services\ShareStatusService::class);
+        $statusInfo = $shareStatusService->getShareStatus($share, 'sold');
+        $stats = $shareStatusService->getPairingStats($share);
+        
+        // Only load pair history if we should show it (to prevent confusion for transitioned shares)
+        $pairedShares = collect(); // Default empty collection
+        $totalBuyers = 0;
         $paidTransactions = 0;
         $pendingTransactions = 0;
         $totalAmount = 0;
         
-        foreach($pairedShares as $pairedShare) {
-            $payment = \App\Models\UserSharePayment::where('user_share_pair_id', $pairedShare->id)->orderBy('id', 'desc')->first();
-            $totalAmount += $pairedShare->share;
-            if($payment && in_array($payment->status, ['paid', 'conformed'])) {
-                $paidTransactions++;
-            } else {
-                $pendingTransactions++;
+        if (isset($shouldShowPairHistory) && $shouldShowPairHistory) {
+            // Get all paired shares and organize them - successful on top, failed at bottom
+            $allPairedShares = \App\Models\UserSharePair::where('paired_user_share_id', $share->id)
+                ->with(['pairedUserShare', 'pairedUserShare.user'])
+                ->get();
+                
+            // Create two collections - one for successful pairings, one for failed ones
+            $successfulPairings = collect();
+            $failedPairings = collect();
+            
+            foreach($allPairedShares as $pairedShare) {
+                $payment = \App\Models\UserSharePayment::where('user_share_pair_id', $pairedShare->id)
+                    ->orderBy('id', 'desc')
+                    ->first();
+                
+                $totalAmount += $pairedShare->share;
+                
+                // Determine if this is a successful or failed pairing
+                $isSuccessful = $pairedShare->is_paid == 1 || ($payment && in_array($payment->status, ['paid', 'conformed']));
+                $isExpired = false;
+                
+                if ($pairedShare->is_paid == 0) {
+                    // Check if payment deadline has expired
+                    $paymentDeadline = \Carbon\Carbon::parse($pairedShare->created_at)
+                        ->addMinutes($share->payment_deadline_minutes ?? 60);
+                    $isExpired = $paymentDeadline->isPast();
+                }
+                
+                // If payment confirmed or in process, add to successful list
+                // Otherwise, add to failed list
+                if ($isSuccessful) {
+                    $successfulPairings->push($pairedShare);
+                    $paidTransactions++;
+                } else if ($isExpired) {
+                    $failedPairings->push($pairedShare);
+                    $pendingTransactions++;
+                } else {
+                    // Still in payment window, add to successful list
+                    $successfulPairings->push($pairedShare);
+                    $paidTransactions++;
+                }
             }
+            
+            // Sort each collection by created_at descending (newest first)
+            $successfulPairings = $successfulPairings->sortByDesc('created_at');
+            $failedPairings = $failedPairings->sortByDesc('created_at');
+            
+            // Combine the collections - successful on top, failed at bottom
+            $pairedShares = $successfulPairings->concat($failedPairings);
+            $totalBuyers = $pairedShares->count();
         }
     @endphp
 
@@ -54,16 +102,24 @@
                                 <i class="ri-share-line align-middle me-2"></i>
                                 Share Details: {{$share->ticket_no}}
                             </h3>
-                            <p class="text-white-75 mb-0 fs-16">
-                                Track and manage your paired share transactions and payment confirmations
-                            </p>
+                            @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
+                                <p class="text-white-75 mb-0 fs-16">
+                                    Track and manage your paired share transactions and payment confirmations
+                                </p>
+                            @else
+                                <p class="text-white-75 mb-0 fs-16">
+                                    This share has matured and is ready for new buyers. Old pair history is hidden to prevent confusion.
+                                </p>
+                            @endif
                         </div>
                         <div class="col-lg-4 text-end">
                             <div class="text-white">
-                                <div class="display-6 mb-2">
-                                    <i class="ri-exchange-line"></i>
+                                <div class="mb-3">
+                                    <span class="badge {{ $statusInfo['class'] }} fs-6 px-3 py-2" title="{{ $statusInfo['description'] }}">
+                                        {{ $statusInfo['status'] }}
+                                    </span>
                                 </div>
-                                <h6 class="text-white mb-0">Paired Share Management</h6>
+                                <h6 class="text-white mb-0">{{ $statusInfo['description'] }}</h6>
                             </div>
                         </div>
                     </div>
@@ -72,6 +128,7 @@
         </div>
     </div>
 
+    @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6">
@@ -133,11 +190,11 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1">
-                            <p class="text-uppercase fw-medium text-muted mb-0">Paid Transactions</p>
+                            <p class="text-uppercase fw-medium text-muted mb-0">Confirmed Payments</p>
                         </div>
                         <div class="flex-shrink-0">
                             <div class="avatar-sm">
-                                <span class="avatar-title bg-info-subtle text-info rounded-2">
+                                <span class="avatar-title bg-success-subtle text-success rounded-2">
                                     <i class="ri-check-double-line fs-16"></i>
                                 </span>
                             </div>
@@ -145,9 +202,9 @@
                     </div>
                     <div class="d-flex align-items-end justify-content-between mt-4">
                         <div>
-                            <h4 class="fs-22 fw-semibold ff-secondary mb-2">{{$paidTransactions}}</h4>
-                            <span class="badge bg-info-subtle text-info"> 
-                                <i class="ri-shield-check-line align-middle"></i> Completed 
+                            <h4 class="fs-22 fw-semibold ff-secondary mb-2">{{$stats['paid']}}</h4>
+                            <span class="badge bg-success-subtle text-success"> 
+                                <i class="ri-shield-check-line align-middle"></i> Confirmed 
                             </span>
                         </div>
                     </div>
@@ -160,7 +217,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="flex-grow-1">
-                            <p class="text-uppercase fw-medium text-muted mb-0">Pending</p>
+                            <p class="text-uppercase fw-medium text-muted mb-0">Awaiting Confirmation</p>
                         </div>
                         <div class="flex-shrink-0">
                             <div class="avatar-sm">
@@ -172,9 +229,9 @@
                     </div>
                     <div class="d-flex align-items-end justify-content-between mt-4">
                         <div>
-                            <h4 class="fs-22 fw-semibold ff-secondary mb-2">{{$pendingTransactions}}</h4>
+                            <h4 class="fs-22 fw-semibold ff-secondary mb-2">{{$stats['awaiting_confirmation'] + $stats['unpaid']}}</h4>
                             <span class="badge bg-warning-subtle text-warning"> 
-                                <i class="ri-hourglass-line align-middle"></i> Awaiting 
+                                <i class="ri-hourglass-line align-middle"></i> Pending 
                             </span>
                         </div>
                     </div>
@@ -182,7 +239,9 @@
             </div>
         </div>
     </div>
+    @endif
 
+    @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
     <!-- Paired Shares Table -->
     <div class="row">
         <div class="col-lg-12">
@@ -194,7 +253,7 @@
                                 <i class="ri-exchange-funds-line align-middle me-2 text-primary"></i>
                                 Your Paired Shares
                             </h5>
-                            <p class="text-muted mb-0">Manage buyer payments and confirmations</p>
+                            <p class="text-muted mb-0">Latest successful pairings shown first, failed payments at bottom</p>
                         </div>
                         <div class="col-auto">
                             <div class="d-flex flex-wrap align-items-center gap-1">
@@ -235,11 +294,47 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    @php
+                                        $hasShownFailedHeader = false;
+                                        $previousWasFailed = false;
+                                    @endphp
+                                    
                                     @foreach($pairedShares as $key => $pairedShare)
                                         @php
                                             $payment = \App\Models\UserSharePayment::where('user_share_pair_id', $pairedShare->id)->orderBy('id', 'desc')->first();
+                                            
+                                            // Determine if this is a failed pairing for styling
+                                            $isExpired = false;
+                                            if ($pairedShare->is_paid == 0) {
+                                                $paymentDeadline = \Carbon\Carbon::parse($pairedShare->created_at)
+                                                    ->addMinutes($share->payment_deadline_minutes ?? 60);
+                                                $isExpired = $paymentDeadline->isPast();
+                                            }
+                                            
+                                            $currentIsFailed = $isExpired || $pairedShare->is_paid == 2;
+                                            $rowClass = '';
+                                            if ($currentIsFailed) {
+                                                $rowClass = 'table-row-failed';
+                                            }
                                         @endphp
-                                        <tr>
+                                        
+                                        {{-- Show section header when transitioning from successful to failed --}}
+                                        @if ($currentIsFailed && !$hasShownFailedHeader && !$previousWasFailed)
+                                            <tr class="table-divider">
+                                                <td colspan="6" class="text-center py-3">
+                                                    <div class="d-flex align-items-center justify-content-center">
+                                                        <hr class="flex-grow-1">
+                                                        <span class="mx-3 text-muted small">
+                                                            <i class="ri-close-circle-line me-1 text-danger"></i>
+                                                            Failed/Expired Payments
+                                                        </span>
+                                                        <hr class="flex-grow-1">
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @php $hasShownFailedHeader = true; @endphp
+                                        @endif
+                                        <tr class="{{ $rowClass }}">
                                             <td class="text-center">
                                                 <span class="fw-medium text-primary">{{ $key + 1 }}</span>
                                             </td>
@@ -252,7 +347,7 @@
                                                     </div>
                                                     <div>
                                                         <h6 class="fs-15 fw-semibold mb-0">{{ $pairedShare->pairedUserShare->user->name }}</h6>
-                                                        <p class="text-muted mb-0 fs-13">@{{ $pairedShare->pairedUserShare->user->username }}</p>
+                                                        <p class="text-muted mb-0 fs-13">{{ $pairedShare->pairedUserShare->user->username }}</p>
                                                     </div>
                                                 </div>
                                             </td>
@@ -277,13 +372,33 @@
                                                     <span class="badge bg-success-subtle text-success px-3 py-2">
                                                         <i class="ri-check-double-line align-middle me-1"></i>Payment Confirmed
                                                     </span>
+                                                @elseif($pairedShare->is_paid === 1)
+                                                    <span class="badge bg-success-subtle text-success px-3 py-2">
+                                                        <i class="ri-check-double-line align-middle me-1"></i>Payment Completed
+                                                    </span>
                                                 @elseif($pairedShare->is_paid === 0)
-                                                    <span class="badge bg-info-subtle text-info px-3 py-2">
-                                                        <i class="ri-hourglass-line align-middle me-1"></i>Waiting for Payment
+                                                    @php
+                                                        // Check if payment deadline has expired
+                                                        $paymentDeadline = \Carbon\Carbon::parse($pairedShare->created_at)
+                                                            ->addMinutes($share->payment_deadline_minutes ?? 60);
+                                                        $isDeadlineExpired = $paymentDeadline->isPast();
+                                                    @endphp
+                                                    @if($isDeadlineExpired)
+                                                        <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                                                            <i class="ri-close-circle-line align-middle me-1"></i>Payment Failed
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-info-subtle text-info px-3 py-2">
+                                                            <i class="ri-hourglass-line align-middle me-1"></i>Waiting for Payment
+                                                        </span>
+                                                    @endif
+                                                @elseif($pairedShare->is_paid === 2)
+                                                    <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                                                        <i class="ri-close-circle-line align-middle me-1"></i>Payment Failed
                                                     </span>
                                                 @else
-                                                    <span class="badge bg-danger-subtle text-danger px-3 py-2">
-                                                        <i class="ri-close-circle-line align-middle me-1"></i>Payment Expired
+                                                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2">
+                                                        <i class="ri-question-line align-middle me-1"></i>Unknown Status
                                                     </span>
                                                 @endif
                                             </td>
@@ -294,6 +409,8 @@
                                                 </button>
                                             </td>
                                         </tr>
+                                        
+                                        @php $previousWasFailed = $currentIsFailed; @endphp
                                     @endforeach
                                 </tbody>
                             </table>
@@ -311,7 +428,30 @@
             </div>
         </div>
     </div>
+    @else
+    <!-- Share Maturity Message -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="mb-3">
+                        <i class="ri-check-double-line display-3 text-success"></i>
+                    </div>
+                    <h4 class="text-success mb-3">Share Has Matured</h4>
+                    <p class="text-muted mb-4">
+                        This share has completed its maturity period and is now ready for new buyers.
+                    </p>
+                    <div class="alert alert-info" role="alert">
+                        <i class="ri-information-line align-middle me-2"></i>
+                        Once new buyers are available in the market, pairing information will be displayed here.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
+    @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
     <!-- Payment Details Modals -->
     @foreach($pairedShares as $pairedShare)
         @php
@@ -428,18 +568,19 @@
                             @if($payment->status !== 'conformed')
                                 <!-- Confirmation Form -->
                                 <div class="mt-4">
-                                    <form id="paymentApproveForm{{$payment->id}}" action="{{ route('share.paymentApprove') }}" method="post">
+                                    <form id="paymentApproveForm{{$payment->id}}" action="{{ route('user.share.paymentApprove') }}" method="post">
                                         @csrf
                                         <input type="hidden" value="{{ $payment->id }}" name="paymentId">
                                         <div class="mb-3">
-                                            <label for="note_by_receiver" class="form-label">
+                                            <label for="note_by_receiver_approve_{{ $payment->id }}" class="form-label">
                                                 <i class="ri-message-2-line align-middle me-1"></i>
                                                 Your Comment <small class="text-muted">(optional)</small>
                                             </label>
-                                            <textarea name="note_by_receiver" id="note_by_receiver" class="form-control" rows="3" 
+                                            <textarea name="note_by_receiver" id="note_by_receiver_approve_{{ $payment->id }}" class="form-control" rows="3" 
                                                       placeholder="Add any comments about this payment..."></textarea>
                                         </div>
                                     </form>
+                                    
                                 </div>
                             @endif
                         </div>
@@ -463,6 +604,7 @@
             </div>
         @endif
     @endforeach
+    @endif
 
 @endsection
 @section('script')
@@ -491,7 +633,7 @@
                         { orderable: false, targets: [0, 5] }, // Disable sorting on # and Action columns
                         { searchable: false, targets: [0, 5] }  // Disable search on # and Action columns
                     ],
-                    order: [[1, 'asc']] // Sort by buyer name by default
+                    order: [] // Disable default ordering to preserve custom PHP ordering
                 });
             }
             
@@ -505,7 +647,7 @@
             animateStatsCards();
         });
 
-        // Enhanced payment confirmation function
+        // Enhanced payment confirmation function with audio notifications
         function handlePaymentConformSubmit(paymentId) {
             const submitBtn = $('.subBtn-' + paymentId);
             const originalText = submitBtn.html();
@@ -516,14 +658,30 @@
             
             // Add confirmation dialog
             if (confirm('Are you sure you want to confirm this payment? This action cannot be undone.')) {
-                // Submit the form
-                $('#paymentApproveForm' + paymentId).submit();
+                // Validation successful
+                console.log('Payment confirmation validated');
+                
+                // Submit the form and schedule delayed notification sound
+                try {
+                    $('#paymentApproveForm' + paymentId).submit();
+                    
+                    console.log('Payment confirmation form submitted');
+                    
+                } catch (error) {
+                    console.error('Form submission error:', error);
+                    
+                    
+                    // Reset button state on error
+                    submitBtn.prop('disabled', false);
+                    submitBtn.html(originalText);
+                }
             } else {
                 // Reset button state if cancelled
                 submitBtn.prop('disabled', false);
                 submitBtn.html(originalText);
             }
         }
+        
 
         // Animate statistics cards
         function animateStatsCards() {
@@ -685,6 +843,32 @@
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+        }
+        
+        /* Failed pairing row styling */
+        .table-row-failed {
+            background-color: rgba(220, 53, 69, 0.04);
+            border-left: 3px solid #dc3545;
+            opacity: 0.75;
+        }
+        
+        .table-row-failed:hover {
+            background-color: rgba(220, 53, 69, 0.08);
+        }
+        
+        /* Table divider styling */
+        .table-divider {
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .table-divider td {
+            border: none !important;
+            background-color: #f8f9fa;
+        }
+        
+        .table-divider hr {
+            margin: 0;
+            border-color: #dee2e6;
         }
         
         .badge {

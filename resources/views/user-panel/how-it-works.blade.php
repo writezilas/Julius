@@ -221,16 +221,7 @@
     margin: 3rem 0;
 }
 
-.process-flow::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    z-index: 1;
-}
+/* Horizontal line removed */
 
 @media (max-width: 768px) {
     .how-it-works-hero {

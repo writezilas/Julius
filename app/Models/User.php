@@ -35,6 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'business_account_id',
         'block_until',
         'suspension_until',
+        'suspension_reason',
         'status',
     ];
 
@@ -59,9 +60,42 @@ class User extends Authenticatable implements MustVerifyEmail
         'suspension_until' => 'datetime',
     ];
 
+    /**
+     * Get business profile data safely
+     * Returns array with empty values if profile is null or invalid JSON
+     */
+    public function getBusinessProfileData()
+    {
+        $defaultProfile = [
+            'mpesa_no' => '',
+            'mpesa_name' => '',
+            'mpesa_till_no' => '',
+            'mpesa_till_name' => ''
+        ];
+
+        if (empty($this->business_profile)) {
+            return $defaultProfile;
+        }
+
+        try {
+            $profile = json_decode($this->business_profile, true);
+            if (!is_array($profile)) {
+                return $defaultProfile;
+            }
+            return array_merge($defaultProfile, $profile);
+        } catch (\Exception $e) {
+            return $defaultProfile;
+        }
+    }
+
     public function trade()
     {
         return $this->belongsTo(Trade::class);
+    }
+
+    public function tradingCategory()
+    {
+        return $this->belongsTo(Trade::class, 'trading_category_id');
     }
 
     public function role()
@@ -69,21 +103,21 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class);
     }
 
-    public function scopePending()
+    public function scopeActive()
     {
-        return $this->where('status', 'pending');
+        return $this->where('status', 'active');
     }
-    public function scopeBlock()
+    public function scopeBlocked()
     {
-        return $this->where('status', 'block');
+        return $this->where('status', 'blocked');
     }
-    public function scopeSuspend()
+    public function scopeSuspended()
     {
-        return $this->where('status', 'suspend');
+        return $this->where('status', 'suspended');
     }
-    public function scopeFine()
+    public function scopeValidForTrading()
     {
-        return $this->whereIn('status', ['fine', 'pending']);
+        return $this->whereIn('status', ['active']);
     }
 
     /**
@@ -91,7 +125,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function isSuspended()
     {
-        return $this->status === 'suspend' && 
+        return $this->status === 'suspended' && 
                $this->suspension_until && 
                $this->suspension_until->isFuture();
     }
@@ -113,11 +147,11 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function checkSuspensionExpiry()
     {
-        if ($this->status === 'suspend' && 
+        if ($this->status === 'suspended' && 
             $this->suspension_until && 
             $this->suspension_until->isPast()) {
             $this->update([
-                'status' => 'fine',
+                'status' => 'active',
                 'suspension_until' => null
             ]);
             return true;
@@ -126,25 +160,30 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Suspend user for payment failures (12 hours)
+     * Suspend user for payment failures with escalating duration
+     * 1st: 6 hours, 2nd: 24 hours, 3rd+: 72 hours
      */
     public function suspendForPaymentFailures()
     {
-        $suspensionUntil = now()->addHours(12);
+        $paymentFailure = $this->getCurrentPaymentFailure();
+        $durationHours = $paymentFailure->markSuspendedWithLevel();
+        $suspensionUntil = now()->addHours($durationHours);
         
         $this->update([
-            'status' => 'suspend',
-            'suspension_until' => $suspensionUntil
+            'status' => 'suspended',
+            'suspension_until' => $suspensionUntil,
+            'suspension_reason' => 'payment_failure'
         ]);
 
-        // Pause all running sold shares
-        $this->pauseRunningShares();
+        // Suspend all active trades and shares
+        $this->suspendAllActiveTrades();
 
         // Clear all sessions for this user to force logout from all devices
         $this->clearAllUserSessions();
 
-        // Log the suspension
-        \Log::info('User suspended for payment failures: ' . $this->username . ' until ' . $suspensionUntil);
+        // Log the suspension with level info
+        \Log::info('User suspended for payment failures: ' . $this->username . 
+                  ' (Level ' . $paymentFailure->suspension_level . ', Duration: ' . $durationHours . 'h) until ' . $suspensionUntil);
 
         return $suspensionUntil;
     }
@@ -155,12 +194,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function liftSuspension()
     {
         $this->update([
-            'status' => 'fine',
-            'suspension_until' => null
+            'status' => 'active',
+            'suspension_until' => null,
+            'suspension_reason' => null
         ]);
 
-        // Resume all paused shares
-        $this->resumePausedShares();
+        // Resume all suspended trades and shares
+        $this->resumeAllSuspendedTrades();
 
         // Mark suspension as lifted in payment failures
         $paymentFailure = $this->paymentFailures()->latest()->first();
@@ -220,6 +260,84 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Suspend all active trades and shares for user
+     * Includes: running, paired, partially paired, pending, and active statuses
+     */
+    public function suspendAllActiveTrades()
+    {
+        $suspendedCount = 0;
+        
+        // Get all shares that need to be suspended
+        $activeShares = $this->shares()
+            ->whereIn('status', ['running', 'paired', 'partially_paired', 'pending', 'active'])
+            ->orWhere(function($query) {
+                // Also suspend completed shares that are ready to sell (running timer)
+                $query->where('status', 'completed')
+                      ->where('is_ready_to_sell', 0)
+                      ->whereNotNull('start_date')
+                      ->where('timer_paused', false);
+            })
+            ->get();
+
+        foreach ($activeShares as $share) {
+            // Pause the timer for running shares
+            if ($share->start_date && !$share->timer_paused) {
+                $share->update([
+                    'timer_paused' => true,
+                    'timer_paused_at' => now()
+                ]);
+            }
+            
+            // For shares in pairing process, mark them as suspended
+            if (in_array($share->status, ['running', 'paired', 'partially_paired', 'pending', 'active'])) {
+                // Store original status to restore later
+                $share->update([
+                    'status_before_suspension' => $share->status,
+                    'status' => 'suspended_by_system'
+                ]);
+            }
+            
+            $suspendedCount++;
+        }
+        
+        // Log suspension of trades
+        \Log::info('Suspended ' . $suspendedCount . ' active trades/shares for user: ' . $this->username);
+        
+        return $suspendedCount;
+    }
+
+    /**
+     * Resume all suspended trades and shares for user
+     */
+    public function resumeAllSuspendedTrades()
+    {
+        $resumedCount = 0;
+        
+        // Resume paused timers
+        $this->resumePausedShares();
+        
+        // Resume suspended trades
+        $suspendedShares = $this->shares()
+            ->where('status', 'suspended_by_system')
+            ->get();
+
+        foreach ($suspendedShares as $share) {
+            // Restore original status
+            $originalStatus = $share->status_before_suspension ?? 'running';
+            $share->update([
+                'status' => $originalStatus,
+                'status_before_suspension' => null
+            ]);
+            
+            $resumedCount++;
+        }
+        
+        \Log::info('Resumed ' . $resumedCount . ' suspended trades/shares for user: ' . $this->username);
+        
+        return $resumedCount;
+    }
+
+    /**
      * Get current payment failure record
      */
     public function getCurrentPaymentFailure()
@@ -264,7 +382,7 @@ class User extends Authenticatable implements MustVerifyEmail
             return asset($this->avatar);
         }
         
-        return asset('images/default.jpg');
+        return asset('assets/images/users/default.jpg');
     }
 
     public function logs()

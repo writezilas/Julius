@@ -5,8 +5,10 @@ namespace App\Console\Commands;
 use App\Models\TradePeriod;
 use App\Models\User;
 use App\Models\UserShare;
+use App\Services\ProgressCalculationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UpdateSharesCommand extends Command
 {
@@ -95,10 +97,16 @@ class UpdateSharesCommand extends Command
     public function updateShareStatusAsFailed($shares)
     {
         $bought_time = get_gs_value('bought_time') ?: 1; // Default 1 minute
+        $progressService = new ProgressCalculationService();
         
         foreach ($shares as $key => $share) {
             // Check if the payment timeout has been reached
             if ($share->created_at->addMinutes($bought_time)->isPast()) {
+                // Get progress data before marking as failed (for progress restoration)
+                $tradeId = $share->trade_id;
+                $failedShares = $share->share_quantity ?? 1;
+                
+                // Mark share as failed
                 $share->status = 'failed';
                 $share->save();
                 
@@ -113,7 +121,7 @@ class UpdateSharesCommand extends Command
                         if ($sellerShare && $pairedShare->share > 0) {
                             $sellerShare->decrement('hold_quantity', $pairedShare->share);
                             $sellerShare->increment('total_share_count', $pairedShare->share);
-                            \Log::info('Returned ' . $pairedShare->share . ' shares to seller (UserShare ID: ' . $sellerShare->id . ') due to buyer payment timeout');
+                            Log::info('Returned ' . $pairedShare->share . ' shares to seller (UserShare ID: ' . $sellerShare->id . ') due to buyer payment timeout');
                         }
                         $pairedShare->is_paid = 2; // Mark as failed payment
                         $pairedShare->save();
@@ -124,9 +132,37 @@ class UpdateSharesCommand extends Command
                 $paidSharesSum = $paidPairedShares->sum('share');
                 if ($paidSharesSum > 0) {
                     saveAllocateShare($share->user_id, $share, $paidSharesSum, $key + 1);
-                    \Log::info('Allocated ' . $paidSharesSum . ' shares to buyer (User ID: ' . $share->user_id . ') for partially paid transaction');
+                    Log::info('Allocated ' . $paidSharesSum . ' shares to buyer (User ID: ' . $share->user_id . ') for partially paid transaction');
                 } else {
-                    \Log::info('No shares allocated to buyer (User ID: ' . $share->user_id . ') - no payments were made within timeout period');
+                    Log::info('No shares allocated to buyer (User ID: ' . $share->user_id . ') - no payments were made within timeout period');
+                }
+                
+                // Use ProgressCalculationService to handle progress restoration for failed trades
+                try {
+                    $progressResult = $progressService->handleFailedTradeProgressRestoration($tradeId, $failedShares);
+                    
+                    if ($progressResult['success']) {
+                        Log::info('Progress restoration completed for failed trade', [
+                            'trade_id' => $tradeId,
+                            'failed_shares' => $failedShares,
+                            'progress_restored' => $progressResult['progress_restored'] . '%',
+                            'user_id' => $share->user_id
+                        ]);
+                        
+                        // The progress bar should now correctly show the restored progress
+                        // This ensures the UI reflects the accurate state after failed trades
+                    } else {
+                        Log::warning('Failed to restore progress for failed trade', [
+                            'trade_id' => $tradeId,
+                            'error' => $progressResult['error'] ?? 'Unknown error'
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Exception during progress restoration for failed trade: ' . $e->getMessage(), [
+                        'trade_id' => $tradeId,
+                        'failed_shares' => $failedShares,
+                        'trace' => $e->getTraceAsString()
+                    ]);
                 }
             }
         }

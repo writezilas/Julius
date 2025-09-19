@@ -71,11 +71,19 @@
                                 <div class="mb-3">
                                     <label class="form-label">Time period</label>
                                     <select name="period" class="form-control" id="allocateShareFromUser">
-                                        @foreach($periods as $period)
-                                            <option value="{{ $period->days }}" @selected(old('period') == $period->days)>
-                                                {{ $period->days }} days
-                                            </option>
-                                        @endforeach
+                                        @if($periods->count() > 0)
+                                            @foreach($periods as $period)
+                                                <option value="{{ $period->days }}" @selected(old('period') == $period->days)>
+                                                    @if(isset($period->label))
+                                                        {{ $period->label }}
+                                                    @else
+                                                        {{ $period->days }} days ({{ $period->percentage }}% return)
+                                                    @endif
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            <option value="" disabled>No trade periods available</option>
+                                        @endif
                                     </select>
                                     @error('period')
                                     <span class="invalid-feedback" role="alert">

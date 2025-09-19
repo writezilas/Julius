@@ -12,9 +12,16 @@ class UserShareController extends Controller
 {
     public function boughtShareView($id)
     {
+        // Find the share and check if it belongs to the current user
         $share = UserShare::with('pairedShares', 'refferal', 'payments',
                                 'pairedShares.user:id,username')
+                ->where('user_id', auth()->id())
                 ->findOrFail($id);
+                
+        // Additional check for admin-allocated shares that should be viewable
+        if (!$share) {
+            abort(403, 'Unauthorized access to this share.');
+        }
 
         $pairedIds = $share->pairedShares->pluck('paired_user_share_id')->toArray();
 
@@ -45,7 +52,7 @@ class UserShareController extends Controller
         //             'text' => 'Paid, waiting for confirmation',
         //             'class' => 'badge bg-info'
         //         ];
-        //     }elseif(\Carbon\Carbon::parse($pairedShare->created_at)->addHour(3) >= now() && $pairedShare->is_paid == 0){
+        //     }elseif(\Carbon\Carbon::parse($pairedShare->created_at)->addMinutes($share->payment_deadline_minutes ?? 60) >= now() && $pairedShare->is_paid == 0){
         //         $status = [
         //             'text' => 'Waiting for payment',
         //             'class' => 'badge bg-primary'
@@ -70,7 +77,7 @@ class UserShareController extends Controller
         //             'text' => 'Paid, waiting for confirmation',
         //             'class' => 'badge bg-info'
         //         ];
-        //     }elseif(\Carbon\Carbon::parse($pairedShare->created_at)->addHour(3) >= now() && $pairedShare->is_paid == 0){
+        //     }elseif(\Carbon\Carbon::parse($pairedShare->created_at)->addMinutes($share->payment_deadline_minutes ?? 60) >= now() && $pairedShare->is_paid == 0){
         //         $action = [
         //             'text' => 'modal',
         //             'class' => 'btn btn-primary',
@@ -100,10 +107,53 @@ class UserShareController extends Controller
     }
     public function soldShareView($id)
     {
-        $share = UserShare::findOrFail($id);
+        // Find the share and check if it belongs to the current user
+        $share = UserShare::where('user_id', auth()->id())->findOrFail($id);
         $pageTitle = 'Sold share view '.$share->ticket_no;
+        
+        // Allow purchased shares to be viewed on the sold shares page when they have transitioned
+        // to the selling phase, but hide their pair history to prevent confusion
+        
+        // Determine if we should show pair history
+        // Only show pair history for shares that were originally selling shares
+        // Do NOT show pair history for shares that have transitioned from bought to sold phase
+        $shouldShowPairHistory = $this->shouldShowPairHistoryForSoldShare($share);
 
-        return view('user-panel.share.sold-share-view', compact('pageTitle', 'share'));
+        return view('user-panel.share.sold-share-view', compact('pageTitle', 'share', 'shouldShowPairHistory'));
+    }
+    
+    /**
+     * Determine if pair history should be shown for a sold share
+     * 
+     * @param UserShare $share
+     * @return bool
+     */
+    private function shouldShowPairHistoryForSoldShare($share)
+    {
+        // If the share was originally purchased (get_from = 'purchase'),
+        // and it has transitioned to the sold phase, we should NOT show pair history
+        // because it will create confusion when the shares mature and are paired with new buyers
+        
+        // Case 1: If this is a purchased share that has matured and is ready to sell,
+        // do NOT show old pair history from the buying phase
+        if ($share->get_from === 'purchase' && $share->is_ready_to_sell == 1) {
+            return false;
+        }
+        
+        // Case 2: If this is a purchased share in countdown mode (not ready to sell yet),
+        // do NOT show old pair history either as it's still in transition
+        if ($share->get_from === 'purchase' && $share->is_ready_to_sell == 0) {
+            return false;
+        }
+        
+        // Case 3: If this is an admin-allocated share or other non-purchase share,
+        // show pair history as these are legitimate selling shares
+        if ($share->get_from !== 'purchase') {
+            return true;
+        }
+        
+        // Default: don't show pair history for safety
+        return false;
     }
 
     public function updateShareStatusAsFailed(Request $request) {

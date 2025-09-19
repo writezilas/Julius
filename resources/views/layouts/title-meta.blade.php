@@ -4,4 +4,6 @@
 <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
 <meta content="Themesbrand" name="author" />
 <!-- App favicon -->
-<link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico')}}">
+<link rel="shortcut icon" href="{{ URL::asset('images/autobidder.svg')}}">
+<link rel="icon" type="image/svg+xml" href="{{ URL::asset('images/autobidder.svg')}}">
+<link rel="apple-touch-icon" href="{{ URL::asset('images/autobidder.svg')}}">

@@ -6,19 +6,19 @@
                 <div class="navbar-brand-box horizontal-logo">
                     <a href="index" class="logo logo-dark">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{ URL::asset('assets/images/logo-dark.png') }}" alt="" height="17">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
                         </span>
                     </a>
 
                     <a href="index" class="logo logo-light">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{ URL::asset('assets/images/logo-light.png') }}" alt="" height="17">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
                         </span>
                     </a>
                 </div>
@@ -478,14 +478,21 @@
                         <i class='bx bx-moon fs-22'></i>
                     </button>
                 </div>
+                @if(auth()->check())
                 <div class="dropdown topbar-head-dropdown ms-1 header-item">
                     <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
                         id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
                         <i class='bx bx-bell fs-22'></i>
-                        <span
-                            class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger"> {{ count(auth()->user()->unreadNotifications) }}<span
-                                class="visually-hidden">unread messages</span></span>
+                        @php
+                            $unreadCount = auth()->check() ? auth()->user()->unreadNotifications->count() : 0;
+                        @endphp
+                        @if($unreadCount > 0)
+                        <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
+                            {{ $unreadCount }}
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                        @endif
                     </button>
                     
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
@@ -497,12 +504,12 @@
                                 <div class="row align-items-center">
                                     <div class="col">
                                         <h6 class="m-0 fs-16 fw-semibold text-white"> Notifications </h6>
-                                        @if(count(auth()->user()->unreadNotifications))
-                                        <a class="badge badge-gradient-warning fs-13 mt-3" href="{{route('notification.read-all')}}">Mark all read</a>
-                                        @endif
-                                    </div>
-                                    <div class="col-auto dropdown-tabs">
-                                        <span class="badge badge-soft-light fs-13"> {{ count(auth()->user()->unreadNotifications) }} New</span>
+                        @if(auth()->check() && count(auth()->user()->unreadNotifications))
+                        <a class="badge badge-gradient-warning fs-13 mt-3" href="{{route('notification.read-all')}}">Mark all read</a>
+                        @endif
+                    </div>
+                    <div class="col-auto dropdown-tabs">
+                        <span class="badge badge-soft-light fs-13"> {{ auth()->check() ? count(auth()->user()->unreadNotifications) : 0 }} New</span>
                                     </div>
                                 </div>
                             </div>
@@ -517,6 +524,7 @@
                         <div class="tab-content" id="notificationItemsTabContent">
                             <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
                                 <div data-simplebar style="max-height: 300px;" class="pe-2">
+                                    @if(auth()->check())
                                     @foreach(auth()->user()->unreadNotifications as $notification)
                                     <div class="text-reset notification-item d-block dropdown-item position-relative">
                                         <div class="d-flex">
@@ -533,6 +541,7 @@
                                         </div>
                                     </div>
                                     @endforeach
+                                    @endif
 
                                     {{-- <div class="my-3 text-center">--}}
                                     {{-- <button type="button" class="btn btn-soft-success waves-effect waves-light">View--}}
@@ -553,22 +562,24 @@
                         </div>
                     </div>
                 </div>
+                @endif
 
+                @if(auth()->check())
                 <div class="dropdown ms-sm-3 header-item topbar-user">
                     <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
-                            <img class="rounded-circle header-profile-user" src="@if (Auth::user()->avatar && Auth::user()->avatar != ''){{ asset(Auth::user()->avatar) }} @else{{ asset('images/default.jpg') }}@endif"
+                            <img class="rounded-circle header-profile-user" src="@if (Auth::user()->avatar && Auth::user()->avatar != ''){{ asset(Auth::user()->avatar) }} @else{{ asset('assets/images/users/default.jpg') }}@endif"
                                 alt="Header Avatar">
                             <span class="text-start ms-xl-2">
-                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{Auth::user()->name}}</span>
-                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">{{Auth::user()->username}}</span>
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->name ?? 'User' }}</span>
+                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">{{ Auth::user()->username ?? 'N/A' }}</span>
                             </span>
                         </span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <!-- item-->
-                        <h6 class="dropdown-header">Welcome {{ auth()->user()->username }} !</h6>
+                        <h6 class="dropdown-header">Welcome {{ auth()->user()->username ?? 'User' }}!</h6>
                         <a class="dropdown-item" href="{{ route('profile') }}"><i
                                 class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span
                                 class="align-middle">Profile</span></a>
@@ -600,6 +611,13 @@
                         </form>
                     </div>
                 </div>
+                @else
+                <div class="ms-1 header-item">
+                    <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm">
+                        <i class="bx bx-user fs-16 align-middle me-1"></i> Login
+                    </a>
+                </div>
+                @endif
             </div>
         </div>
     </div>

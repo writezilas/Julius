@@ -1,0 +1,176 @@
+--- a/src/Illuminate/Support/helpers.php
++++ b/src/Illuminate/Support/helpers.php
+@@ -199,7 +199,7 @@ if (! function_exists('optional')) {
+      * @param  callable|null  $callback
+      * @return mixed
+      */
+-    function optional($value = null, callable $callback = null)
++    function optional($value = null, ?callable $callback = null)
+     {
+         if (is_null($callback)) {
+             return new Optional($value);
+@@ -431,7 +431,7 @@ if (! function_exists('with')) {
+      * @param  (callable(TValue): (TReturn))|null  $callback
+      * @return ($callback is null ? TValue : TReturn)
+      */
+-    function with($value, callable $callback = null)
++    function with($value, ?callable $callback = null)
+     {
+         return is_null($callback) ? $value : $callback($value);
+     }
+--- a/src/Illuminate/Container/Container.php
++++ b/src/Illuminate/Container/Container.php
+@@ -1125,7 +1125,7 @@ class Container implements ArrayAccess, ContainerContract
+      * @param  \Closure|null  $callback
+      * @return void
+      */
+-    public function beforeResolving($abstract, Closure $callback = null)
++    public function beforeResolving($abstract, ?Closure $callback = null)
+     {
+         if (is_string($abstract)) {
+             $abstract = $this->getAlias($abstract);
+@@ -1145,7 +1145,7 @@ class Container implements ArrayAccess, ContainerContract
+      * @param  \Closure|null  $callback
+      * @return void
+      */
+-    public function resolving($abstract, Closure $callback = null)
++    public function resolving($abstract, ?Closure $callback = null)
+     {
+         if (is_string($abstract)) {
+             $abstract = $this->getAlias($abstract);
+@@ -1165,7 +1165,7 @@ class Container implements ArrayAccess, ContainerContract
+      * @param  \Closure|null  $callback
+      * @return void
+      */
+-    public function afterResolving($abstract, Closure $callback = null)
++    public function afterResolving($abstract, ?Closure $callback = null)
+     {
+         if (is_string($abstract)) {
+             $abstract = $this->getAlias($abstract);
+@@ -1404,7 +1404,7 @@ class Container implements ArrayAccess, ContainerContract
+      * @param  \Illuminate\Contracts\Container\Container|null  $container
+      * @return \Illuminate\Contracts\Container\Container|static
+      */
+-    public static function setInstance(ContainerContract $container = null)
++    public static function setInstance(?ContainerContract $container = null)
+     {
+         return static::$instance = $container;
+     }
+--- a/src/Illuminate/Contracts/Container/Container.php
++++ b/src/Illuminate/Contracts/Container/Container.php
+@@ -188,7 +188,7 @@ interface Container
+      * @param  \Closure|null  $callback
+      * @return void
+      */
+-    public function beforeResolving($abstract, Closure $callback = null);
++    public function beforeResolving($abstract, ?Closure $callback = null);
+ 
+     /**
+      * Register a new resolving callback.
+@@ -197,7 +197,7 @@ interface Container
+      * @param  \Closure|null  $callback
+      * @return void
+      */
+-    public function resolving($abstract, Closure $callback = null);
++    public function resolving($abstract, ?Closure $callback = null);
+ 
+     /**
+      * Register a new after resolving callback.
+@@ -206,5 +206,5 @@ interface Container
+      * @param  \Closure|null  $callback
+      * @return void
+      */
+-    public function afterResolving($abstract, Closure $callback = null);
++    public function afterResolving($abstract, ?Closure $callback = null);
+ }
+--- a/src/Illuminate/Collections/Arr.php
++++ b/src/Illuminate/Collections/Arr.php
+@@ -185,7 +185,7 @@ class Arr
+      * @param  mixed  $default
+      * @return mixed
+      */
+-    public static function first($array, callable $callback = null, $default = null)
++    public static function first($array, ?callable $callback = null, $default = null)
+     {
+         if (is_null($callback)) {
+             if (empty($array)) {
+@@ -214,7 +214,7 @@ class Arr
+      * @param  mixed  $default
+      * @return mixed
+      */
+-    public static function last($array, callable $callback = null, $default = null)
++    public static function last($array, ?callable $callback = null, $default = null)
+     {
+         if (is_null($callback)) {
+             return empty($array) ? value($default) : end($array);
+--- a/src/Illuminate/Events/Dispatcher.php
++++ b/src/Illuminate/Events/Dispatcher.php
+@@ -62,7 +62,7 @@ class Dispatcher implements DispatcherContract
+      * @param  \Illuminate\Contracts\Container\Container|null  $container
+      * @return void
+      */
+-    public function __construct(ContainerInterface $container = null)
++    public function __construct(?ContainerInterface $container = null)
+     {
+         $this->container = $container ?: new Container;
+     }
+--- a/src/Illuminate/Conditionable/Traits/Conditionable.php
++++ b/src/Illuminate/Conditionable/Traits/Conditionable.php
+@@ -18,7 +18,7 @@ trait Conditionable
+      * @param  callable|null  $default
+      * @return $this|mixed
+      */
+-    public function when($value = null, callable $callback = null, callable $default = null)
++    public function when($value = null, ?callable $callback = null, ?callable $default = null)
+     {
+         $value = $value instanceof Closure ? $value($this) : $value;
+ 
+@@ -50,7 +50,7 @@ trait Conditionable
+      * @param  callable|null  $default
+      * @return $this|mixed
+      */
+-    public function unless($value = null, callable $callback = null, callable $default = null)
++    public function unless($value = null, ?callable $callback = null, ?callable $default = null)
+     {
+         $value = $value instanceof Closure ? $value($this) : $value;
+ 
+--- a/src/Illuminate/Support/Str.php
++++ b/src/Illuminate/Support/Str.php
+@@ -752,7 +752,7 @@ class Str
+      * @param  callable|null  $factory
+      * @return void
+      */
+-    public static function createRandomStringsUsing(callable $factory = null)
++    public static function createRandomStringsUsing(?callable $factory = null)
+     {
+         static::$randomStringFactory = $factory;
+     }
+@@ -1271,7 +1271,7 @@ class Str
+      * @param  callable|null  $factory
+      * @return void
+      */
+-    public static function createUuidsUsing(callable $factory = null)
++    public static function createUuidsUsing(?callable $factory = null)
+     {
+         static::$uuidFactory = $factory;
+     }
+@@ -1316,7 +1316,7 @@ class Str
+      * @param  callable|null  $callback
+      * @return \Illuminate\Support\Collection
+      */
+-    public static function freezeUuids(callable $callback = null)
++    public static function freezeUuids(?callable $callback = null)
+     {
+         $factory = static::$uuidFactory;
+ 
+--- a/src/Illuminate/Log/Logger.php
++++ b/src/Illuminate/Log/Logger.php
+@@ -40,7 +40,7 @@ class Logger implements LoggerInterface
+      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
+      * @return void
+      */
+-    public function __construct(LoggerInterface $logger, EventDispatcher $dispatcher = null)
++    public function __construct(LoggerInterface $logger, ?EventDispatcher $dispatcher = null)
+     {
+         $this->logger = $logger;
+         $this->dispatcher = $dispatcher;

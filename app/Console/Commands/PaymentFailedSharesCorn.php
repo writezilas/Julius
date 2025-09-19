@@ -37,7 +37,30 @@ class PaymentFailedSharesCorn extends Command
      */
     public function handle()
     {
-        updatePaymentFailedShareStatus();
-        $this->info('Payment failed cron Cummand Run successfully! '. now());
+        try {
+            $this->line('🔍 Starting payment expiry check at: ' . now());
+            
+            updatePaymentFailedShareStatus();
+            
+            $this->info('✅ Payment failed cron command completed successfully! '. now());
+            \Log::info('Payment failed cron executed successfully', [
+                'timestamp' => now(),
+                'command' => 'paymentfailedshare:cron'
+            ]);
+            
+            return 0;
+            
+        } catch (\Exception $e) {
+            $this->error('❌ Error in payment failed cron: ' . $e->getMessage());
+            \Log::error('Payment failed cron error', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'timestamp' => now()
+            ]);
+            
+            return 1;
+        }
     }
 }

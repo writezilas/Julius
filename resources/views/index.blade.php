@@ -35,12 +35,15 @@
     .stat-card {
         background: white;
         border-radius: 15px;
-        padding: 1.5rem;
+        padding: 1.2rem;
         box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         transition: all 0.3s ease;
         border-left: 4px solid transparent;
         position: relative;
         overflow: hidden;
+        min-height: 120px;
+        display: flex;
+        align-items: center;
     }
     
     .stat-card::before {
@@ -65,10 +68,23 @@
     .stat-card.info { border-left-color: #17a2b8; }
     
     .stat-number {
-        font-size: 2.2rem;
+        font-size: 1.5rem; /* Reduced from 2.2rem */
         font-weight: 700;
         color: #2d3436;
-        line-height: 1;
+        line-height: 1.2;
+        word-break: break-all;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Responsive font sizes for very large numbers */
+    .stat-number.large-number {
+        font-size: 1.2rem;
+    }
+    
+    .stat-number.very-large-number {
+        font-size: 1rem;
     }
     
     .stat-label {
@@ -268,6 +284,47 @@
         0%, 100% { transform: translateY(0px); }
         50% { transform: translateY(-10px); }
     }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+        .stat-number {
+            font-size: 1.2rem !important;
+        }
+        
+        .stat-number.large-number {
+            font-size: 1rem !important;
+        }
+        
+        .stat-number.very-large-number {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-card {
+            padding: 1rem;
+            min-height: 100px;
+        }
+        
+        .metric-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .stat-number {
+            font-size: 1rem !important;
+            line-height: 1.1;
+        }
+        
+        .stat-number.large-number {
+            font-size: 0.9rem !important;
+        }
+        
+        .stat-number.very-large-number {
+            font-size: 0.8rem !important;
+        }
+    }
 </style>
 @endsection
 @section('content')
@@ -346,7 +403,7 @@
                                                     <i class="ri-shopping-bag-line"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-number pulse">
+                                                    <div class="stat-number pulse" id="bought-shares-{{ $trade->id }}">
                                                         <span class="counter-value" data-target="{{ $totalShares + $totalProfit }}">0</span>
                                                     </div>
                                                     <div class="stat-label">Bought Shares</div>
@@ -361,7 +418,7 @@
                                                     <i class="ri-exchange-line"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-number pulse">
+                                                    <div class="stat-number pulse" id="sold-shares-{{ $trade->id }}">
                                                         <span class="counter-value" data-target="{{ ($totalShares + $totalProfit) - $totalRemainShares }}">0</span>
                                                     </div>
                                                     <div class="stat-label">Sold Shares</div>
@@ -376,7 +433,7 @@
                                                     <i class="ri-stack-line"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="stat-number pulse">
+                                                    <div class="stat-number pulse" id="remaining-shares-{{ $trade->id }}">
                                                         <span class="counter-value" data-target="{{ $totalRemainShares }}">0</span>
                                                     </div>
                                                     <div class="stat-label">Remaining</div>
@@ -423,7 +480,7 @@
                                     <!--end col-->
                                     <div class="col-6 col-sm-3">
                                         <div class="p-3 border border-dashed border-start-0">
-                                            <h5 class="mb-1">$<span class="counter-value" data-target="22.89">0</span>k</h5>
+                                            <h5 class="mb-1">KSH <span class="counter-value" data-target="22.89">0</span>k</h5>
                                             <p class="text-muted mb-0">Earnings</p>
                                         </div>
                                     </div>
@@ -501,7 +558,7 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <h5 class="fs-14 my-1 fw-normal">${{$top->price}}</h5>
+                                                    <h5 class="fs-14 my-1 fw-normal">KSH {{number_format($top->price, 2)}}</h5>
                                                     <span class="text-muted">Price</span>
                                                 </td>
                                                 <td>
@@ -513,7 +570,7 @@
                                                     <span class="text-muted">Stock</span>
                                                 </td>
                                                 <td>
-                                                    <h5 class="fs-14 my-1 fw-normal">${{$totalRemainShares * $top->price}}</h5>
+                                                    <h5 class="fs-14 my-1 fw-normal">KSH {{number_format($totalRemainShares * $top->price, 2)}}</h5>
                                                     <span class="text-muted">Amount</span>
                                                 </td>
                                             </tr>
@@ -598,7 +655,7 @@
                                                     <span class="text-muted">Stock</span>
                                                 </td>
                                                 <td>
-                                                    <span class="text-muted">${{$topTrader->balance}}</span>
+                                                    <span class="text-muted">KSH {{number_format($topTrader->balance, 2)}}</span>
                                                 </td>
                                                 <td>
                                                     <h5 class="fs-14 mb-0">32%<i class="ri-bar-chart-fill text-success fs-16 align-middle ms-2"></i>
@@ -707,126 +764,8 @@
                 {{-- @include('components.live-statistics') --}}
 
             @endcan
-            @can('view-share-pending-confirmation')
-                
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="card">
-                            <div class="card-header align-items-center d-flex">
-                                <h4 class="card-title mb-0 flex-grow-1">Share pending confirmation</h4>
-                                
-                            </div><!-- end card header -->
-
-                            <div class="card-body">
-                                <div class="table-responsive table-card">
-                                    {{-- <table class="table table-borderless table-centered align-middle table-nowrap mb-0"> --}}
-                                    <table id="scroll-vertical" class="table table-bordered dt-responsive nowrap align-middle mdl-data-table" style="width:100%">
-                                        <thead class="text-muted table-light">
-                                            <tr>
-                                                <th scope="col">Ticket no</th>
-                                                <th scope="col">Customer</th>
-                                                <th scope="col">Share type</th>
-                                                <th scope="col">Share bought</th>
-                                                <th scope="col">Payment status</th>
-                                                <th scope="col">Action</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-
-                                            @foreach($pendingShares as $share)
-                                            @php
-                                            $payment = $share->payment;
-                                            @endphp
-                                            <tr>
-                                                <td>
-                                                    <a href="#" class="fw-medium link-primary">{{ $share->pairedShare->ticket_no }}</a>
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="text-decoration-underline text-blue">
-                                                        {{ $share->pairedShare->user->name }}
-                                                    </a>
-                                                </td>
-                                                <td> {{ $share->pairedShare->trade->name }} </td>
-                                                <td>
-                                                    <span class="text-success">
-                                                        {{ $share->share }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="badge badge-soft-danger">Pending confirmation</span>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group" role="group" aria-label="Basic example"></a>
-                                                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#soldShareDetails{{ $share->pairedShare->id }}">
-                                                            Details
-                                                        </button>
-                                                        <div class="modal fade" id="soldShareDetails{{ $share->pairedShare->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                                            <div class="modal-dialog modal-lg">
-                                                                <div class="modal-content">
-                                                                    <div class="modal-header">
-                                                                        <h5 class="modal-title" id="staticBackdropLabel">Payment confirmation</h5>
-                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                                    </div>
-                                                                    <div class="modal-body">
-                                                                        <table class="table table-bordered">
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <th>Sender name</th>
-                                                                                    <td>{{ $payment->name }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th>Amount sent from</th>
-                                                                                    <td>{{ $payment->number }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th>Amount received from</th>
-                                                                                    <td>{{ $payment->number }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th>Amount</th>
-                                                                                    <td>{{ formatPrice($payment->amount) }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th>Transaction no</th>
-                                                                                    <td>{{ $payment->txs_id }}</td>
-                                                                                </tr>
-                                                                                <tr>
-                                                                                    <th>Note by sender</th>
-                                                                                    <td>{{ $payment->note_by_sender }}</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                        @can('accept-share-pending-confirmation')
-                                                                        
-                                                                        <form id="paymentApproveForm{{$payment->id}}" action="{{ route('share.paymentApprove') }}" method="post">
-                                                                            @csrf
-                                                                            <div class="form-group">
-                                                                                <label>Comment <small>if any</small></label>
-                                                                                <textarea name="note_by_receiver" class="form-control"></textarea>
-                                                                                <input type="hidden" value="{{ $payment->id }}" name="paymentId">
-                                                                                <input type="hidden" value="1" name="by_admin">
-                                                                            </div>
-                                                                            <button type="button" onclick="handlePaymentConformSubmit({{ $payment->id }})" class="btn btn-success mt-3 float-end subBtn-{{$payment->id}}">Confirm payment</button>
-                                                                        </form>
-                                                                        @endcan
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <!-- end tr -->
-                                            @endforeach
-                                        </tbody><!-- end tbody -->
-                                    </table><!-- end table -->
-                                </div>
-                            </div>
-                        </div> <!-- .card-->
-                    </div> <!-- .col-->
-                </div> 
-            @endcan<!-- end row-->
+            {{-- Share pending confirmation card has been moved to a dedicated page under Share Management --}}
+            {{-- View at: /admin/pending-payment-confirmations --}}
 
         </div> <!-- end .h-100-->
 
@@ -1302,6 +1241,58 @@
         $('.subBtn-' + paymentId).prop('disabled', true);
         $('#paymentApproveForm' + paymentId).submit();
     }
+
+    function handlePaymentDeclineSubmit(paymentId) {
+        $('.declineBtn-' + paymentId).prop('disabled', true);
+        $('#paymentDeclineForm' + paymentId).submit();
+    }
+
+    function toggleForms(paymentId, formType) {
+        if (formType === 'decline') {
+            $('#confirmForm' + paymentId).hide();
+            $('#declineForm' + paymentId).show();
+        } else {
+            $('#declineForm' + paymentId).hide();
+            $('#confirmForm' + paymentId).show();
+        }
+    }
+    
+    // Function to format large numbers and add responsive classes
+    function formatStatsNumbers() {
+        $('.stat-number').each(function() {
+            const $this = $(this);
+            const $counterValue = $this.find('.counter-value');
+            const targetValue = parseInt($counterValue.attr('data-target'));
+            
+            // Add responsive classes based on number size
+            if (targetValue >= 1000000) {
+                $this.addClass('very-large-number');
+            } else if (targetValue >= 100000) {
+                $this.addClass('large-number');
+            }
+        });
+    }
+    
+    // Override the counter animation to format numbers with commas
+    function formatCounterNumbers() {
+        // Wait for counter animation to complete, then format
+        setTimeout(function() {
+            $('.counter-value').each(function() {
+                const $this = $(this);
+                const currentValue = parseInt($this.text());
+                if (!isNaN(currentValue)) {
+                    const formattedNumber = new Intl.NumberFormat().format(currentValue);
+                    $this.text(formattedNumber);
+                }
+            });
+        }, 3000); // Wait 3 seconds for counter animation
+    }
+    
+    // Run formatting when page loads
+    $(document).ready(function() {
+        formatStatsNumbers();
+        formatCounterNumbers();
+    });
 
 </script>
 @endsection

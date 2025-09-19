@@ -56,7 +56,11 @@ class MarketController extends Controller
                 'date_format:H:i',
                 'after:open_time',
             ],
+            'is_active' => 'nullable|boolean',
         ]);
+        
+        // Set default value if not provided
+        $data['is_active'] = $data['is_active'] ?? true;
 
         if(Market::create($data)) {
             toastr()->success('Market has been created successfully');
@@ -103,7 +107,11 @@ class MarketController extends Controller
                 'date_format:H:i',
                 'after:open_time',
             ],
+            'is_active' => 'nullable|boolean',
         ]);
+        
+        // Set default value if not provided
+        $data['is_active'] = $data['is_active'] ?? true;
 
 
         $market = Market::findOrFail($id);
@@ -134,5 +142,33 @@ class MarketController extends Controller
         }
 
         return back();
+    }
+    
+    /**
+     * Toggle the status of a market (active/inactive)
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function toggleStatus($id)
+    {
+        try {
+            $market = Market::findOrFail($id);
+            $market->is_active = !$market->is_active;
+            $market->save();
+            
+            $message = $market->is_active ? 'Market has been activated successfully' : 'Market has been deactivated successfully';
+            
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'is_active' => $market->is_active
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update market status'
+            ], 500);
+        }
     }
 }

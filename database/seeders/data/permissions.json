@@ -2,6 +2,10 @@
     {"name": "view-analytic", "guard_name": "web", "module_name": "dashboard"},
     {"name": "view-share-pending-confirmation", "guard_name": "web", "module_name": "dashboard"},
     {"name": "accept-share-pending-confirmation", "guard_name": "web", "module_name": "dashboard"},
+    {"name": "pending-payment-confirmation-index", "guard_name": "web", "module_name": "share-management"},
+    {"name": "pending-payment-confirmation-view", "guard_name": "web", "module_name": "share-management"},
+    {"name": "pending-payment-confirmation-approve", "guard_name": "web", "module_name": "share-management"},
+    {"name": "pending-payment-confirmation-decline", "guard_name": "web", "module_name": "share-management"},
 
     {"name": "role-index", "guard_name": "web", "module_name": "role-management"},
     {"name": "role-create", "guard_name": "web", "module_name": "role-management"},

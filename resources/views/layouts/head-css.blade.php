@@ -1,3 +1,4 @@
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @yield('css')
 <!-- Layout config Js -->
 <script src="{{ URL::asset('assets/js/layout.js') }}"></script>
@@ -9,6 +10,12 @@
 <link href="{{ URL::asset('assets/css/app.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
 <!-- custom Css-->
 <link href="{{ URL::asset('assets/css/custom.min.css') }}" id="app-style" rel="stylesheet" type="text/css" />
+<!-- Enhanced Admin Panel Css-->
+<link href="{{ URL::asset('assets/css/admin-panel-custom.css') }}" rel="stylesheet" type="text/css" />
+<!-- Logo Css-->
+<link href="{{ URL::asset('assets/css/logo.css') }}" rel="stylesheet" type="text/css" />
+<!-- Notification Badge Fix Css-->
+<link href="{{ URL::asset('assets/css/notification-fix.css') }}" rel="stylesheet" type="text/css" />
 {{--data table --}}
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet" type="text/css" />
 {{--sweetalert --}}

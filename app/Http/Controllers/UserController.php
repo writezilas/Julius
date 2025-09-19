@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -32,6 +33,61 @@ class UserController extends Controller
         $emptyMessage   = $this->emptyMessage;
 
         return view('admin-panel.users.index', compact('pageTitle', 'emptyMessage', 'users'));
+    }
+    
+    /**
+     * Unified user management interface
+     */
+    public function unifiedIndex(Request $request)
+    {
+        $query = User::where('role_id', 2);
+        
+        // Apply status filter
+        if ($request->has('status') && !empty($request->status)) {
+            $status = $request->status;
+            $query->where('status', $status);
+        }
+        
+        // Apply search filter
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('username', 'like', '%' . $search . '%')
+                  ->orWhere('email', 'like', '%' . $search . '%')
+                  ->orWhere('phone', 'like', '%' . $search . '%');
+            });
+        }
+        
+        // Apply date filters
+        if ($request->has('date_from') && !empty($request->date_from)) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        
+        if ($request->has('date_to') && !empty($request->date_to)) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        // Get paginated results
+        $users = $query->latest()->paginate(25)->appends($request->query());
+        
+        // Get user statistics
+        $stats = $this->getUserStats();
+        
+        return view('admin-panel.users.unified', compact('users', 'stats'));
+    }
+    
+    /**
+     * Get user statistics for dashboard cards
+     */
+    private function getUserStats()
+    {
+        return [
+            'total' => User::where('role_id', 2)->count(),
+            'active' => User::where('role_id', 2)->where('status', 'active')->count(),
+            'suspended' => User::where('role_id', 2)->where('status', 'suspended')->count(),
+            'blocked' => User::where('role_id', 2)->where('status', 'blocked')->count(),
+        ];
     }
 
     /**
@@ -87,21 +143,33 @@ class UserController extends Controller
         $user->status = $request->status;
         
         // Handle suspension with duration
-        if($request->status == 'suspend'){
+        if($request->status == 'suspend' || $request->status == 'suspended'){
+            // Standardize to 'suspended' status
+            $user->status = 'suspended';
+            
             if($request->has('suspension_duration') && $request->suspension_duration > 0) {
                 $user->suspension_until = \Carbon\Carbon::now()->addHours($request->suspension_duration);
             } else {
                 // Default to 24 hours if no duration specified
                 $user->suspension_until = \Carbon\Carbon::now()->addHours(24);
             }
+            
+            // Set suspension reason to 'manual' for admin suspensions
+            $user->suspension_reason = 'manual';
+            
+        } elseif($request->status == 'block' || $request->status == 'blocked') {
+            // Standardize to 'blocked' status
+            $user->status = 'blocked';
+            
+            // Admin blocks are permanent - do not set block_until
+            // Temporary blocks are handled by the system, not admin interface
+            $user->block_until = null;
+            
         } else {
-            // Clear suspension when status changes to something else
+            // Clear suspension and blocking when status changes to something else (e.g., active)
             $user->suspension_until = null;
-        }
-        
-        // Handle blocking with duration (keep existing functionality)
-        if($request->status == 'block' && $request->has('time')){
-            $user->block_until = \Carbon\Carbon::now()->addHours($request->time);
+            $user->suspension_reason = null;
+            $user->block_until = null;
         }
         
         $user->save();
@@ -206,19 +274,21 @@ class UserController extends Controller
     public function revertSuspendUsers()
     {
         // Revert suspended users whose suspension time has expired
-        User::where('status', 'suspend')
+        User::whereIn('status', ['suspend', 'suspended'])
             ->where('suspension_until', '<', now())
             ->update([
-                'status' => 'fine',
-                'suspension_until' => null
+                'status' => 'active',
+                'suspension_until' => null,
+                'suspension_reason' => null
             ]);
         
         // Also handle old block_until logic for backward compatibility
-        User::where('status', 'suspend')
+        User::whereIn('status', ['suspend', 'suspended'])
             ->where('block_until', '<', now())
             ->update([
-                'status' => 'fine',
-                'block_until' => null
+                'status' => 'active',
+                'block_until' => null,
+                'suspension_reason' => null
             ]);
     }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\CronController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\OthersController;
+use App\Http\Controllers\ReferralController;
 use App\Http\Controllers\SupportController;
 use App\Http\Controllers\TradeController;
 use App\Http\Controllers\TradePeriodController;
@@ -67,6 +68,10 @@ Route::get('cache-clear', function () {
     return 'success';
 });
 
+// Public policy pages - accessible without authentication
+Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('page.privacy_policy');
+Route::get('/terms-and-conditions', [HomeController::class, 'termsAndConditions'])->name('page.termsAndConditions');
+Route::get('/confidentiality-policy', [HomeController::class, 'confidentialityPolicy'])->name('page.confidentialityPolicy');
 
 Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiration', 'verified']], function () {
 
@@ -112,6 +117,7 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
             Route::get('/{id}/edit', 'edit')->name('admin.trade.edit')->middleware('permission:trade-edit');
             Route::patch('/{id}', 'update')->name('admin.trade.update')->middleware('permission:trade-update');
             Route::get('/delete/{id}', 'destroy')->name('admin.trade.delete')->middleware('permission:trade-delete');
+            Route::get('/export', 'export')->name('admin.trade.export')->middleware('permission:trade-index');
         });
         Route::controller(MarketController::class)->prefix('market')->name('admin.markets.')->group(function () {
             Route::get('/', 'index')->name('index')->middleware('permission:market-index');
@@ -120,6 +126,7 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
             Route::get('/{id}/edit', 'edit')->name('edit')->middleware('permission:market-edit');
             Route::put('/{id}', 'update')->name('update')->middleware('permission:market-update');
             Route::get('/delete/{id}', 'destroy')->name('delete')->middleware('permission:trade-delete');
+            Route::post('/toggle-status/{id}', 'toggleStatus')->name('toggle-status')->middleware('permission:market-edit');
         });
 
         Route::controller(TradePeriodController::class)->prefix('trade/period')->group(function () {
@@ -137,8 +144,9 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
         Route::post('update/sold-share-status', [UserShareController::class, 'updateAsReadyToSell'])->name('share.status.updateAsReadyToSell');
 
         Route::post('share/payment', [UserSharePaymentController::class, 'payment'])->name('share.payment');
-        Route::get('shares/payment', [UserSharePaymentController::class, 'sharesPayment'])->name('shares.payment');
+        Route::post('shares/payment', [UserSharePaymentController::class, 'sharesPayment'])->name('shares.payment');
         Route::post('share/payment/approve', [UserSharePaymentController::class, 'paymentApprove'])->name('share.paymentApprove');
+        Route::post('share/payment/decline', [UserSharePaymentController::class, 'paymentDecline'])->name('share.paymentDecline');
 
         Route::get('email', [AnnouncementController::class, 'createEmail'])->name('email.create')->middleware('permission:send-email');
         Route::post('email/send', [AnnouncementController::class, 'sendEmail'])->name('email.send')->middleware('permission:send-email');
@@ -160,16 +168,38 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
         Route::post('get/share/by/trade', [AllocateShareController::class, 'getShareByTradeAndUser'])->name('admin.getShareByTradeAndUser');
         Route::get('transfer/share', [AllocateShareController::class, 'transferShare'])->name('admin.transfer.share')->middleware('permission:transfer-share-from-user');
         Route::post('transfer/share/save', [AllocateShareController::class, 'saveTransferShare'])->name('admin.allocate.saveTransferShare')->middleware('permission:transfer-share-from-user');
+        
+        Route::get('pending-payment-confirmations', [AllocateShareController::class, 'pendingPaymentConfirmations'])->name('admin.share.pending-payment-confirmations')->middleware('permission:pending-payment-confirmation-index');
 
         Route::post('user/status/update/{user_id}', [UserController::class, 'statusUpdate'])->name('user.status.update')->middleware('permission:customer-update');
         Route::get('/permission-denied', [PermissionController::class, 'denied'])->name('permission.denied');
+        
+        // Unified User Management Route (placed before other user routes to avoid conflicts)
+        Route::get('users-management', [UserController::class, 'unifiedIndex'])->name('admin.users.unified')->middleware('permission:customer-index');
+        
+        // Redirect old user management URLs to unified interface
+        Route::get('users/all', function() {
+            return redirect()->route('admin.users.unified', ['status' => '']);
+        })->middleware('permission:customer-index');
+        
+        Route::get('users/block', function() {
+            return redirect()->route('admin.users.unified', ['status' => 'blocked']);
+        })->middleware('permission:customer-index');
+        
+        Route::get('users/suspend', function() {
+            return redirect()->route('admin.users.unified', ['status' => 'suspended']);
+        })->middleware('permission:customer-index');
+        
+        Route::get('users/fine', function() {
+            return redirect()->route('admin.users.unified', ['status' => 'active']);
+        })->middleware('permission:customer-index');
 
         Route::get('setting/sms', [SettingController::class, 'createSmsSetting'])->name('admin.setting.sms.create')->middleware('permission:sms-api-page-view');
         Route::post('setting/sms', [SettingController::class, 'storeSmsSetting'])->name('admin.setting.sms.store');
         Route::get('setting/mail', [SettingController::class, 'createMailSetting'])->name('admin.setting.mail.create')->middleware('permission:email-api-page-view');
         Route::post('setting/mail', [SettingController::class, 'storeMailSetting'])->name('admin.setting.email.store')->middleware('permission:email-api-page-update');
         Route::get('general-setting', [SettingController::class, 'generalSetting'])->name('admin.general-setting')->middleware('permission:general-setting-view');
-        Route::post('general-setting', [SettingController::class, 'generalSettingStore'])->name('admin.general-setting')->middleware('permission:general-setting-update');
+        Route::post('general-setting', [SettingController::class, 'generalSettingStore'])->name('admin.general-setting.store')->middleware('permission:general-setting-update');
 
         Route::get('users/{slug}', [App\Http\Controllers\UserController::class, 'index'])->name('users.status')->middleware('permission:customer-index');
         Route::get('user/{user_id}', [UserController::class, 'show'])->name('user.single')->middleware('permission:customer-view');
@@ -195,12 +225,9 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
     Route::get('bought-shares', [HomeController::class, 'boughtShares'])->name('users.bought_shares');
     Route::get('/bought-shares/view/{id}', [UserShareController::class, 'boughtShareView'])->name('bought-share.view');
 
-    Route::get('referrals', [HomeController::class, 'referrals'])->name('users.referrals');
-    Route::get('support', [HomeController::class, 'support'])->name('users.support');
+    Route::get('referrals', [ReferralController::class, 'index'])->name('users.referrals');
+    Route::get('support', [HomeController::class, 'supportNew'])->name('users.support');
     Route::get('/how-it-works', [HomeController::class, 'howItWorksPage'])->name('page.how_it_work');
-    Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('page.privacy_policy');
-    Route::get('/terms-and-conditions', [HomeController::class, 'termsAndConditions'])->name('page.termsAndConditions');
-    Route::get('/confidentiality-policy', [HomeController::class, 'confidentialityPolicy'])->name('page.confidentialityPolicy');
 
     // Chat System Routes
     Route::prefix('chat')->group(function () {
@@ -220,16 +247,28 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
     //Update User Details
     Route::patch('/update-profile/{id}', [HomeController::class, 'updateProfile'])->name('updateProfile');
     Route::post('/update-password/{id}', [HomeController::class, 'updatePassword'])->name('updatePassword');
+    Route::post('/update-business-profile/{id}', [HomeController::class, 'updateBusinessProfile'])->name('updateBusinessProfile');
 
     Route::get('dashboard', [App\Http\Controllers\User\HomeController::class, 'root'])->name('user.dashboard');
 
     Route::post('bid', [OthersController::class, 'bid'])->name('user.bid');
+    Route::get('buy-share/{trade_id}', [OthersController::class, 'buySharePage'])->name('user.buyShare');
 
+    // User payment routes (outside admin prefix)
+    Route::post('share/payment', [UserSharePaymentController::class, 'payment'])->name('user.share.payment');
+    Route::post('shares/payment', [UserSharePaymentController::class, 'sharesPayment'])->name('user.shares.payment');
+    Route::post('share/payment/approve', [UserSharePaymentController::class, 'paymentApprove'])->name('user.share.paymentApprove');
+    Route::post('share/payment/decline', [UserSharePaymentController::class, 'paymentDecline'])->name('user.share.paymentDecline');
 
     Route::get('notification/read/{id}', [OthersController::class, 'notification_read'])->name('notification.read');
 
     // Live Statistics API
     Route::get('api/live-statistics', [HomeController::class, 'getLiveStatistics'])->name('api.live-statistics');
+    
+    // Live Statistics Demo Page
+    Route::get('demo/live-statistics', function () {
+        return view('demo.live-statistics');
+    })->name('demo.live-statistics');
     Route::get('notification/read-all', [OthersController::class, 'notification_readAll'])->name('notification.read-all');
     Route::get('change-mode', [UserController::class, 'changeMode'])->name('changeMode');
 });
@@ -256,11 +295,63 @@ Route::get('signup', function () {
     return redirect()->route('register');
 });
 
+// Test route for market availability - REMOVE THIS IN PRODUCTION
+Route::get('/test-market-availability/{userId}', function($userId) {
+    $user = App\Models\User::find($userId);
+    
+    if (!$user) {
+        return response()->json(['error' => 'User not found'], 404);
+    }
+    
+    // Login as the user
+    Auth::login($user);
+    
+    // Test the helper function
+    $availableShares = checkAvailableSharePerTrade(1); // Safaricom shares
+    
+    // Get detailed breakdown
+    $allShares = App\Models\UserShare::where('trade_id', 1)
+        ->where('status', 'completed')
+        ->where('is_ready_to_sell', 1)
+        ->where('total_share_count', '>', 0)
+        ->with('user')
+        ->get();
+        
+    $userOwnShares = $allShares->where('user_id', $user->id)->sum('total_share_count');
+    $otherShares = $allShares->where('user_id', '!=', $user->id)->sum('total_share_count');
+    
+    // Logout
+    Auth::logout();
+    
+    return response()->json([
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'username' => $user->username
+        ],
+        'shares' => [
+            'own_shares' => $userOwnShares,
+            'other_users_shares' => $otherShares,
+            'helper_function_result' => $availableShares,
+            'expected_to_see' => $otherShares
+        ],
+        'verification' => [
+            'is_correct' => $availableShares == $otherShares,
+            'message' => $availableShares == $otherShares ? 'Working correctly' : 'Issue detected'
+        ]
+    ], 200, [], JSON_PRETTY_PRINT);
+});
+
 // Catch-all route moved to the end to avoid conflicts
 Route::get('{slug}', function ($slug) {
     // Only allow specific slugs to prevent conflicts with existing routes
     if (in_array($slug, ['about', 'contact', 'faq', 'help', 'info'])) {
         return view($slug);
     }
+    abort(404);
+});
+
+// Fallback route for any unmatched routes
+Route::fallback(function () {
     abort(404);
 });

@@ -6,19 +6,19 @@
                 <div class="navbar-brand-box horizontal-logo">
                     <a href="/" class="logo logo-dark">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{ URL::asset('assets/images/autobidder_dark.png') }}" alt="" height="17">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
                         </span>
                     </a>
 
                     <a href="/" class="logo logo-light">
                         <span class="logo-sm">
-                            <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
                         </span>
                         <span class="logo-lg">
-                            <img src="{{ URL::asset('assets/images/autobidder_light.png') }}" alt="" height="17">
+                            <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
                         </span>
                     </a>
                 </div>
@@ -484,9 +484,15 @@
                         id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
                         <i class='bx bx-bell fs-22'></i>
-                        <span
-                            class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger"> {{ count(auth()->user()->unreadNotifications) }}<span
-                                class="visually-hidden">unread messages</span></span>
+                        @php
+                            $unreadCount = auth()->check() ? auth()->user()->unreadNotifications->count() : 0;
+                        @endphp
+                        @if($unreadCount > 0)
+                        <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
+                            {{ $unreadCount }}
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                        @endif
                     </button>
                     <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
                         aria-labelledby="page-header-notifications-dropdown">
@@ -517,29 +523,35 @@
                         <div class="tab-content" id="notificationItemsTabContent">
                             <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
                                 <div data-simplebar style="max-height: 300px;" class="pe-2">
-                                    @foreach(auth()->user()->unreadNotifications as $notification)
-                                    <div class="text-reset notification-item d-block dropdown-item position-relative">
-                                        <div class="d-flex">
-                                            <div class="flex-1">
-                                                <a href="{{ route('notification.read', $notification->id) }}" class="stretched-link">
-                                                    <h6 class="mt-0 mb-2 lh-base">
-                                                        {{ $notification->data['heading'] }}
-                                                    </h6>
-                                                </a>
-                                                <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                    <span><i class="mdi mdi-clock-outline"></i> {{ $notification->created_at->diffForHumans() }}</span>
-                                                </p>
+                                    @if(auth()->check() && auth()->user()->unreadNotifications->count() > 0)
+                                        @foreach(auth()->user()->unreadNotifications as $notification)
+                                        <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                            <div class="d-flex">
+                                                <div class="flex-1">
+                                                    <a href="{{ route('notification.read', $notification->id) }}" class="stretched-link">
+                                                        <h6 class="mt-0 mb-2 lh-base">
+                                                            {{ $notification->data['heading'] ?? $notification->data['message'] ?? 'Notification' }}
+                                                        </h6>
+                                                    </a>
+                                                    <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                        <span><i class="mdi mdi-clock-outline"></i> {{ $notification->created_at->diffForHumans() }}</span>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    @endforeach
-
-                                    {{-- <div class="my-3 text-center">--}}
-                                    {{-- <button type="button" class="btn btn-soft-success waves-effect waves-light">View--}}
-                                    {{-- All Notifications <i class="ri-arrow-right-line align-middle"></i></button>--}}
-                                    {{-- </div>--}}
+                                        @endforeach
+                                    @else
+                                        <div class="text-center p-4">
+                                            <div class="w-25 w-sm-50 pt-3 mx-auto">
+                                                <img src="{{ URL::asset('assets/images/svg/bell.svg') }}" class="img-fluid" alt="No notifications">
+                                            </div>
+                                            <div class="text-center pb-2 mt-2">
+                                                <h6 class="fs-16 fw-semibold lh-base">No notifications</h6>
+                                                <p class="text-muted mb-0 fs-13">You're all caught up!</p>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
-
                             </div>
 
                             <div class="tab-pane fade p-4" id="alerts-tab" role="tabpanel" aria-labelledby="alerts-tab">
@@ -559,11 +571,11 @@
                         aria-haspopup="true" aria-expanded="false">
                         <span class="d-flex align-items-center">
 
-                            <img class="rounded-circle header-profile-user" src="@if (Auth::user()->avatar && Auth::user()->avatar != ''){{ URL::asset(Auth::user()->avatar) }}@else{{ URL::asset('images/default.jpg') }}@endif"
+                            <img class="rounded-circle header-profile-user" src="{{ Auth::user()->avatar_url }}"
                                 alt="Header Avatar">
                             <span class="text-start ms-xl-2">
-                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{Auth::user()->name}}</span>
-                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">{{Auth::user()->username}}</span>
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->name ?? 'User' }}</span>
+                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">{{ Auth::user()->username ?? 'N/A' }}</span>
                             </span>
                         </span>
                     </button>

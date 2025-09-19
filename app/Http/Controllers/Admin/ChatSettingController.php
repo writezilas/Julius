@@ -38,9 +38,9 @@ class ChatSettingController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'chat_enabled' => 'required|boolean',
+            'chat_enabled' => 'nullable|boolean',
             'chat_character_limit' => 'required|integer|min:10|max:2000',
-            'chat_file_upload_enabled' => 'required|boolean',
+            'chat_file_upload_enabled' => 'nullable|boolean',
             'chat_max_file_size' => 'required|integer|min:100|max:10240' // 100KB to 10MB
         ], [
             'chat_character_limit.min' => 'Character limit must be at least 10 characters.',
@@ -54,10 +54,10 @@ class ChatSettingController extends Controller
         }
 
         try {
-            // Update each setting
+            // Update each setting - handle checkbox values properly
             ChatSetting::set(
                 'chat_enabled', 
-                $request->chat_enabled ? '1' : '0', 
+                $request->input('chat_enabled', 0) == '1' ? '1' : '0', 
                 'boolean', 
                 'Enable or disable the chat system'
             );
@@ -71,7 +71,7 @@ class ChatSettingController extends Controller
 
             ChatSetting::set(
                 'chat_file_upload_enabled', 
-                $request->chat_file_upload_enabled ? '1' : '0', 
+                $request->input('chat_file_upload_enabled', 0) == '1' ? '1' : '0', 
                 'boolean', 
                 'Allow file uploads in chat'
             );

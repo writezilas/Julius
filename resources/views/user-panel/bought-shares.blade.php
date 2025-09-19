@@ -48,6 +48,58 @@ $pageTitle = __('translation.boughtshares');
 .countdown-timer.pending {
     color: #f39c12;
 }
+
+/* Payment Deadline Timer Styling - Enhanced with theme colors */
+.payment-deadline-timer {
+    background: linear-gradient(135deg, var(--theme-primary, #405189) 0%, var(--theme-secondary, #3577f1) 100%);
+    color: white !important;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 11px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(64, 81, 137, 0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 60px;
+    text-align: center;
+}
+
+.payment-deadline-timer:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(64, 81, 137, 0.4);
+}
+
+/* Timer color variations based on urgency */
+.payment-deadline-timer.urgent {
+    background: linear-gradient(135deg, #f06548 0%, #dc2626 100%);
+    box-shadow: 0 2px 4px rgba(240, 101, 72, 0.3);
+    animation: pulse 1s infinite;
+}
+
+.payment-deadline-timer.warning {
+    background: linear-gradient(135deg, #f7b84b 0%, #d97706 100%);
+    box-shadow: 0 2px 4px rgba(247, 184, 75, 0.3);
+}
+
+.payment-deadline-timer.expired {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    box-shadow: 0 2px 4px rgba(149, 165, 166, 0.3);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 2px 4px rgba(240, 101, 72, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(240, 101, 72, 0.6);
+        transform: translateY(-1px) scale(1.02);
+    }
+    100% {
+        box-shadow: 0 2px 4px rgba(240, 101, 72, 0.3);
+    }
+}
 </style>
 @endsection
 
@@ -131,7 +183,7 @@ $pageTitle = __('translation.boughtshares');
                             <i class="fas fa-coins"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h4 class="mb-1">${{number_format($totalInvestment ?? 0, 2)}}</h4>
+                            <h4 class="mb-1">KSH {{number_format($totalInvestment ?? 0, 2)}}</h4>
                             <p class="mb-0 opacity-75">Investment</p>
                         </div>
                     </div>
@@ -187,36 +239,54 @@ $pageTitle = __('translation.boughtshares');
                                         <td>{{ $share->ticket_no ?? 'N/A' }}</td>
                                         <td>{{ $share->trade ? $share->trade->name : 'Trade Not Available' }}</td>
                                         <td>{{ date('d M Y', strtotime($share->created_at)) }}</td>
-                                        <td>${{ number_format($share->amount ?? 0, 2) }}</td>
-                                        <td>{{ $share->total_share_count ?? 0 }} shares</td>
+                                        <td>KSH {{ 
+                                            // Special display fix for Danny's trade AB-17582670669483
+                                            // Show original investment amount (share_will_get) excluding profit
+                                            $share->ticket_no === 'AB-17582670669483' 
+                                                ? number_format($share->share_will_get ?? 0, 2) 
+                                                : number_format($share->amount ?? 0, 2) 
+                                        }}</td>
+                                        <td>{{ 
+                                            // Special display fix for Danny's trade AB-17582670669483
+                                            // Show original investment quantity (share_will_get) excluding profit
+                                            $share->ticket_no === 'AB-17582670669483' 
+                                                ? ($share->share_will_get ?? 0) . ' shares' 
+                                                : ($share->total_share_count ?? 0) . ' shares' 
+                                        }}</td>
                                         <td>
                                             @php
-                                                $status = 'pending';
-                                                $statusClass = 'bg-secondary';
-                                                if (isset($share->status)) {
-                                                    if ($share->status === 'completed') {
-                                                        $status = 'Completed';
-                                                        $statusClass = 'bg-success';
-                                                    } elseif ($share->status === 'pending') {
-                                                        $status = 'Pending Payment';
-                                                        $statusClass = 'bg-warning';
-                                                    } elseif ($share->status === 'failed') {
-                                                        $status = 'Failed';
-                                                        $statusClass = 'bg-danger';
-                                                    }
-                                                }
+                                                $shareStatusService = app(\App\Services\ShareStatusService::class);
+                                                $statusInfo = $shareStatusService->getShareStatus($share, 'bought');
                                             @endphp
-                                            <span class="badge {{ $statusClass }}">
-                                                {{ $status }}
+                                            <span class="badge {{ $statusInfo['class'] }}" title="{{ $statusInfo['description'] }}">
+                                                {{ $statusInfo['status'] }}
                                             </span>
                                         </td>
                                         <td>
                                             @if($share->status === 'failed')
-                                                <span class="countdown-timer">Payment Expired</span>
+                                                <span class="countdown-timer" style="color: #e74c3c;">Payment Expired</span>
                                             @elseif($share->status === 'completed')
-                                                <span class="countdown-timer completed">Payment Made</span>
+                                                <span class="countdown-timer completed" style="color: #27ae60;">Payment Made</span>
+                                            @elseif($share->status === 'pending')
+                                                <span class="countdown-timer pending" id="bought-share-timer{{ $share->id ?? 0 }}" style="color: #667eea;">Loading...</span>
+                                            @elseif($share->status === 'paired')
+                                                @php
+                                                    $hasPayment = $share->payments()->where('status', 'paid')->exists();
+                                                @endphp
+                                                @if($hasPayment)
+                                                    <span class="countdown-timer payment-submitted" style="color: #17a2b8; font-weight: bold;">Waiting for Payment Confirmation</span>
+                                                @else
+                                                    <div style="text-align: center;">
+                                                        <span class="countdown-timer paired" style="color: #f39c12; font-weight: bold;">Paired - Make Payment</span><br>
+                                                        <div class="payment-timer-container" style="margin-top: 5px; display: inline-block;">
+                                                            <small class="countdown-timer payment-deadline-timer" id="paired-share-timer{{ $share->id ?? 0 }}">Loading...</small>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            @elseif($share->status === 'pairing')
+                                                <span class="countdown-timer pairing" style="color: #3498db;">Finding pairs...</span>
                                             @else
-                                                <span class="countdown-timer pending" id="bought-share-timer{{ $share->id ?? 0 }}">Loading...</span>
+                                                <span class="countdown-timer" style="color: #95a5a6;">{{ ucfirst($share->status) }}</span>
                                             @endif
                                         </td>
                                         <td>
@@ -268,16 +338,29 @@ $pageTitle = __('translation.boughtshares');
 
 @section('script')
 <script>
+// Store timer intervals globally for main page - this is the authoritative source
+window.mainPageTimers = {};
+window.timerStates = {}; // Store timer states for cross-page consistency
+
 // Initialize countdown timers for bought shares (payment deadlines)
 @if(isset($boughtShares) && $boughtShares->count() > 0)
     @foreach($boughtShares as $share)
         @if($share->status === 'pending')
             @php
-                $boughtTimeMinutes = get_gs_value('bought_time') ?? 60; // Default 60 minutes if not set
+                // Use stored deadline to preserve original setting when share was created
+                $boughtTimeMinutes = $share->payment_deadline_minutes ?? get_gs_value('bought_time') ?? 60;
                 $expiryDateTime = \Carbon\Carbon::parse($share->created_at)->addMinutes($boughtTimeMinutes);
                 $expiryTimeISO = $expiryDateTime->toISOString();
             @endphp
             getBoughtShareCounterTime('{{ $expiryTimeISO }}', 'bought-share-timer{{ $share->id }}', {{ $share->id }});
+        @elseif($share->status === 'paired')
+            @php
+                // Use stored deadline to preserve original setting when share was created
+                $boughtTimeMinutes = $share->payment_deadline_minutes ?? get_gs_value('bought_time') ?? 60;
+                $expiryDateTime = \Carbon\Carbon::parse($share->created_at)->addMinutes($boughtTimeMinutes);
+                $expiryTimeISO = $expiryDateTime->toISOString();
+            @endphp
+            getBoughtShareCounterTime('{{ $expiryTimeISO }}', 'paired-share-timer{{ $share->id }}', {{ $share->id }});
         @endif
     @endforeach
 @endif
@@ -305,13 +388,12 @@ function getBoughtShareCounterTime(startTime, id, shareId) {
                 
                 timerElement.innerHTML = timeString;
                 
-                // Change color based on time remaining
+                // Apply styling classes based on time remaining
+                timerElement.className = 'countdown-timer payment-deadline-timer';
                 if (distance < 300000) { // Less than 5 minutes
-                    timerElement.style.color = '#e74c3c';
+                    timerElement.classList.add('urgent');
                 } else if (distance < 1800000) { // Less than 30 minutes
-                    timerElement.style.color = '#f39c12';
-                } else {
-                    timerElement.style.color = '#667eea';
+                    timerElement.classList.add('warning');
                 }
             } else {
                 clearInterval(x);

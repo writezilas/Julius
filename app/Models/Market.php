@@ -11,6 +11,34 @@ class Market extends Model
     use HasFactory;
 
     protected $guarded = [];
+    
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
+    /**
+     * Scope a query to only include active markets.
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+    
+    /**
+     * Scope a query to only include inactive markets.
+     */
+    public function scopeInactive($query)
+    {
+        return $query->where('is_active', false);
+    }
+    
+    /**
+     * Check if the market is currently open AND active
+     */
+    public function isOpenAndActive()
+    {
+        return $this->is_active && $this->isOpen();
+    }
 
     /**
      * Get the configured application timezone
@@ -28,7 +56,10 @@ class Market extends Model
         $appTimezone = self::getAppTimezone();
         $today = Carbon::today($appTimezone);
         
-        return Carbon::createFromFormat('H:i', $this->open_time, $appTimezone)
+        // Handle both H:i:s and H:i formats
+        $timeFormat = strlen($this->open_time) > 5 ? 'H:i:s' : 'H:i';
+        
+        return Carbon::createFromFormat($timeFormat, $this->open_time, $appTimezone)
             ->setDateFrom($today);
     }
 
@@ -40,7 +71,10 @@ class Market extends Model
         $appTimezone = self::getAppTimezone();
         $today = Carbon::today($appTimezone);
         
-        return Carbon::createFromFormat('H:i', $this->close_time, $appTimezone)
+        // Handle both H:i:s and H:i formats
+        $timeFormat = strlen($this->close_time) > 5 ? 'H:i:s' : 'H:i';
+        
+        return Carbon::createFromFormat($timeFormat, $this->close_time, $appTimezone)
             ->setDateFrom($today);
     }
 
