@@ -119,6 +119,8 @@
 <script>
 $(document).ready(function() {
     console.log('Market toggle script loaded');
+    console.log('jQuery version:', $.fn.jquery);
+    console.log('Document ready state:', document.readyState);
     
     // Initialize DataTable first
     var table = $('#alternative-pagination').DataTable({
@@ -129,10 +131,15 @@ $(document).ready(function() {
     const csrfToken = $('meta[name="csrf-token"]').attr('content');
     if (!csrfToken) {
         console.error('CSRF token not found!');
+        console.error('Meta tags found:', $('meta').length);
+        $('meta').each(function(i, meta) {
+            console.log('Meta tag ' + i + ':', $(meta).attr('name'), '=', $(meta).attr('content'));
+        });
         return;
     }
     
     console.log('CSRF token found:', csrfToken.substring(0, 10) + '...');
+    console.log('Toggle elements found:', $('.market-status-toggle').length);
     
     // Use event delegation to handle toggle switches (works with DataTable)
     $(document).on('change', '.market-status-toggle', function() {
@@ -186,7 +193,16 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr, status, error) {
-                console.error('AJAX error:', xhr.responseText, status, error);
+                console.error('=== AJAX ERROR DETAILS ===');
+                console.error('Status:', status);
+                console.error('Error:', error);
+                console.error('Response Status Code:', xhr.status);
+                console.error('Response Text:', xhr.responseText);
+                console.error('Response Headers:', xhr.getAllResponseHeaders());
+                console.error('Request URL was:', `/admin/market/toggle-status/${marketId}`);
+                console.error('CSRF Token used:', csrfToken);
+                console.error('========================');
+                
                 // Revert checkbox state on error
                 toggle.prop('checked', !isChecked);
                 
