@@ -240,6 +240,29 @@ if (!function_exists('updatePaymentFailedShareStatus')) {
             $deadlineMinutes = $share->payment_deadline_minutes ?? 60; // fallback to 60 minutes if not set
             $timeoutTime = \Carbon\Carbon::parse($share->created_at)->addMinutes($deadlineMinutes);
             
+            // CRITICAL FIX: Don't mark as failed if payment was submitted (timer paused)
+            // Check both legacy and new enhanced timer fields for comprehensive coverage
+            if ($share->timer_paused || $share->payment_timer_paused) {
+                \Illuminate\Support\Facades\Log::info('Skipping share ' . $share->ticket_no . ' - payment submitted, timer paused (updatePaymentFailedShareStatus)', [
+                    'timer_paused' => $share->timer_paused,
+                    'payment_timer_paused' => $share->payment_timer_paused
+                ]);
+                continue; // Skip this share - payment was submitted
+            }
+            
+            // Additional check: if there are payment records, don't mark as failed
+            if ($share->payments()->exists()) {
+                \Illuminate\Support\Facades\Log::info('Skipping share ' . $share->ticket_no . ' - payment records found (updatePaymentFailedShareStatus)');
+                continue; // Skip this share - payments exist
+            }
+            
+            // Extra safety check: verify pairing payment status
+            $hasConfirmedPayments = $share->pairedShares()->where('is_paid', 1)->exists();
+            if ($hasConfirmedPayments) {
+                \Illuminate\Support\Facades\Log::info('Skipping share ' . $share->ticket_no . ' - confirmed payments exist in pairings (updatePaymentFailedShareStatus)');
+                continue; // Skip this share - has confirmed payments
+            }
+            
             if ($timeoutTime < \Carbon\Carbon::now()) {
 
                 $share->status = 'failed';
@@ -392,9 +415,29 @@ if (!function_exists('get_app_timezone')) {
     }
 }
 if (!function_exists('is_market_open')) {
+    /**
+     * Check if the market is currently open based on configured market schedules
+     * 
+     * LOGIC:
+     * - If NO active markets are configured → Market defaults to OPEN (24/7 trading)
+     * - If active markets ARE configured → Check current time against schedules
+     * 
+     * This ensures that:
+     * 1. New installations work immediately without market configuration
+     * 2. Markets with no schedules allow continuous trading
+     * 3. Configured markets follow their specific opening hours
+     * 
+     * @return bool True if market is open, false if closed
+     */
     function is_market_open()
     {
         $markets = get_markets();
+        
+        // If no active markets are configured, default to market being open (24/7 trading)
+        if ($markets->isEmpty()) {
+            return true;
+        }
+        
         $appTimezone = get_app_timezone();
         $now = \Carbon\Carbon::now($appTimezone);
         
@@ -419,6 +462,7 @@ if (!function_exists('get_next_market_open_time')) {
         $now = \Carbon\Carbon::now($appTimezone);
         $todayDate = $now->format('Y-m-d');
         
+        // If no active markets are configured, market is always open, so no "next open time"
         if (count($markets) == 0) {
             return null;
         }

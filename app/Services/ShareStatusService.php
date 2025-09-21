@@ -37,9 +37,19 @@ class ShareStatusService
     /**
      * Get status for BOUGHT shares (buyer's perspective)
      * UPDATED: Removed "Maturing" status - buying and selling are independent trades
+     * UPDATED: Added support for admin-allocated shares
      */
     private function getBoughtShareStatus(UserShare $share): array
     {
+        // Admin-allocated shares special handling
+        if ($share->get_from === 'allocated-by-admin' && $share->status === 'completed') {
+            return [
+                'status' => 'Admin Allocated',
+                'class' => 'bg-success',
+                'description' => 'Share allocated by administrator - no payment required'
+            ];
+        }
+
         // Failed shares
         if ($share->status === 'failed') {
             return [
@@ -128,52 +138,7 @@ class ShareStatusService
             $totalInvestmentPlusEarning = ($share->share_will_get ?? 0) + ($share->profit_share ?? 0);
             $totalAmountPaired = $pairingStats['total_amount_paired'];
 
-            // 4. AVAILABLE - Initial status immediately the sell payment time is completed
-            if ($pairingStats['total'] == 0) {
-                return [
-                    'status' => 'Available',
-                    'class' => 'bg-info',
-                    'description' => 'Shares matured and available for sale'
-                ];
-            }
-
-            // 4. AVAILABLE - Share is ready to sell and has shares available
-            // Check if share has shares available for selling (not fully sold yet)
-            if ($share->total_share_count > 0 || $share->hold_quantity > 0) {
-                return [
-                    'status' => 'Available',
-                    'class' => 'bg-info',
-                    'description' => 'Shares matured and available for sale'
-                ];
-            }
-            
-            // 4. AVAILABLE - When is_ready_to_sell=1, all pairings are paid, and status is still "completed"
-            // This handles the case where shares are mature and all paired amounts are paid but not yet marked as "sold"
-            if ($share->status === 'completed' && 
-                $pairingStats['unpaid'] == 0 && 
-                $pairingStats['awaiting_confirmation'] == 0 && 
-                $pairingStats['paid'] > 0 && 
-                $totalAmountPaired >= $totalInvestmentPlusEarning) {
-                return [
-                    'status' => 'Available',
-                    'class' => 'bg-info',
-                    'description' => 'Shares matured and available for sale'
-                ];
-            }
-            
-            // Check payment status for paired shares when no shares available
-            if ($pairingStats['paid'] > 0) {
-                // 6. PARTIALLY SOLD - When partially paired trade is paid and confirmed but pairing process is still pending
-                if ($pairingStats['unpaid'] > 0 || $pairingStats['awaiting_confirmation'] > 0 || $totalAmountPaired < $totalInvestmentPlusEarning) {
-                    return [
-                        'status' => 'Partially Sold',
-                        'class' => 'bg-success',
-                        'description' => 'Some shares sold, others available for pairing'
-                    ];
-                }
-            }
-
-            // Check for shares awaiting payment confirmation
+            // PRIORITY 1: Check for shares awaiting payment confirmation FIRST
             if ($pairingStats['awaiting_confirmation'] > 0) {
                 // 5. PAIRED - Amount paired equals (investment + earning), no further pairing, awaiting confirmation
                 if ($totalAmountPaired >= $totalInvestmentPlusEarning) {
@@ -193,7 +158,7 @@ class ShareStatusService
                 }
             }
 
-            // Check pairing completeness for unpaid shares (without payment submitted)
+            // PRIORITY 2: Check pairing completeness for unpaid shares (without payment submitted)
             if ($pairingStats['unpaid'] > 0) {
                 // 5. PAIRED - Amount paired equals (investment + earning), no further pairing
                 if ($totalAmountPaired >= $totalInvestmentPlusEarning) {
@@ -211,6 +176,51 @@ class ShareStatusService
                         'description' => 'Partially paired, awaiting more buyers and payments'
                     ];
                 }
+            }
+
+            // PRIORITY 3: Check payment status for paired shares when no shares available
+            if ($pairingStats['paid'] > 0) {
+                // 6. PARTIALLY SOLD - When partially paired trade is paid and confirmed but pairing process is still pending
+                if ($pairingStats['unpaid'] > 0 || $pairingStats['awaiting_confirmation'] > 0 || $totalAmountPaired < $totalInvestmentPlusEarning) {
+                    return [
+                        'status' => 'Partially Sold',
+                        'class' => 'bg-success',
+                        'description' => 'Some shares sold, others available for pairing'
+                    ];
+                }
+            }
+            
+            // PRIORITY 4: AVAILABLE - When is_ready_to_sell=1, all pairings are paid, and status is still "completed"
+            // This handles the case where shares are mature and all paired amounts are paid but not yet marked as "sold"
+            if ($share->status === 'completed' && 
+                $pairingStats['unpaid'] == 0 && 
+                $pairingStats['awaiting_confirmation'] == 0 && 
+                $pairingStats['paid'] > 0 && 
+                $totalAmountPaired >= $totalInvestmentPlusEarning) {
+                return [
+                    'status' => 'Available',
+                    'class' => 'bg-info',
+                    'description' => 'Shares matured and available for sale'
+                ];
+            }
+
+            // PRIORITY 5: AVAILABLE - Initial status immediately the sell payment time is completed (no pairings)
+            if ($pairingStats['total'] == 0) {
+                return [
+                    'status' => 'Available',
+                    'class' => 'bg-info',
+                    'description' => 'Shares matured and available for sale'
+                ];
+            }
+
+            // FALLBACK: AVAILABLE - Share is ready to sell and has shares available
+            // This should only be reached if there are no active pairings
+            if ($share->total_share_count > 0 || $share->hold_quantity > 0) {
+                return [
+                    'status' => 'Available',
+                    'class' => 'bg-info',
+                    'description' => 'Shares matured and available for sale'
+                ];
             }
         }
 
@@ -339,20 +349,90 @@ class ShareStatusService
     /**
      * Get specialized pairing statistics for sold shares
      * Includes total amount paired to determine Paired vs Partially Paired status
+     * FIXED: Excludes pairings where the buyer share has failed
      */
     public function getSoldSharePairingStats(UserShare $share): array
     {
-        $stats = $this->getPairingStats($share);
+        // Start with general pairing stats but we need to recalculate for failed exclusion
+        $paidPairings = 0;
+        $failedPairings = 0;
+        $awaitingConfirmation = 0;
+        $genuinelyUnpaid = 0;
+        $totalAmountPaired = 0;
         
-        // Calculate total amount paired by summing up all pairing amounts
-        $totalAmountPaired = UserSharePair::where('user_share_id', $share->id)
-            ->sum('share') + 
-            UserSharePair::where('paired_user_share_id', $share->id)
-            ->sum('share');
+        // When this share is the SELLER (paired_user_share_id = share->id)
+        // Check each pairing and exclude those where buyer (user_share_id) has failed
+        $sellerSidePairings = UserSharePair::where('paired_user_share_id', $share->id)->get();
+        
+        foreach ($sellerSidePairings as $pairing) {
+            $buyerShare = UserShare::find($pairing->user_share_id);
             
-        $stats['total_amount_paired'] = $totalAmountPaired;
+            // Skip pairings where buyer share failed due to payment deadline expiry
+            if (!$buyerShare || $buyerShare->status === 'failed') {
+                continue;
+            }
+            
+            // Count valid pairings only
+            $totalAmountPaired += $pairing->share;
+            
+            if ($pairing->is_paid == 1) {
+                $paidPairings++;
+            } elseif ($pairing->is_paid == 2) {
+                $failedPairings++;
+            } else {
+                // Check if payment is submitted but not confirmed
+                $hasSubmittedPayment = $buyerShare->payments()
+                    ->where('user_share_pair_id', $pairing->id)
+                    ->where('status', 'paid')
+                    ->exists();
+                if ($hasSubmittedPayment) {
+                    $awaitingConfirmation++;
+                } else {
+                    $genuinelyUnpaid++;
+                }
+            }
+        }
         
-        return $stats;
+        // When this share is the BUYER (user_share_id = share->id) - less common for sold shares context
+        $buyerSidePairings = UserSharePair::where('user_share_id', $share->id)->get();
+        
+        foreach ($buyerSidePairings as $pairing) {
+            $sellerShare = UserShare::find($pairing->paired_user_share_id);
+            
+            // Skip pairings where seller share failed
+            if (!$sellerShare || $sellerShare->status === 'failed') {
+                continue;
+            }
+            
+            // Count valid pairings only
+            $totalAmountPaired += $pairing->share;
+            
+            if ($pairing->is_paid == 1) {
+                $paidPairings++;
+            } elseif ($pairing->is_paid == 2) {
+                $failedPairings++;
+            } else {
+                // Check if payment is submitted but not confirmed
+                $hasSubmittedPayment = $share->payments()
+                    ->where('user_share_pair_id', $pairing->id)
+                    ->where('status', 'paid')
+                    ->exists();
+                if ($hasSubmittedPayment) {
+                    $awaitingConfirmation++;
+                } else {
+                    $genuinelyUnpaid++;
+                }
+            }
+        }
+        
+        return [
+            'paid' => $paidPairings,
+            'unpaid' => $genuinelyUnpaid,
+            'awaiting_confirmation' => $awaitingConfirmation,
+            'failed' => $failedPairings,
+            'total' => $paidPairings + $genuinelyUnpaid + $awaitingConfirmation + $failedPairings,
+            'total_amount_paired' => $totalAmountPaired
+        ];
     }
 
     /**

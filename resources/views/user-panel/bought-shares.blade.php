@@ -263,7 +263,12 @@ $pageTitle = __('translation.boughtshares');
                                             </span>
                                         </td>
                                         <td>
-                                            @if($share->status === 'failed')
+                                            @if($share->get_from === 'allocated-by-admin')
+                                                {{-- Admin-allocated shares don't have payment deadlines --}}
+                                                <span class="countdown-timer completed" style="color: #28a745; font-weight: bold;">
+                                                    <i class="fas fa-gift me-1"></i>Admin Allocated
+                                                </span>
+                                            @elseif($share->status === 'failed')
                                                 <span class="countdown-timer" style="color: #e74c3c;">Payment Expired</span>
                                             @elseif($share->status === 'completed')
                                                 <span class="countdown-timer completed" style="color: #27ae60;">Payment Made</span>

@@ -6,6 +6,7 @@ use App\Models\TradePeriod;
 use App\Models\User;
 use App\Models\UserShare;
 use App\Services\ProgressCalculationService;
+use App\Services\PaymentVerificationService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -42,7 +43,7 @@ class UpdateSharesCommand extends Command
         try {
             DB::beginTransaction();
 
-            $shares = UserShare::with('tradePeriod', 'pairedShares')
+            $shares = UserShare::with('tradePeriod', 'pairedShares', 'pairedShares.payment')
                 ->whereIn('status', ['completed', 'paired'])
                 ->where('is_ready_to_sell', 0)->get();
             $whereIn = ['allocated-by-paid-share', 'purchase'];
@@ -98,9 +99,24 @@ class UpdateSharesCommand extends Command
     {
         $bought_time = get_gs_value('bought_time') ?: 1; // Default 1 minute
         $progressService = new ProgressCalculationService();
+        $verificationService = new PaymentVerificationService(); // NEW: Payment verification service
+        
+        // Log statistics for monitoring
+        $stats = $verificationService->getVerificationStats($shares->toArray());
+        Log::info('UpdateSharesCommand: Payment failure analysis', $stats);
         
         foreach ($shares as $key => $share) {
-            // Check if the payment timeout has been reached
+            // NEW: Use comprehensive payment verification instead of simple timeout check
+            if (!$verificationService->shouldMarkAsFailed($share)) {
+                // Log why this share is being protected from failure
+                $verificationService->logVerificationDecision($share, 'UpdateSharesCommand');
+                continue; // Skip this share - payment submitted or other protection applies
+            }
+            
+            // Log decision to mark as failed for audit trail
+            $verificationService->logVerificationDecision($share, 'UpdateSharesCommand - MARKING AS FAILED');
+            
+            // Original timeout check (now redundant but keeping for compatibility)
             if ($share->created_at->addMinutes($bought_time)->isPast()) {
                 // Get progress data before marking as failed (for progress restoration)
                 $tradeId = $share->trade_id;

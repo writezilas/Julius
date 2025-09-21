@@ -365,7 +365,7 @@ class HomeController extends Controller
     {
         $pageTitle = __('translation.boughtshares');
 
-        // Get paginated results (10 items per page) - only show actual bought shares
+        // Get paginated results (10 items per page) - show bought shares + admin allocations
         $boughtShares = UserShare::where('user_id', \auth()->user()->id)
             ->where(function($query) {
                 // Include shares purchased by the user
@@ -373,11 +373,10 @@ class HomeController extends Controller
                       ->whereIn('status', ['pending', 'paired', 'completed', 'failed']);
             })
             ->orWhere(function($query) {
-                // Include admin-allocated shares that haven't been sold yet (still in buying/completion phase)
+                // ALSO include admin-allocated shares so they appear in bought shares view
                 $query->where('user_id', \auth()->user()->id)
                       ->where('get_from', 'allocated-by-admin')
-                      ->whereIn('status', ['pending', 'paired', 'completed'])
-                      ->where('status', '!=', 'sold'); // Exclude fully sold admin-allocated shares
+                      ->whereIn('status', ['completed']); // Only show completed admin allocations
             })
             ->orderBy('id', 'DESC')
             ->paginate(10);
@@ -390,11 +389,10 @@ class HomeController extends Controller
                       ->whereIn('status', ['pending', 'paired', 'completed', 'failed']);
             })
             ->orWhere(function($query) {
-                // Include admin-allocated shares that haven't been sold yet
+                // ALSO include admin-allocated shares in statistics
                 $query->where('user_id', \auth()->user()->id)
                       ->where('get_from', 'allocated-by-admin')
-                      ->whereIn('status', ['pending', 'paired', 'completed'])
-                      ->where('status', '!=', 'sold');
+                      ->whereIn('status', ['completed']); // Only show completed admin allocations
             })
             ->get();
         $totalShares = $allShares->count();
@@ -441,11 +439,12 @@ class HomeController extends Controller
                            ->where('start_date', '!=', '');
                 })
                 ->orWhere(function($subQuery) {
-                    // OR show admin-allocated shares in countdown mode or fully sold
+                    // OR show admin-allocated shares (they start directly in selling/maturity phase)
                     $subQuery->where('get_from', 'allocated-by-admin')
                            ->whereIn('status', ['completed', 'sold']) // Include both completed and sold
                            ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
+                           ->where('start_date', '!=', '')
+                           ->whereNotNull('selling_started_at'); // Ensure timer can run
                 })
                 ->orWhere(function($subQuery) {
                     // OR show purchased shares that are in maturity countdown phase
@@ -501,11 +500,12 @@ class HomeController extends Controller
                            ->where('start_date', '!=', '');
                 })
                 ->orWhere(function($subQuery) {
-                    // OR show admin-allocated shares
+                    // OR show admin-allocated shares (they start directly in selling/maturity phase)
                     $subQuery->where('get_from', 'allocated-by-admin')
                            ->whereIn('status', ['completed', 'sold'])
                            ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
+                           ->where('start_date', '!=', '')
+                           ->whereNotNull('selling_started_at'); // Ensure timer can run
                 })
                 ->orWhere(function($subQuery) {
                     // OR show purchased shares in countdown

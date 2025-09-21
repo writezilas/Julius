@@ -92,6 +92,12 @@ class CronController extends Controller
                 continue; // Skip this share - payments exist
             }
             
+            // Extra safety check: if buyer share status was manually set to 'paired', respect it
+            if ($share->status === 'paired') {
+                \Log::info('Skipping share ' . $share->ticket_no . ' - status manually set to paired');
+                continue; // Skip this share - manually set as paired
+            }
+            
             // Check if the payment timeout has been reached (only for shares without payments)
             if ($share->created_at->addMinutes($deadlineMinutes)->isPast()) {
                 $share->status = 'failed';

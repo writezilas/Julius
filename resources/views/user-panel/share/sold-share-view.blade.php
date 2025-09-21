@@ -37,6 +37,7 @@
         $paidTransactions = 0;
         $pendingTransactions = 0;
         $totalAmount = 0;
+        $validAmount = 0; // Amount from valid (non-failed) pairings only
         
         if (isset($shouldShowPairHistory) && $shouldShowPairHistory) {
             // Get all paired shares and organize them - successful on top, failed at bottom
@@ -53,17 +54,38 @@
                     ->orderBy('id', 'desc')
                     ->first();
                 
+                // Always include the pairing in total display amount
                 $totalAmount += $pairedShare->share;
                 
+                // Check the buyer share status for proper categorization
+                $buyerShare = $pairedShare->pairedUserShare;
+                $buyerHasFailed = $buyerShare && $buyerShare->status === 'failed';
+                
                 // Determine if this is a successful or failed pairing
-                $isSuccessful = $pairedShare->is_paid == 1 || ($payment && in_array($payment->status, ['paid', 'conformed']));
+                $isSuccessful = false;
                 $isExpired = false;
                 
-                if ($pairedShare->is_paid == 0) {
-                    // Check if payment deadline has expired
-                    $paymentDeadline = \Carbon\Carbon::parse($pairedShare->created_at)
-                        ->addMinutes($share->payment_deadline_minutes ?? 60);
-                    $isExpired = $paymentDeadline->isPast();
+                if ($buyerHasFailed) {
+                    // Buyer share has failed due to payment deadline expiry - exclude from valid statistics
+                    $isSuccessful = false;
+                    $isExpired = true;
+                } else {
+                    // Only count valid pairings in the statistics
+                    $validAmount += $pairedShare->share;
+                    
+                    if ($pairedShare->is_paid == 1) {
+                        // Payment confirmed
+                        $isSuccessful = true;
+                    } elseif ($payment && in_array($payment->status, ['paid', 'conformed'])) {
+                        // Payment submitted and waiting for confirmation
+                        $isSuccessful = true;
+                    } elseif ($pairedShare->is_paid == 0) {
+                        // Check if payment deadline has expired
+                        $paymentDeadline = \Carbon\Carbon::parse($pairedShare->created_at)
+                            ->addMinutes($share->payment_deadline_minutes ?? 60);
+                        $isExpired = $paymentDeadline->isPast();
+                        $isSuccessful = !$isExpired;
+                    }
                 }
                 
                 // If payment confirmed or in process, add to successful list
@@ -303,15 +325,29 @@
                                         @php
                                             $payment = \App\Models\UserSharePayment::where('user_share_pair_id', $pairedShare->id)->orderBy('id', 'desc')->first();
                                             
+                                            // Check buyer share status for proper categorization
+                                            $buyerShare = $pairedShare->pairedUserShare;
+                                            $buyerHasFailed = $buyerShare && $buyerShare->status === 'failed';
+                                            
                                             // Determine if this is a failed pairing for styling
                                             $isExpired = false;
-                                            if ($pairedShare->is_paid == 0) {
+                                            $currentIsFailed = false;
+                                            
+                                            if ($buyerHasFailed) {
+                                                // Buyer share failed due to payment deadline expiry
+                                                $currentIsFailed = true;
+                                                $isExpired = true;
+                                            } elseif ($pairedShare->is_paid == 2) {
+                                                // Pairing explicitly marked as failed
+                                                $currentIsFailed = true;
+                                            } elseif ($pairedShare->is_paid == 0) {
+                                                // Check if payment deadline has expired
                                                 $paymentDeadline = \Carbon\Carbon::parse($pairedShare->created_at)
                                                     ->addMinutes($share->payment_deadline_minutes ?? 60);
                                                 $isExpired = $paymentDeadline->isPast();
+                                                $currentIsFailed = $isExpired;
                                             }
                                             
-                                            $currentIsFailed = $isExpired || $pairedShare->is_paid == 2;
                                             $rowClass = '';
                                             if ($currentIsFailed) {
                                                 $rowClass = 'table-row-failed';
@@ -364,7 +400,11 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                @if($payment && $payment->status === 'paid')
+                                                @if($buyerHasFailed)
+                                                    <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                                                        <i class="ri-user-x-line align-middle me-1"></i>Buyer Share Failed
+                                                    </span>
+                                                @elseif($payment && $payment->status === 'paid')
                                                     <span class="badge bg-warning-subtle text-warning px-3 py-2">
                                                         <i class="ri-time-line align-middle me-1"></i>Awaiting Confirmation
                                                     </span>

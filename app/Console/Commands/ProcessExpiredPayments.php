@@ -45,8 +45,14 @@ class ProcessExpiredPayments extends Command
                 ->where('balance', 0)
                 ->where(function ($query) {
                     // Only include shares where timer is NOT paused (no payment submitted)
+                    // Check both legacy and enhanced timer fields
                     $query->where('timer_paused', false)
                           ->orWhereNull('timer_paused');
+                })
+                ->where(function ($query) {
+                    // Also check enhanced payment timer fields
+                    $query->where('payment_timer_paused', false)
+                          ->orWhereNull('payment_timer_paused');
                 })
                 ->with(['payments']) // Load payments to double-check
                 ->get()
@@ -66,7 +72,9 @@ class ProcessExpiredPayments extends Command
             $sharesWithPayments = UserShare::whereStatus('paired')
                 ->where('balance', 0)
                 ->where(function ($query) {
-                    $query->where('timer_paused', true);
+                    // Check both legacy and enhanced timer fields
+                    $query->where('timer_paused', true)
+                          ->orWhere('payment_timer_paused', true);
                 })
                 ->whereHas('payments')
                 ->count();

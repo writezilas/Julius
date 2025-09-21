@@ -95,6 +95,8 @@ class AllocateShareController extends Controller
             // Admin allocated shares should start with countdown timer like regular shares
             $data['is_ready_to_sell'] = 0;
             $data['matured_at'] = null;
+            // Set selling_started_at to start_date for admin allocations (they start selling immediately)
+            $data['selling_started_at'] = $data['start_date'];
 
             $createdShare = UserShare::create($data);
 
