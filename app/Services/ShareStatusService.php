@@ -70,7 +70,8 @@ class ShareStatusService
 
         // Payment submitted, waiting for confirmation
         if ($share->status === 'paired') {
-            $pairingStats = $this->getPairingStats($share);
+            // Use bought-specific pairing stats to prevent cross-contamination
+            $pairingStats = $this->getBoughtSharePairingStats($share);
             if ($pairingStats['awaiting_confirmation'] > 0) {
                 return [
                     'status' => 'Payment Submitted',
@@ -178,14 +179,23 @@ class ShareStatusService
                 }
             }
 
-            // PRIORITY 3: Check payment status for paired shares when no shares available
+            // PRIORITY 3: Check payment status for paired shares
             if ($pairingStats['paid'] > 0) {
-                // 6. PARTIALLY SOLD - When partially paired trade is paid and confirmed but pairing process is still pending
-                if ($pairingStats['unpaid'] > 0 || $pairingStats['awaiting_confirmation'] > 0 || $totalAmountPaired < $totalInvestmentPlusEarning) {
+                // 6. PARTIALLY SOLD - When some shares are sold but others are still available
+                if ($pairingStats['unpaid'] > 0 || $pairingStats['awaiting_confirmation'] > 0 || 
+                    $share->total_share_count > 0 || $share->hold_quantity > 0) {
                     return [
                         'status' => 'Partially Sold',
                         'class' => 'bg-success',
                         'description' => 'Some shares sold, others available for pairing'
+                    ];
+                }
+                // If all conditions are false, it means all shares are sold
+                else {
+                    return [
+                        'status' => 'Sold',
+                        'class' => 'bg-dark',
+                        'description' => 'All shares sold and confirmed'
                     ];
                 }
             }
@@ -273,7 +283,59 @@ class ShareStatusService
     }
 
     /**
-     * Get pairing statistics for a share (general purpose)
+     * Get pairing statistics for BOUGHT shares (buyer's perspective only)
+     * Only considers pairings where this share is the BUYER
+     */
+    public function getBoughtSharePairingStats(UserShare $share): array
+    {
+        $paidPairings = 0;
+        $failedPairings = 0;
+        $awaitingConfirmation = 0;
+        $genuinelyUnpaid = 0;
+        
+        // ONLY consider when this share is the BUYER (user_share_id = share->id)
+        // This prevents inheritance from sold shares - bought shares should be independent
+        $buyerSidePairings = UserSharePair::where('user_share_id', $share->id)->get();
+        
+        foreach ($buyerSidePairings as $pairing) {
+            $sellerShare = UserShare::find($pairing->paired_user_share_id);
+            
+            // Skip pairings where seller share failed
+            if (!$sellerShare || $sellerShare->status === 'failed') {
+                continue;
+            }
+            
+            if ($pairing->is_paid == 1) {
+                $paidPairings++;
+            } elseif ($pairing->is_paid == 2) {
+                $failedPairings++;
+            } else {
+                // Check if payment is submitted but not confirmed
+                $hasSubmittedPayment = $share->payments()
+                    ->where('user_share_pair_id', $pairing->id)
+                    ->where('status', 'paid')
+                    ->exists();
+                if ($hasSubmittedPayment) {
+                    $awaitingConfirmation++;
+                } else {
+                    $genuinelyUnpaid++;
+                }
+            }
+        }
+        
+        return [
+            'paid' => $paidPairings,
+            'unpaid' => $genuinelyUnpaid,
+            'awaiting_confirmation' => $awaitingConfirmation,
+            'failed' => $failedPairings,
+            'total' => $paidPairings + $genuinelyUnpaid + $awaitingConfirmation + $failedPairings
+        ];
+    }
+    
+    /**
+     * Get pairing statistics for a share (general purpose - LEGACY)
+     * WARNING: This method includes BOTH buyer and seller perspectives
+     * Use getBoughtSharePairingStats() or getSoldSharePairingStats() for context-specific logic
      */
     public function getPairingStats(UserShare $share): array
     {
@@ -348,20 +410,19 @@ class ShareStatusService
 
     /**
      * Get specialized pairing statistics for sold shares
-     * Includes total amount paired to determine Paired vs Partially Paired status
-     * FIXED: Excludes pairings where the buyer share has failed
+     * FIXED: Only considers SELLER-side pairings to prevent inheritance from bought shares
+     * When a share appears in sold context, only its selling activities matter, not its buying history
      */
     public function getSoldSharePairingStats(UserShare $share): array
     {
-        // Start with general pairing stats but we need to recalculate for failed exclusion
         $paidPairings = 0;
         $failedPairings = 0;
         $awaitingConfirmation = 0;
         $genuinelyUnpaid = 0;
         $totalAmountPaired = 0;
         
-        // When this share is the SELLER (paired_user_share_id = share->id)
-        // Check each pairing and exclude those where buyer (user_share_id) has failed
+        // ONLY consider when this share is the SELLER (paired_user_share_id = share->id)
+        // This prevents inheritance from bought shares - sold shares should be independent
         $sellerSidePairings = UserSharePair::where('paired_user_share_id', $share->id)->get();
         
         foreach ($sellerSidePairings as $pairing) {
@@ -393,37 +454,10 @@ class ShareStatusService
             }
         }
         
-        // When this share is the BUYER (user_share_id = share->id) - less common for sold shares context
-        $buyerSidePairings = UserSharePair::where('user_share_id', $share->id)->get();
-        
-        foreach ($buyerSidePairings as $pairing) {
-            $sellerShare = UserShare::find($pairing->paired_user_share_id);
-            
-            // Skip pairings where seller share failed
-            if (!$sellerShare || $sellerShare->status === 'failed') {
-                continue;
-            }
-            
-            // Count valid pairings only
-            $totalAmountPaired += $pairing->share;
-            
-            if ($pairing->is_paid == 1) {
-                $paidPairings++;
-            } elseif ($pairing->is_paid == 2) {
-                $failedPairings++;
-            } else {
-                // Check if payment is submitted but not confirmed
-                $hasSubmittedPayment = $share->payments()
-                    ->where('user_share_pair_id', $pairing->id)
-                    ->where('status', 'paid')
-                    ->exists();
-                if ($hasSubmittedPayment) {
-                    $awaitingConfirmation++;
-                } else {
-                    $genuinelyUnpaid++;
-                }
-            }
-        }
+        // DO NOT include buyer-side pairings (user_share_id = share->id)
+        // This prevents cross-contamination from the bought shares context
+        // When evaluating a share as "sold", we only care about who is buying FROM it, 
+        // not who it bought from originally
         
         return [
             'paid' => $paidPairings,

@@ -298,30 +298,41 @@ if (!function_exists('updatePaymentFailedShareStatus')) {
 if (!function_exists('getSoldShareStatus')) {
     function getSoldShareStatus($share): string
     {
-        // If share has been fully sold (no shares left and has sold some)
+        // PRIORITY 1: If share is active and not ready to sell yet (Running)
+        if ($share->start_date != '' && $share->is_ready_to_sell === 0) {
+            return 'Active';
+        }
+        
+        // PRIORITY 2: If share has been fully sold (no shares left and has sold some)
         if ($share->total_share_count == 0 && $share->hold_quantity == 0 && $share->sold_quantity > 0) {
             return 'Sold';
         }
-        // If share is active and not ready to sell yet
-        elseif ($share->start_date != '' && $share->is_ready_to_sell === 0) {
-            return 'Active';
+        
+        // PRIORITY 3: AVAILABLE - Share is ready to sell and has shares available
+        // This is the CRITICAL FIX - Available status must come BEFORE Partially Sold
+        if ($share->is_ready_to_sell === 1 && ($share->total_share_count > 0 || $share->hold_quantity > 0)) {
+            // Check if this is truly available (no sales yet) or partially sold
+            if ($share->sold_quantity == 0) {
+                return 'Available';
+            }
+            // If some shares sold but more available, then partially sold
+            else {
+                return 'Partially Sold';
+            }
         }
-        // If share is partially sold (some shares sold, some remaining)
-        elseif ($share->sold_quantity > 0 && ($share->total_share_count > 0 || $share->hold_quantity > 0)) {
-            return 'Partially Sold';
-        }
-        // If share has been paired but not fully processed
-        elseif ((($share->share_will_get + $share->profit_share) > $share->total_share_count) && ($share->total_share_count !== 0 || $share->hold_quantity !== 0)) {
+        
+        // PRIORITY 4: If share has been paired but not fully processed
+        if ((($share->share_will_get + $share->profit_share) > $share->total_share_count) && ($share->total_share_count !== 0 || $share->hold_quantity !== 0)) {
             return 'Paired';
         }
-        // If share is completed but not sold
-        elseif ($share->total_share_count === 0 && $share->hold_quantity === 0 && $share->sold_quantity === 0) {
+        
+        // PRIORITY 5: If share is completed but not sold (edge case)
+        if ($share->total_share_count === 0 && $share->hold_quantity === 0 && $share->sold_quantity === 0) {
             return 'Completed';
         }
+        
         // Default status
-        else {
-            return 'Pending';
-        }
+        return 'Available';
     }
 }
 
