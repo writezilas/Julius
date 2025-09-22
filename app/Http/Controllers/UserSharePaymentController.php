@@ -10,6 +10,7 @@ use App\Models\UserSharePayment;
 use App\Notifications\PaymentApproved;
 use App\Notifications\PaymentSentToSeller;
 use App\Services\PaymentDeclineService;
+use App\Services\PaymentConfirmationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -226,35 +227,33 @@ class UserSharePaymentController extends Controller
 
     public function paymentApprove(Request $request)
     {
+        $paymentConfirmationService = new PaymentConfirmationService();
+        
         try {
             DB::beginTransaction();
-            //update payment status column
-            $payment = UserSharePayment::findOrFail($request->paymentId);
             
-            // Check if payment is already processed
-            if ($payment->status === 'conformed') {
-                DB::rollBack();
-                toastr()->error('Payment has already been confirmed.');
+            // Validate request parameters
+            if (!$request->paymentId) {
+                \Log::error('Payment approval attempted without paymentId');
+                toastr()->error('Invalid payment request.');
                 return back();
             }
             
-            //validate share pair and share amounts
-            $sharePair = UserSharePair::findOrFail($payment->user_share_pair_id);
+            // Use service to validate all payment confirmation requirements
+            $validation = $paymentConfirmationService->validatePaymentConfirmation($request->paymentId);
             
-            // Check if share pair is already processed
-            if ($sharePair->is_paid == 1) {
+            if (!$validation['success']) {
+                \Log::error('Payment validation failed: ' . $validation['message'] . ' (Code: ' . $validation['error_code'] . ')');
                 DB::rollBack();
-                toastr()->error('This share pair has already been processed.');
+                toastr()->error($validation['message']);
                 return back();
             }
             
-            // Prevent processing payment for 0 shares
-            if ($sharePair->share <= 0) {
-                \Log::warning('Attempted to approve payment for 0 or negative shares. Payment ID: ' . $payment->id . ', SharePair ID: ' . $sharePair->id);
-                DB::rollBack();
-                toastr()->error('Cannot approve payment for 0 shares.');
-                return back();
-            }
+            // Extract validated objects
+            $payment = $validation['payment'];
+            $sharePair = $validation['sharePair'];
+            $userShare = $validation['userShare'];
+            $pairedShare = $validation['pairedShare'];
             
             $payment->note_by_receiver = $request->note_by_receiver;
             $payment->status = 'conformed';
@@ -272,13 +271,8 @@ class UserSharePaymentController extends Controller
             
             $sharePair->save();
 
-            //Update share count column
-            $userShare = UserShare::findOrFail($sharePair->user_share_id);
+            //Update share count column (userShare and pairedShare already validated above)
             $userShare->increment('total_share_count', $sharePair->share);
-
-
-            //finally update the paired share hold and share count column
-            $pairedShare = UserShare::findOrFail($sharePair->paired_user_share_id);
             
             // Additional validation: Check if the paired share is actually a completed buyer order
             if ($pairedShare->status === 'completed' && $pairedShare->total_share_count === $pairedShare->share_will_get && $pairedShare->hold_quantity === 0) {
@@ -288,11 +282,13 @@ class UserSharePaymentController extends Controller
                 return back();
             }
             
-            // Prevent constraint violation by checking if hold_quantity has enough shares
-            if ($pairedShare->hold_quantity < $sharePair->share) {
-                \Log::error("Cannot decrement hold_quantity. Current hold_quantity: {$pairedShare->hold_quantity}, trying to decrement: {$sharePair->share}, SharePair ID: {$sharePair->id}, Payment ID: {$payment->id}");
+            // Validate seller has sufficient hold quantity using service
+            $quantityValidation = $paymentConfirmationService->validateSellerQuantity($pairedShare, $sharePair);
+            
+            if (!$quantityValidation['success']) {
+                \Log::error("Seller quantity validation failed: {$quantityValidation['message']} (Code: {$quantityValidation['error_code']}) - Hold quantity: {$pairedShare->hold_quantity}, Required: {$sharePair->share}, SharePair ID: {$sharePair->id}, Payment ID: {$payment->id}");
                 DB::rollBack();
-                toastr()->error('Payment confirmation failed due to insufficient hold quantity. Please contact support.');
+                toastr()->error($quantityValidation['message']);
                 return back();
             }
             
@@ -307,49 +303,20 @@ class UserSharePaymentController extends Controller
                 
                 // CRITICAL: Clear payment timer AND start selling timer when payment is confirmed
                 // Investment period begins when seller confirms money received, not when buyer submits
-                try {
-                    $enhancedTimerService = new \App\Services\EnhancedTimerManagementService();
-                    
-                    // Clear payment timer - payment phase is complete
-                    $userShare->update([
-                        'payment_timer_paused' => 0,
-                        'payment_timer_paused_at' => null,
-                        // Also clear legacy timer fields for backward compatibility
-                        'timer_paused' => 0,
-                        'timer_paused_at' => null
-                    ]);
-                    
-                    // Start selling timer (investment maturity) - this is when investment period begins
-                    if ($userShare->get_from === 'purchase') {
-                        $enhancedTimerService->startSellingTimer($userShare, 'Payment confirmed by seller - investment period starts now');
-                        
-                        \Log::info("Investment period started for buyer share {$userShare->ticket_no} after payment confirmation", [
-                            'share_id' => $userShare->id,
-                            'timer_type' => 'investment_started',
-                            'investment_period_days' => $userShare->period,
-                            'selling_started_at' => now()->toDateTimeString()
-                        ]);
-                    }
-                    
-                    \Log::info("Payment timer cleared for buyer share {$userShare->ticket_no} after payment confirmation", [
-                        'share_id' => $userShare->id,
-                        'timer_type' => 'payment_cleared',
-                        'investment_timer_started' => ($userShare->get_from === 'purchase')
-                    ]);
-                    
-                } catch (\Exception $e) {
-                    \Log::error("Failed to manage timers for share {$userShare->id}: " . $e->getMessage());
-                    // Continue processing even if timer management fails
-                }
+                $paymentConfirmationService->manageTimers($userShare);
                 
                 $userShare->save();
             }
             // Check if seller share should be marked as sold (all shares sold)
             if ($pairedShare->total_share_count == 0 && $pairedShare->hold_quantity == 0 && $pairedShare->sold_quantity > 0) {
+                // IMPORTANT: When setting status to 'sold', we must clear is_ready_to_sell to satisfy the chk_ready_to_sell_logic constraint
+                // The constraint requires: (is_ready_to_sell = 0) OR (is_ready_to_sell = 1 AND status IN ('completed', 'failed'))
+                // Since 'sold' is not in the allowed list, is_ready_to_sell must be 0
                 $pairedShare->status = 'sold';
                 $pairedShare->is_sold = 1;
+                $pairedShare->is_ready_to_sell = 0; // Clear this flag to satisfy constraint
                 $pairedShare->save();
-                \Log::info('Seller share marked as sold: ' . $pairedShare->ticket_no . ' (sold_quantity: ' . $pairedShare->sold_quantity . ')');
+                \Log::info('Seller share marked as sold: ' . $pairedShare->ticket_no . ' (sold_quantity: ' . $pairedShare->sold_quantity . ', is_ready_to_sell cleared)');
             } else {
                 // Check if seller has any other unpaid pairs
                 $otherUnpaidPairs = UserSharePair::where('paired_user_share_id', $pairedShare->id)
@@ -364,30 +331,9 @@ class UserSharePaymentController extends Controller
                 }
             }
 
-            // send notification
-            $user = User::findOrFail($payment->sender_id);
-            try {
-                Notification::send($user, new PaymentApproved($payment));
-            } catch (\Exception $th) {
-                \Log::error('File:' . $th->getFile() . 'Line:' . $th->getLine() . 'Message:' . $th->getMessage());
-            }
-
-
-            // Save log for payment receiver
-            $log = new Log();
-            $log->remarks = "You confirmed a payment from " . $user->username;
-            $log->type = "payment";
-            $log->value = $payment->amount;
-            $log->user_id = auth()->user()->id;
-            $payment->logs()->save($log);
-
-            // Save log for payers
-            $log = new Log();
-            $log->remarks = "Your payment is confirmed by " . auth()->user()->username;
-            $log->type = "payment";
-            $log->value = $payment->amount;
-            $log->user_id = $user->id;
-            $payment->logs()->save($log);
+            // Send notification and create logs using service
+            $paymentConfirmationService->sendPaymentNotification($payment);
+            $paymentConfirmationService->createPaymentLogs($payment);
 
             if ($userShare->status == 'failed') {
                 saveAllocateShare($userShare->user_id, $userShare, $sharePair->share);
@@ -396,9 +342,12 @@ class UserSharePaymentController extends Controller
             DB::commit();
             toastr()->success('Payment received status updated successfully.');
         } catch (\Exception $e) {
-            \Log::error('File:' . $e->getFile() . 'Line:' . $e->getLine() . 'Message:' . $e->getMessage());
+            \Log::error('Payment confirmation failed - File:' . $e->getFile() . ' Line:' . $e->getLine() . ' Message:' . $e->getMessage() . ' PaymentID: ' . ($request->paymentId ?? 'unknown') . ' User: ' . (auth()->id() ?? 'unknown') . ' Stack: ' . $e->getTraceAsString());
             DB::rollBack();
-            toastr()->error('Failed to confirm payment receive. Please try again later');
+            
+            // Use service to get appropriate error message
+            $errorMessage = $paymentConfirmationService->getErrorMessage($e);
+            toastr()->error($errorMessage);
         }
         return back();
     }

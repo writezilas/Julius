@@ -638,6 +638,14 @@ class ShareStatusService
                     }
                     break;
                     
+                case 'sold':
+                    // Shares that are fully sold - no timer needed
+                    return [
+                        'text' => 'All Shares Sold',
+                        'class' => 'countdown-timer sold',
+                        'color' => '#28a745'
+                    ];
+                    
                 case 'failed':
                     return [
                         'text' => 'Transaction failed',

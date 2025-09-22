@@ -111,49 +111,95 @@ class UserShareController extends Controller
         $share = UserShare::where('user_id', auth()->id())->findOrFail($id);
         $pageTitle = 'Sold share view '.$share->ticket_no;
         
-        // Allow purchased shares to be viewed on the sold shares page when they have transitioned
-        // to the selling phase, but hide their pair history to prevent confusion
+        // Get pairing context to determine what to show
+        $pairingContext = $this->getPairingContextForSoldShare($share);
         
-        // Determine if we should show pair history
-        // Only show pair history for shares that were originally selling shares
-        // Do NOT show pair history for shares that have transitioned from bought to sold phase
-        $shouldShowPairHistory = $this->shouldShowPairHistoryForSoldShare($share);
+        // Determine what pair history to show based on context
+        $shouldShowPairHistory = $pairingContext['shouldShow'];
+        $showBuyerHistory = $pairingContext['showBuyerHistory'];
+        $showSellerHistory = $pairingContext['showSellerHistory'];
+        $hasSellerPairings = $pairingContext['hasSellerPairings'];
+        $hasBuyerPairings = $pairingContext['hasBuyerPairings'];
 
-        return view('user-panel.share.sold-share-view', compact('pageTitle', 'share', 'shouldShowPairHistory'));
+        return view('user-panel.share.sold-share-view', compact(
+            'pageTitle', 
+            'share', 
+            'shouldShowPairHistory',
+            'showBuyerHistory',
+            'showSellerHistory',
+            'hasSellerPairings',
+            'hasBuyerPairings'
+        ));
     }
     
     /**
-     * Determine if pair history should be shown for a sold share
+     * Get pairing context to determine what pair history should be shown for a sold share
+     * 
+     * @param UserShare $share
+     * @return array
+     */
+    private function getPairingContextForSoldShare($share)
+    {
+        // Check for seller-side pairings (current selling activity)
+        $sellerPairings = UserSharePair::where('paired_user_share_id', $share->id)->exists();
+        
+        // Check for buyer-side pairings (historical buying activity)
+        $buyerPairings = UserSharePair::where('user_share_id', $share->id)->exists();
+        
+        // Determine what to show based on share type and available pairings
+        $context = [
+            'hasSellerPairings' => $sellerPairings,
+            'hasBuyerPairings' => $buyerPairings,
+            'shouldShow' => false,
+            'showSellerHistory' => false,
+            'showBuyerHistory' => false,
+        ];
+        
+        // If this is an admin-allocated share or other non-purchase share,
+        // show all pair history as these are legitimate selling shares
+        if ($share->get_from !== 'purchase') {
+            $context['shouldShow'] = $sellerPairings || $buyerPairings;
+            $context['showSellerHistory'] = $sellerPairings;
+            $context['showBuyerHistory'] = $buyerPairings;
+            return $context;
+        }
+        
+        // For purchased shares that have transitioned to selling phase:
+        // Always show current selling activity (seller-side pairings)
+        // Only show old buying activity if there's no current selling activity
+        if ($share->get_from === 'purchase') {
+            if ($sellerPairings) {
+                // Has current selling activity - show it
+                $context['shouldShow'] = true;
+                $context['showSellerHistory'] = true;
+                $context['showBuyerHistory'] = false; // Hide old buying history to prevent confusion
+            } elseif ($buyerPairings && $share->is_ready_to_sell == 0) {
+                // No current selling activity but has old buying history and not ready to sell yet
+                // Show buying history as it's still relevant
+                $context['shouldShow'] = true;
+                $context['showSellerHistory'] = false;
+                $context['showBuyerHistory'] = true;
+            } else {
+                // No current selling activity and either no buying history or ready to sell
+                // Don't show anything
+                $context['shouldShow'] = false;
+            }
+        }
+        
+        return $context;
+    }
+    
+    /**
+     * Legacy method - kept for backward compatibility
+     * Use getPairingContextForSoldShare() instead for new implementations
      * 
      * @param UserShare $share
      * @return bool
      */
     private function shouldShowPairHistoryForSoldShare($share)
     {
-        // If the share was originally purchased (get_from = 'purchase'),
-        // and it has transitioned to the sold phase, we should NOT show pair history
-        // because it will create confusion when the shares mature and are paired with new buyers
-        
-        // Case 1: If this is a purchased share that has matured and is ready to sell,
-        // do NOT show old pair history from the buying phase
-        if ($share->get_from === 'purchase' && $share->is_ready_to_sell == 1) {
-            return false;
-        }
-        
-        // Case 2: If this is a purchased share in countdown mode (not ready to sell yet),
-        // do NOT show old pair history either as it's still in transition
-        if ($share->get_from === 'purchase' && $share->is_ready_to_sell == 0) {
-            return false;
-        }
-        
-        // Case 3: If this is an admin-allocated share or other non-purchase share,
-        // show pair history as these are legitimate selling shares
-        if ($share->get_from !== 'purchase') {
-            return true;
-        }
-        
-        // Default: don't show pair history for safety
-        return false;
+        $context = $this->getPairingContextForSoldShare($share);
+        return $context['shouldShow'];
     }
 
     public function updateShareStatusAsFailed(Request $request) {

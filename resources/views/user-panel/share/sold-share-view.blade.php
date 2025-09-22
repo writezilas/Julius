@@ -31,7 +31,7 @@
         $statusInfo = $shareStatusService->getShareStatus($share, 'sold');
         $stats = $shareStatusService->getPairingStats($share);
         
-        // Only load pair history if we should show it (to prevent confusion for transitioned shares)
+        // Load pair history based on new context variables
         $pairedShares = collect(); // Default empty collection
         $totalBuyers = 0;
         $paidTransactions = 0;
@@ -40,10 +40,24 @@
         $validAmount = 0; // Amount from valid (non-failed) pairings only
         
         if (isset($shouldShowPairHistory) && $shouldShowPairHistory) {
-            // Get all paired shares and organize them - successful on top, failed at bottom
-            $allPairedShares = \App\Models\UserSharePair::where('paired_user_share_id', $share->id)
-                ->with(['pairedUserShare', 'pairedUserShare.user'])
-                ->get();
+            // Get paired shares based on what we should show
+            $allPairedShares = collect();
+            
+            // Add seller-side pairings if we should show them (current selling activity)
+            if (isset($showSellerHistory) && $showSellerHistory) {
+                $sellerPairings = \App\Models\UserSharePair::where('paired_user_share_id', $share->id)
+                    ->with(['pairedUserShare', 'pairedUserShare.user'])
+                    ->get();
+                $allPairedShares = $allPairedShares->concat($sellerPairings);
+            }
+            
+            // Add buyer-side pairings if we should show them (historical buying activity)
+            if (isset($showBuyerHistory) && $showBuyerHistory) {
+                $buyerPairings = \App\Models\UserSharePair::where('user_share_id', $share->id)
+                    ->with(['pairedUserShare', 'pairedUserShare.user'])
+                    ->get();
+                $allPairedShares = $allPairedShares->concat($buyerPairings);
+            }
                 
             // Create two collections - one for successful pairings, one for failed ones
             $successfulPairings = collect();
@@ -126,11 +140,23 @@
                             </h3>
                             @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
                                 <p class="text-white-75 mb-0 fs-16">
-                                    Track and manage your paired share transactions and payment confirmations
+                                    @if (isset($showSellerHistory) && $showSellerHistory && isset($showBuyerHistory) && $showBuyerHistory)
+                                        Track and manage your complete pairing history - both buying and selling activities
+                                    @elseif (isset($showSellerHistory) && $showSellerHistory)
+                                        Track and manage your current selling transactions and payment confirmations
+                                    @elseif (isset($showBuyerHistory) && $showBuyerHistory)
+                                        View your historical buying transactions for this share
+                                    @else
+                                        Track and manage your paired share transactions and payment confirmations
+                                    @endif
                                 </p>
                             @else
                                 <p class="text-white-75 mb-0 fs-16">
-                                    This share has matured and is ready for new buyers. Old pair history is hidden to prevent confusion.
+                                    @if (isset($hasSellerPairings) && $hasSellerPairings)
+                                        This share has current pairing activity. Pairing information will be displayed once processing is complete.
+                                    @else
+                                        This share is ready for new buyers. Pairing information will be displayed when buyers are found.
+                                    @endif
                                 </p>
                             @endif
                         </div>
@@ -469,22 +495,36 @@
         </div>
     </div>
     @else
-    <!-- Share Maturity Message -->
+    <!-- No Pair History Message -->
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body text-center py-5">
-                    <div class="mb-3">
-                        <i class="ri-check-double-line display-3 text-success"></i>
-                    </div>
-                    <h4 class="text-success mb-3">Share Has Matured</h4>
-                    <p class="text-muted mb-4">
-                        This share has completed its maturity period and is now ready for new buyers.
-                    </p>
-                    <div class="alert alert-info" role="alert">
-                        <i class="ri-information-line align-middle me-2"></i>
-                        Once new buyers are available in the market, pairing information will be displayed here.
-                    </div>
+                    @if (isset($hasSellerPairings) && $hasSellerPairings)
+                        <div class="mb-3">
+                            <i class="ri-loader-2-line display-3 text-primary"></i>
+                        </div>
+                        <h4 class="text-primary mb-3">Processing Active Pairings</h4>
+                        <p class="text-muted mb-4">
+                            This share has active pairing activity that is currently being processed.
+                        </p>
+                        <div class="alert alert-info" role="alert">
+                            <i class="ri-information-line align-middle me-2"></i>
+                            Pairing details will be displayed once the current transactions are fully processed.
+                        </div>
+                    @else
+                        <div class="mb-3">
+                            <i class="ri-check-double-line display-3 text-success"></i>
+                        </div>
+                        <h4 class="text-success mb-3">Share Ready for Market</h4>
+                        <p class="text-muted mb-4">
+                            This share is ready and available for new buyers in the market.
+                        </p>
+                        <div class="alert alert-info" role="alert">
+                            <i class="ri-information-line align-middle me-2"></i>
+                            Once buyers are found and paired, transaction details will be displayed here.
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -504,7 +544,7 @@
                         <div class="modal-header bg-primary bg-gradient">
                             <h5 class="modal-title text-white" id="paymentModalLabel{{ $pairedShare->id }}">
                                 <i class="ri-secure-payment-line align-middle me-2"></i>
-                                Payment Confirmation Details
+                                Payment from {{ $pairedShare->pairedUserShare->user->name }}
                             </h5>
                             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
@@ -518,7 +558,7 @@
                                         </div>
                                         <div class="flex-grow-1 ms-3">
                                             <h6 class="mb-1">Payment Completed Successfully!</h6>
-                                            <p class="mb-0">Thank you for confirming the payment. The transaction is now complete.</p>
+                                            <p class="mb-0">You have confirmed the buyer's payment. The transaction is now complete.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -530,19 +570,94 @@
                                         </div>
                                         <div class="flex-grow-1 ms-3">
                                             <h6 class="mb-1">Payment Awaiting Confirmation</h6>
-                                            <p class="mb-0">Please review the payment details below and confirm if the payment is correct.</p>
+                                            <p class="mb-0">The buyer has submitted payment details. Please review and confirm if the payment is correct.</p>
                                         </div>
                                     </div>
                                 </div>
                             @endif
+
+                            <!-- Buyer Information Card -->
+                            <div class="card border-0 bg-info-subtle mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-3 text-info">
+                                        <i class="ri-user-line align-middle me-2"></i>
+                                        Buyer Information
+                                    </h6>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-user-3-line text-muted me-2"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">Buyer Name</small>
+                                                    <p class="fw-medium mb-0">{{ $pairedShare->pairedUserShare->user->name }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-at-line text-muted me-2"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">Username</small>
+                                                    <p class="fw-medium mb-0">{{ $pairedShare->pairedUserShare->user->username }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @php
+                                            $buyerProfileInfo = json_decode($pairedShare->pairedUserShare->user->business_profile);
+                                            $showTillInfoBuyer = !empty($buyerProfileInfo->mpesa_till_number) && !empty($buyerProfileInfo->mpesa_till_name);
+                                        @endphp
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-smartphone-line text-muted me-2"></i>
+                                                </div>
+                                                <div>
+                                                    @if ($showTillInfoBuyer)
+                                                        <small class="text-muted">Buyer's Till Name</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfileInfo->mpesa_till_name }}</p>
+                                                    @else
+                                                        <small class="text-muted">Buyer's MPESA Name</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfileInfo->mpesa_name ?? 'N/A' }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-phone-line text-muted me-2"></i>
+                                                </div>
+                                                <div>
+                                                    @if ($showTillInfoBuyer)
+                                                        <small class="text-muted">Buyer's Till Number</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfileInfo->mpesa_till_number }}</p>
+                                                    @else
+                                                        <small class="text-muted">Buyer's MPESA Number</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfileInfo->mpesa_no ?? 'N/A' }}</p>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <!-- Payment Details Card -->
                             <div class="card border-0 bg-light">
                                 <div class="card-body">
                                     <h6 class="card-title mb-3">
                                         <i class="ri-bill-line align-middle me-2 text-primary"></i>
-                                        Transaction Information
+                                        Payment Submitted Details
                                     </h6>
+                                    @php
+                                        $buyerProfile = json_decode($pairedShare->pairedUserShare->user->business_profile);
+                                        // Determine whether to show Till info or regular MPESA info
+                                        $showTillInfo = !empty($buyerProfile->mpesa_till_number) && !empty($buyerProfile->mpesa_till_name);
+                                    @endphp
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <div class="d-flex align-items-center">
@@ -550,8 +665,13 @@
                                                     <i class="ri-user-line text-muted me-2"></i>
                                                 </div>
                                                 <div>
-                                                    <small class="text-muted">Sender Name</small>
-                                                    <p class="fw-medium mb-0">{{ $payment->name }}</p>
+                                                    @if ($showTillInfo)
+                                                        <small class="text-muted">Buyer's Till Name</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfile->mpesa_till_name }}</p>
+                                                    @else
+                                                        <small class="text-muted">Buyer's MPESA Name</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfile->mpesa_name ?? 'N/A' }}</p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -561,8 +681,13 @@
                                                     <i class="ri-smartphone-line text-muted me-2"></i>
                                                 </div>
                                                 <div>
-                                                    <small class="text-muted">Phone Number</small>
-                                                    <p class="fw-medium mb-0">{{ $payment->number }}</p>
+                                                    @if ($showTillInfo)
+                                                        <small class="text-muted">Buyer's Till Number</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfile->mpesa_till_number }}</p>
+                                                    @else
+                                                        <small class="text-muted">Buyer's MPESA Number</small>
+                                                        <p class="fw-medium mb-0">{{ $buyerProfile->mpesa_no ?? 'N/A' }}</p>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -601,6 +726,41 @@
                                             </div>
                                         </div>
                                         @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actual Payment Submission Details Card -->
+                            <div class="card border-0 bg-warning-subtle">
+                                <div class="card-body">
+                                    <h6 class="card-title mb-3 text-warning">
+                                        <i class="ri-send-plane-line align-middle me-2"></i>
+                                        Actual Payment Submission
+                                    </h6>
+                                    <p class="text-muted small mb-3">This shows who actually submitted the payment (may be different from buyer's profile)</p>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-user-received-line text-muted me-2"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">Payment Submitted By</small>
+                                                    <p class="fw-medium mb-0">{{ $payment->name }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0">
+                                                    <i class="ri-phone-line text-muted me-2"></i>
+                                                </div>
+                                                <div>
+                                                    <small class="text-muted">From Phone Number</small>
+                                                    <p class="fw-medium mb-0">{{ $payment->number }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
