@@ -8,6 +8,8 @@
 <link href="{{ URL::asset('/assets/css/enhanced-bidding-cards.css') }}?v={{ time() }}" rel="stylesheet">
 <!-- Enhanced Announcement Card Styles -->
 <link href="{{ URL::asset('/assets/css/announcement-card.css') }}?v={{ time() }}" rel="stylesheet">
+<!-- Enhanced Countdown Timer Styles -->
+<link href="{{ URL::asset('/assets/css/enhanced-countdown.css') }}?v={{ time() }}" rel="stylesheet">
 @endsection
 
 @section('content')
@@ -217,11 +219,11 @@
                             <h4 class="text-muted mb-2">Market Closed</h4>
                             <p class="text-muted mb-4">Auction closed at the moment. Click REFRESH when it is time to bid.</p>
                             @if($open)
-                                <div class="alert alert-info mb-4">
+                                <div class="mb-4">
                                     <p class="mb-2"><strong>Market will open at: {{ $open->format('h:i A') }}</strong></p>
                                     <p class="mb-2 small text-muted">Time shown in {{ $appTimezone }} timezone</p>
                                     <div class="mt-3">
-                                        <span id="count-down" class="badge bg-primary fs-6 p-2" data-time="{{$open->utc()}}">Calculating...</span>
+                                        <div id="count-down" data-time="{{$open->utc()}}">Loading countdown...</div>
                                     </div>
                                 </div>
                             @endif
@@ -450,12 +452,99 @@
                 animate();
             });
             
-            // Countdown Timer for Market Open
+            // Enhanced Countdown Timer for Market Open
             const countdownElement = document.getElementById('count-down');
             if (countdownElement) {
+                // Store previous values for flip animation
+                let previousValues = { days: '', hours: '', minutes: '', seconds: '' };
+                
+                // Function to pad numbers with leading zeros
+                const padNumber = (num) => num.toString().padStart(2, '0');
+                
+                // Function to create the enhanced countdown HTML structure
+                const createCountdownHTML = (days, hours, minutes, seconds) => {
+                    const daysStr = padNumber(days);
+                    const hoursStr = padNumber(hours);
+                    const minutesStr = padNumber(minutes);
+                    const secondsStr = padNumber(seconds);
+                    
+                    return `
+                        <div class="enhanced-countdown-container">
+                            <div class="countdown-header">
+                                <h3 class="countdown-title">TIME REMAINING</h3>
+                            </div>
+                            <div class="countdown-digits">
+                                <div class="countdown-unit">
+                                    <div class="countdown-digits-group">
+                                        <div class="countdown-digit days" data-digit="days-tens">${daysStr[0]}</div>
+                                        <div class="countdown-digit days" data-digit="days-ones">${daysStr[1]}</div>
+                                    </div>
+                                    <div class="countdown-label">DAYS</div>
+                                </div>
+                                <div class="countdown-unit">
+                                    <div class="countdown-digits-group">
+                                        <div class="countdown-digit hours" data-digit="hours-tens">${hoursStr[0]}</div>
+                                        <div class="countdown-digit hours" data-digit="hours-ones">${hoursStr[1]}</div>
+                                    </div>
+                                    <div class="countdown-label">HOURS</div>
+                                </div>
+                                <div class="countdown-unit">
+                                    <div class="countdown-digits-group">
+                                        <div class="countdown-digit minutes" data-digit="minutes-tens">${minutesStr[0]}</div>
+                                        <div class="countdown-digit minutes" data-digit="minutes-ones">${minutesStr[1]}</div>
+                                    </div>
+                                    <div class="countdown-label">MINUTES</div>
+                                </div>
+                                <div class="countdown-unit">
+                                    <div class="countdown-digits-group">
+                                        <div class="countdown-digit seconds" data-digit="seconds-tens">${secondsStr[0]}</div>
+                                        <div class="countdown-digit seconds" data-digit="seconds-ones">${secondsStr[1]}</div>
+                                    </div>
+                                    <div class="countdown-label">SECONDS</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                };
+                
+                // Function to update individual digits with flip animation
+                const updateDigits = (days, hours, minutes, seconds) => {
+                    const daysStr = padNumber(days);
+                    const hoursStr = padNumber(hours);
+                    const minutesStr = padNumber(minutes);
+                    const secondsStr = padNumber(seconds);
+                    
+                    const digitUpdates = {
+                        'days-tens': daysStr[0],
+                        'days-ones': daysStr[1],
+                        'hours-tens': hoursStr[0],
+                        'hours-ones': hoursStr[1],
+                        'minutes-tens': minutesStr[0],
+                        'minutes-ones': minutesStr[1],
+                        'seconds-tens': secondsStr[0],
+                        'seconds-ones': secondsStr[1]
+                    };
+                    
+                    // Update each digit with animation if it changed
+                    Object.entries(digitUpdates).forEach(([digitType, newValue]) => {
+                        const digitElement = document.querySelector(`[data-digit="${digitType}"]`);
+                        if (digitElement && digitElement.textContent !== newValue) {
+                            digitElement.classList.add('flip-in');
+                            digitElement.textContent = newValue;
+                            
+                            // Remove animation class after animation completes
+                            setTimeout(() => {
+                                digitElement.classList.remove('flip-in');
+                            }, 300);
+                        }
+                    });
+                };
+                
                 const getCounterTime = (startTime, id) => {
                     // Parse the input date string into a UTC date object
                     const countDownDate = new Date(startTime + ' UTC').getTime();
+                    
+                    let isInitialized = false;
                     
                     // Update the count down every 1 second
                     const x = setInterval(function() {
@@ -471,16 +560,28 @@
                         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
                         
-                        // Output the result in an element with id="count-down"
-                        document.getElementById(id).innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-                        
-                        // If the count down is over, refresh the page
+                        // If the count down is over, show completion message and refresh
                         if (distance < 0) {
                             clearInterval(x);
-                            document.getElementById(id).innerHTML = "Market open now!";
+                            document.getElementById(id).innerHTML = `
+                                <div class="enhanced-countdown-container countdown-ended">
+                                    <div class="countdown-header">
+                                        <h3 class="countdown-title">Market Open Now!</h3>
+                                    </div>
+                                </div>
+                            `;
                             setTimeout(() => {
                                 window.location.reload();
                             }, 3000);
+                            return;
+                        }
+                        
+                        // Initialize or update the countdown display
+                        if (!isInitialized) {
+                            document.getElementById(id).innerHTML = createCountdownHTML(days, hours, minutes, seconds);
+                            isInitialized = true;
+                        } else {
+                            updateDigits(days, hours, minutes, seconds);
                         }
                     }, 1000);
                 };
