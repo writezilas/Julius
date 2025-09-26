@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Countdown Timer Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .countdown-display { font-size: 24px; font-weight: bold; color: #007bff; padding: 10px; }
+        .status { padding: 5px 10px; border-radius: 3px; margin: 5px 0; }
+        .working { background-color: #d4edda; }
+        .broken { background-color: #f8d7da; }
+    </style>
+</head>
+<body>
+    <h1>Countdown Timer Format Test</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Old Format (Problematic)</h3>
+        <p><strong>Input:</strong> "2025-09-26 05:30:00"</p>
+        <p><strong>Expected Issue:</strong> Browser interprets as local time</p>
+        <div id="countdown1" class="countdown-display">Loading...</div>
+        <div id="status1" class="status">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test 2: ISO Format (Fixed)</h3>
+        <p><strong>Input:</strong> "2025-09-26T05:30:00.000000Z"</p>
+        <p><strong>Expected:</strong> Browser correctly interprets as UTC</p>
+        <div id="countdown2" class="countdown-display">Loading...</div>
+        <div id="status2" class="status">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Browser Information</h3>
+        <p><strong>Browser Time:</strong> <span id="browser-time"></span></p>
+        <p><strong>Browser Timezone:</strong> <span id="browser-timezone"></span></p>
+        <p><strong>UTC Offset:</strong> <span id="utc-offset"></span> minutes</p>
+    </div>
+    
+    <div class="test-section">
+        <h3>Debug Log</h3>
+        <div id="debug-log" style="background: white; padding: 10px; border: 1px solid #ddd; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+    </div>
+    
+    <script>
+        // Display browser info
+        const now = new Date();
+        document.getElementById('browser-time').textContent = now.toString();
+        document.getElementById('browser-timezone').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('utc-offset').textContent = now.getTimezoneOffset();
+        
+        // Debug logging
+        const log = (message) => {
+            const timestamp = new Date().toISOString();
+            const logDiv = document.getElementById('debug-log');
+            logDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        };
+        
+        log('Starting countdown timer tests...');
+        
+        // Test 1: Old problematic format
+        const testCountdown = (inputTime, displayId, statusId, testName) => {
+            log(`${testName}: Input time = ${inputTime}`);
+            
+            let countDownDate;
+            try {
+                countDownDate = new Date(inputTime).getTime();
+                log(`${testName}: Parsed timestamp = ${countDownDate}`);
+                log(`${testName}: Parsed date = ${new Date(countDownDate)}`);
+            } catch (error) {
+                log(`${testName}: ERROR parsing date - ${error}`);
+                document.getElementById(statusId).innerHTML = '❌ Parse Error';
+                document.getElementById(statusId).className = 'status broken';
+                return;
+            }
+            
+            if (isNaN(countDownDate)) {
+                log(`${testName}: ERROR - Parsed to NaN`);
+                document.getElementById(statusId).innerHTML = '❌ NaN Result';
+                document.getElementById(statusId).className = 'status broken';
+                return;
+            }
+            
+            // Expected UTC time: 2025-09-26 05:30:00 UTC
+            const expectedUTC = new Date('2025-09-26T05:30:00.000Z').getTime();
+            const difference = Math.abs(countDownDate - expectedUTC);
+            
+            log(`${testName}: Expected UTC timestamp = ${expectedUTC}`);
+            log(`${testName}: Difference from expected = ${difference}ms`);
+            
+            if (difference < 1000) { // Within 1 second
+                document.getElementById(statusId).innerHTML = '✅ Correct UTC interpretation';
+                document.getElementById(statusId).className = 'status working';
+            } else {
+                document.getElementById(statusId).innerHTML = '❌ Incorrect timezone interpretation';
+                document.getElementById(statusId).className = 'status broken';
+            }
+            
+            // Start countdown
+            const updateCountdown = () => {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
+                
+                if (distance < 0) {
+                    document.getElementById(displayId).innerHTML = '⏰ TIME REACHED!';
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById(displayId).innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            };
+            
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        };
+        
+        // Run tests
+        setTimeout(() => {
+            testCountdown('2025-09-26 05:30:00', 'countdown1', 'status1', 'Test1');
+            testCountdown('2025-09-26T05:30:00.000000Z', 'countdown2', 'status2', 'Test2');
+        }, 1000);
+        
+        log('Tests initialized');
+    </script>
+</body>
+</html>

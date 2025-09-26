@@ -69,4 +69,29 @@ class GeneralSettingController extends Controller
 
     }
 
+    public function supportFormSettings()
+    {
+        $pageTitle = 'Support Form Settings';
+
+        $supportFormEnabled = GeneralSetting::where('key', 'support_form_enabled')->value('value') ?? 1;
+
+        return view('admin-panel.settings.support-form', compact('pageTitle', 'supportFormEnabled'));
+    }
+
+    public function saveSupportFormSettings(Request $request)
+    {
+        $request->validate([
+            'support_form_enabled' => 'required|boolean',
+        ]);
+
+        GeneralSetting::updateOrCreate(
+            ['key' => 'support_form_enabled'],
+            ['value' => $request->support_form_enabled]
+        );
+
+        $status = $request->support_form_enabled ? 'enabled' : 'disabled';
+        toastr()->success("Support form has been {$status} successfully");
+        return back();
+    }
+
 }

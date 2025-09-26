@@ -12,11 +12,13 @@ class AnnouncementCard {
         // Initialize all announcement toggles
         this.bindToggleEvents();
         
-        // Auto-expand first announcement if there's only one
-        this.autoExpandSingle();
+        // Ensure all announcements start collapsed
+        this.ensureCollapsedState();
         
         // Add smooth scrolling to expanded announcements
         this.addSmoothScrolling();
+        
+        // Note: Removed auto-expand to prevent unwanted scrolling
     }
 
     bindToggleEvents() {
@@ -85,10 +87,7 @@ class AnnouncementCard {
             content.style.maxHeight = 'none';
         }, 300);
 
-        // Smooth scroll to keep the announcement in view
-        setTimeout(() => {
-            this.scrollToAnnouncement(content.closest('.announcement-item-enhanced'));
-        }, 100);
+        // Note: Removed auto-scroll to prevent unwanted scrolling on expansion
 
         // Track expansion event
         this.trackEvent('announcement_expanded', {
@@ -131,18 +130,35 @@ class AnnouncementCard {
         });
     }
 
-    autoExpandSingle() {
+    ensureCollapsedState() {
         const announcements = document.querySelectorAll('.announcement-item-enhanced');
         
-        // If there's only one announcement, auto-expand it
-        if (announcements.length === 1) {
-            const toggleBtn = announcements[0].querySelector('.announcement-toggle');
-            if (toggleBtn) {
-                setTimeout(() => {
-                    this.toggleAnnouncement(toggleBtn);
-                }, 500);
+        // Ensure all announcements start in collapsed state
+        announcements.forEach(announcement => {
+            const content = announcement.querySelector('.announcement-content');
+            const toggleBtn = announcement.querySelector('.announcement-toggle');
+            const icon = toggleBtn?.querySelector('.announcement-toggle-icon');
+            const toggleText = toggleBtn?.querySelector('.toggle-text');
+            
+            if (content && toggleBtn) {
+                // Set collapsed state
+                content.classList.remove('expanded');
+                toggleBtn.classList.remove('expanded');
+                toggleBtn.classList.add('collapsed');
+                
+                if (icon) {
+                    icon.classList.remove('expanded');
+                }
+                
+                if (toggleText) {
+                    toggleText.textContent = 'View Details';
+                }
+                
+                // Set initial styles
+                content.style.maxHeight = '0px';
+                content.style.opacity = '0';
             }
-        }
+        });
     }
 
     scrollToAnnouncement(announcementElement) {
@@ -258,12 +274,20 @@ class AnnouncementCard {
 
 // Initialize the announcement card functionality when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Prevent any unwanted scrolling during initialization
+    const originalScrollY = window.scrollY;
+    
     const announcementCard = new AnnouncementCard();
     
     // Setup additional features
     announcementCard.handleImageErrors();
     announcementCard.setupVideoHandling();
     announcementCard.setupKeyboardNavigation();
+    
+    // Restore scroll position if it changed unexpectedly
+    if (window.scrollY !== originalScrollY && originalScrollY === 0) {
+        window.scrollTo(0, originalScrollY);
+    }
     
     // Make it globally accessible for debugging
     window.announcementCard = announcementCard;

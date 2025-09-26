@@ -17,9 +17,12 @@ class ChatController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        
+        // Apply chat system enabled check to all methods EXCEPT getUnreadCount and getChatSettings
         $this->middleware(function ($request, $next) {
-            // Check if chat is enabled
-            if (!ChatSetting::isChatEnabled()) {
+            // Check if chat is enabled (skip this check for unread count and settings)
+            $currentRoute = $request->route()->getActionMethod();
+            if (!in_array($currentRoute, ['getUnreadCount', 'getChatSettings']) && !ChatSetting::isChatEnabled()) {
                 if ($request->expectsJson()) {
                     return response()->json(['error' => 'Chat system is currently disabled'], 403);
                 }
@@ -296,6 +299,16 @@ class ChatController extends Controller
     public function getUnreadCount()
     {
         $user = Auth::user();
+        
+        // If chat is disabled, return 0 count but still allow the request
+        if (!ChatSetting::isChatEnabled()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => 0,
+                'message' => 'Chat system is disabled'
+            ]);
+        }
+        
         $count = $user->getUnreadMessagesCount();
         
         return response()->json([

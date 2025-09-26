@@ -243,6 +243,93 @@ $pageTitle = __('translation.soldshares');
         </div>
     </div>
 
+    <!-- Referral Bonus Trading Section - Hidden from sold-shares page -->
+    {{-- 
+    @if(isset($availableReferralBonuses) && $availableReferralBonuses->count() > 0)
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card border border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0 text-white">
+                        <i class="fas fa-gift me-2"></i>Available Referral Bonus Trades
+<small class="opacity-75 ms-2">(Automatically available for trading)</small>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Referral Bonus Trading:</strong> These bonus shares are automatically assigned to the trade with the most liquidity, ensuring they can be quickly sold to any available buyers.
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Bonus From</th>
+                                    <th>Ticket No</th>
+                                    <th>Share Type</th>
+                                    <th>Bonus Amount</th>
+                                    <th>Earning Potential</th>
+                                    <th>Total Value</th>
+                                    <th>Market Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($availableReferralBonuses as $bonus)
+                                    <tr>
+                                        <td>
+                                            <strong class="text-success">
+                                                @if($bonus->invoice && $bonus->invoice->reff_user)
+                                                    {{ $bonus->invoice->reff_user->name ?? $bonus->invoice->reff_user->username }}
+                                                @else
+                                                    Referral Bonus
+                                                @endif
+                                            </strong>
+                                            <br><small class="text-muted">{{ $bonus->created_at->format('M d, Y') }}</small>
+                                        </td>
+                                        <td><code>{{ $bonus->ticket_no }}</code></td>
+                                        <td>{{ $bonus->trade ? $bonus->trade->name : 'N/A' }}</td>
+                                        <td>
+                                            <span class="badge bg-success">
+                                                KSH {{ number_format($bonus->share_will_get ?? 0, 2) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                KSH 0.00
+                                            </span>
+                                            <br><small class="text-muted">No interest earned</small>
+                                        </td>
+                                        <td>
+                                            <strong class="text-success">
+                                                KSH {{ number_format($bonus->share_will_get ?? 0, 2) }}
+                                            </strong>
+                                            <br><small class="text-muted">Face value only</small>
+                                        </td>
+                                        <td>
+                                            @if($bonus->sold_quantity > 0 || $bonus->pairedWithThis->count() > 0)
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check-circle me-1"></i>Sold
+                                                </span>
+                                                <br><small class="text-muted">Payment confirmed</small>
+                                            @else
+                                                <span class="badge bg-info">
+                                                    <i class="fas fa-shopping-cart me-1"></i>Available
+                                                </span>
+                                                <br><small class="text-muted">Ready for buyers</small>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    --}}
+
     <!-- Main Table -->
     <div class="row">
         <div class="col-lg-12">
@@ -273,11 +360,31 @@ $pageTitle = __('translation.soldshares');
                                     <tr>
                                         <td>{{$loop->iteration}}</td>
                                         <td>{{ $share->ticket_no ?? 'N/A' }}</td>
-                                        <td>{{ $share->trade ? $share->trade->name : 'Trade Not Available' }}</td>
+                                        <td>
+                                            @if($share->get_from === 'refferal-bonus')
+                                                <span class="text-success"><i class="fas fa-gift me-1"></i>Referral Bonus</span>
+                                            @else
+                                                {{ $share->trade ? $share->trade->name : 'Trade Not Available' }}
+                                            @endif
+                                        </td>
                                         <td>{{ $share->start_date ? date('d M Y', strtotime($share->start_date)) : 'N/A' }}</td>
                                         <td>KSH {{ number_format($share->share_will_get ?? 0, 2) }}</td>
-                                        <td>KSH {{ number_format($share->profit_share ?? 0, 2) }}</td>
-                                        <td>KSH {{ number_format(($share->share_will_get ?? 0) + ($share->profit_share ?? 0), 2) }}</td>
+                                        <td>
+                                            @if($share->get_from === 'refferal-bonus')
+                                                <span class="text-muted">KSH 0.00</span>
+                                                <br><small class="text-muted">No interest</small>
+                                            @else
+                                                KSH {{ number_format($share->profit_share ?? 0, 2) }}
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($share->get_from === 'refferal-bonus')
+                                                <strong class="text-primary">KSH {{ number_format($share->share_will_get ?? 0, 2) }}</strong>
+                                                <br><small class="text-muted">Face value only</small>
+                                            @else
+                                                KSH {{ number_format(($share->share_will_get ?? 0) + ($share->profit_share ?? 0), 2) }}
+                                            @endif
+                                        </td>
                                         <td>
                                             @php
                                                 $shareStatusService = app(\App\Services\ShareStatusService::class);
@@ -465,5 +572,8 @@ function getSoldShareCounterTime(startTime, id, shareId) {
         console.error('Timer initialization error:', error);
     }
 }
+
+// Referral bonuses are now automatically floated to market
+// No manual intervention required
 </script>
 @endsection

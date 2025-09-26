@@ -13,6 +13,9 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico')}}">
     @include('layouts.head-css')
+    
+    <!-- iOS Payment Modal Compatibility Fixes -->
+    <link href="{{ asset('assets/css/ios-payment-modal-fix.css') }}?v={{ time() }}" rel="stylesheet">
 
 </head>
 
@@ -53,6 +56,9 @@
 
     <!-- JAVASCRIPT -->
     @include('layouts.vendor-scripts')
+    
+    <!-- iOS Payment Modal JavaScript Fixes -->
+    <script src="{{ asset('assets/js/ios-payment-modal-fix.js') }}?v={{ time() }}"></script>
     
     @auth
     <!-- User Status Monitor -->

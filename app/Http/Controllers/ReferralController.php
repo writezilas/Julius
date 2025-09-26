@@ -35,9 +35,16 @@ class ReferralController extends Controller
         foreach ($refferals as $referral) {
             if ($referral->ref_amount > 0) {
                 // Check if the referrer (current user) has sold bonus shares for this referral
+                // Look for referral bonus shares that have been paired with buyers and payments confirmed
                 $soldBonusShares = UserShare::where('user_id', \auth()->user()->id)
                     ->where('get_from', 'refferal-bonus')
-                    ->where('sold_quantity', '>', 0)
+                    ->whereHas('pairedWithThis', function($query) {
+                        // Check if the pairing has confirmed payment
+                        $query->where('is_paid', 1)
+                              ->whereHas('payment', function($paymentQuery) {
+                                  $paymentQuery->where('status', 'paid');
+                              });
+                    })
                     ->exists();
                     
                 if ($soldBonusShares) {

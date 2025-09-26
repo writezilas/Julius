@@ -557,8 +557,15 @@
 
 @endsection
 @section('script')
+    <!-- iOS Payment Modal Compatibility Fixes -->
+    <link href="{{ asset('assets/css/ios-payment-modal-fix.css') }}?v={{ time() }}" rel="stylesheet">
+    
     <!-- Afresh Payment Form JavaScript -->
     <script src="{{ asset('assets/js/payment-form-afresh.js') }}?v={{ time() }}"></script>
+    
+    <!-- iOS Payment Modal JavaScript Fixes -->
+    <script src="{{ asset('assets/js/ios-payment-modal-fix.js') }}?v={{ time() }}"></script>
+    
     <!-- DataTables for enhanced table functionality -->
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>

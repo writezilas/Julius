@@ -21,6 +21,8 @@
         </div><!--end col-->
         
     </div><!--end row-->
+    
+    @if($supportFormEnabled)
     <div class="row justify-content-center">
         <div class="col-lg-6">
             <div class="card">
@@ -127,6 +129,26 @@
         </div>
         <!--end col-->
     </div>
+    @else
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header align-items-center d-flex">
+                    <h4 class="card-title mb-0 flex-grow-1">Support Form Currently Unavailable</h4>
+                </div><!-- end card header -->
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="alert alert-info" role="alert">
+                            <i class="mdi mdi-information-outline me-2"></i>
+                            The support form is currently disabled. Please use our official Telegram channels above to reach us.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end col-->
+    </div>
+    @endif
 
 
 @endsection

@@ -147,25 +147,28 @@ class RegisterController extends Controller
         $log->user_id = $user->id;
         $user->logs()->save($log);
 
-        // Set referral amount but keep status as pending until bonus shares are sold
+        // Set referral amount and capture bonus at registration time
         if(isset($data['refferal']) && !empty($data['refferal'])) {
             try {
                 $referrer = User::where('username', $data['refferal'])->first();
                 if($referrer) {
-                    // Set the referral amount for the new user (potential earnings)
+                    // Get the current referral bonus amount and store it for this user
                     $bonusAmount = get_gs_value('reffaral_bonus') ?? 100;
+                    
+                    // Store both the potential earnings and the bonus amount at registration
                     $user->ref_amount = $bonusAmount;
+                    $user->referral_bonus_at_registration = $bonusAmount; // Track bonus at time of registration
                     $user->save();
                     
-                    // Log the referral setup
+                    // Log the referral setup with bonus tracking
                     $refLog = new Log();
-                    $refLog->remarks = "Referral setup: Potential earning of KSH {$bonusAmount} for being referred by {$referrer->username}. Status: Pending until bonus shares are sold.";
+                    $refLog->remarks = "Referral setup: Potential earning of KSH {$bonusAmount} for being referred by {$referrer->username}. Bonus amount locked at registration time: KSH {$bonusAmount}. Status: Pending until bonus shares are sold.";
                     $refLog->type = "referral_setup";
                     $refLog->value = $bonusAmount;
                     $refLog->user_id = $user->id;
                     $user->logs()->save($refLog);
                     
-                    \Log::info("Referral setup: User {$user->username} has potential earning of KSH {$bonusAmount} for referral by {$referrer->username}. Waiting for bonus shares to be created and sold.");
+                    \Log::info("Referral setup: User {$user->username} has potential earning of KSH {$bonusAmount} for referral by {$referrer->username}. Bonus amount locked at registration: KSH {$bonusAmount}. Waiting for bonus shares to be created and sold.");
                 }
             } catch (\Exception $e) {
                 \Log::error("Failed to set up referral for user {$user->username}: " . $e->getMessage());

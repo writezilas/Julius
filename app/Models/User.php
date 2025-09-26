@@ -37,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'suspension_until',
         'suspension_reason',
         'status',
+        'referral_bonus_at_registration',
     ];
 
     /**

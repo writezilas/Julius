@@ -26,6 +26,11 @@
                                     <strong>{{ $message }}</strong>
                                 </span>
                                 @enderror
+                                <small class="form-text text-info mt-2">
+                                    <i class="fas fa-info-circle"></i> <strong>Note:</strong> This setting applies to new user registrations only. 
+                                    Users who have already registered will receive referral bonuses based on the amount that was active when they registered.
+                                    This ensures fair bonus distribution regardless of future changes to this setting.
+                                </small>
                             </div>
                         </div>
                         <div class="col-6">

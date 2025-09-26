@@ -116,9 +116,28 @@ class SupportController extends Controller
     public function supportsForAdmin() {
         $supports = Support::orderBy('id', 'desc')->get();
         $pageTitle = 'Supports';
+        $supportFormEnabled = get_gs_value('support_form_enabled') ?? 1;
 
-        return view('admin-panel.communications.supports', compact('pageTitle', 'supports'));
+        return view('admin-panel.communications.supports', compact('pageTitle', 'supports', 'supportFormEnabled'));
 
+    }
+
+    public function toggleSupportForm(Request $request)
+    {
+        $enabled = $request->input('enabled', 0);
+        
+        \App\Models\GeneralSetting::updateOrCreate(
+            ['key' => 'support_form_enabled'],
+            ['value' => $enabled]
+        );
+        
+        $status = $enabled ? 'enabled' : 'disabled';
+        
+        return response()->json([
+            'success' => true,
+            'message' => "Support form has been {$status} successfully",
+            'status' => $status
+        ]);
     }
 
 

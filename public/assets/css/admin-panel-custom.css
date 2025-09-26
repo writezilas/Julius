@@ -214,3 +214,80 @@
     background-size: cover;
     background-position: bottom;
 }\n\n.filter-section .form-control,\n.filter-section .form-select {\n    border-radius: 8px;\n    backdrop-filter: blur(10px);\n    transition: all 0.3s ease;\n}\n\n.filter-section .form-control:hover,\n.filter-section .form-select:hover {\n    background-color: rgba(255, 255, 255, 0.2);\n}\n\n.filter-section .btn {\n    backdrop-filter: blur(10px);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n}\n\n.filter-section .btn:hover {\n    background-color: rgba(255, 255, 255, 0.2);\n    border-color: rgba(255, 255, 255, 0.5);\n}\n\n/* Sidebar Enhancements */\n.app-menu .navbar-nav .nav-link {\n    transition: all 0.3s ease;\n    border-radius: 8px;\n    margin: 2px 8px;\n}\n\n.app-menu .navbar-nav .nav-link:hover {\n    background: rgba(255, 255, 255, 0.1);\n    transform: translateX(5px);\n}\n\n.app-menu .navbar-nav .nav-link.active {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);\n}\n\n/* Topbar Enhancements */\n.navbar-header {\n    background: white;\n    box-shadow: 0 2px 15px rgba(154, 161, 171, 0.15);\n    border-bottom: none;\n}\n\n/* Empty State */\n.empty-state {\n    padding: 60px 20px;\n    text-align: center;\n}\n\n.empty-state .avatar-xl {\n    width: 100px;\n    height: 100px;\n    margin: 0 auto 24px;\n}\n\n.empty-state .avatar-title {\n    border-radius: 50px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n/* Pagination Enhancements */\n.pagination .page-link {\n    border-radius: 8px;\n    margin: 0 2px;\n    border: none;\n    color: #6c757d;\n    transition: all 0.3s ease;\n}\n\n.pagination .page-link:hover {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    color: white;\n    transform: translateY(-2px);\n}\n\n.pagination .page-item.active .page-link {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    border-color: #667eea;\n}\n\n/* Loading Animation */\n.loading {\n    position: relative;\n    overflow: hidden;\n}\n\n.loading::after {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: -100%;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);\n    animation: loading 1.5s infinite;\n}\n\n@keyframes loading {\n    0% { left: -100%; }\n    100% { left: 100%; }\n}\n\n/* Responsive Enhancements */\n@media (max-width: 768px) {\n    .filter-section {\n        padding: 16px;\n    }\n    \n    .filter-section .row {\n        margin: 0;\n    }\n    \n    .filter-section .col-md-3,\n    .filter-section .col-md-2,\n    .filter-section .col-md-4 {\n        padding: 4px;\n        margin-bottom: 12px;\n    }\n    \n    .stats-card {\n        margin-bottom: 16px;\n    }\n    \n    .table-responsive {\n        border-radius: 8px;\n    }\n    \n    .btn {\n        padding: 10px 20px;\n        font-size: 0.875rem;\n    }\n    \n    .card-body {\n        padding: 16px;\n    }\n}\n\n@media (max-width: 576px) {\n    .page-content {\n        padding: 16px;\n    }\n    \n    .filter-section {\n        padding: 12px;\n        border-radius: 8px;\n    }\n    \n    .stats-card .card-body {\n        padding: 16px;\n    }\n    \n    .btn {\n        padding: 8px 16px;\n        font-size: 0.8125rem;\n    }\n}\n\n/* Dark Mode Enhancements */\n@media (prefers-color-scheme: dark) {\n    .main-content {\n        background: #1a1d29;\n    }\n    \n    .card {\n        background: #212529;\n        color: #e9ecef;\n    }\n    \n    .table tbody tr:hover {\n        background: #2c3034;\n    }\n    \n    .filter-section .form-control,\n    .filter-section .form-select {\n        background-color: rgba(255, 255, 255, 0.05);\n        color: #e9ecef;\n    }\n}\n\n/* Print Styles */\n@media print {\n    .filter-section,\n    .btn,\n    .pagination {\n        display: none !important;\n    }\n    \n    .card {\n        box-shadow: none;\n        border: 1px solid #dee2e6;\n    }\n    \n    .table {\n        font-size: 12px;\n    }\n}\n
+
+
+/* Market Page Specific Enhancements */
+.market-page {
+    --market-primary: #667eea;
+    --market-success: #0ab39c;
+    --market-danger: #f06548;
+    --market-warning: #f7b84b;
+}
+
+/* Pulse Animation for Live Markets */
+.pulse-badge {
+    animation: market-pulse 2s infinite ease-in-out;
+    position: relative;
+}
+
+@keyframes market-pulse {
+    0% {
+        background-color: var(--bs-success-bg-subtle);
+        color: var(--bs-success);
+        transform: scale(1);
+    }
+    50% {
+        background-color: var(--bs-success);
+        color: white;
+        transform: scale(1.05);
+    }
+    100% {
+        background-color: var(--bs-success-bg-subtle);
+        color: var(--bs-success);
+        transform: scale(1);
+    }
+}
+
+/* Enhanced Form Switches */
+.form-check-input:checked {
+    background-color: var(--market-success);
+    border-color: var(--market-success);
+}
+
+/* Loading Switch Animation */
+.loading-switch {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading-switch .form-check-input {
+    animation: switch-loading 1s infinite ease-in-out;
+}
+
+@keyframes switch-loading {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Touch Device Enhancements */
+@media (hover: none) and (pointer: coarse) {
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .form-check-input {
+        width: 1.5em;
+        height: 1.5em;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .pulse-badge,
+    .loading-switch .form-check-input {
+        animation: none;
+        transition: none;
+    }
+}
+

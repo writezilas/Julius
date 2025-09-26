@@ -76,6 +76,10 @@ class GeneralSettingSeeder extends Seeder
                 'key' => 'load_periods_from_settings',
                 'value' => '0', // 0 = load from database, 1 = load from settings
             ],
+            [
+                'key' => 'support_form_enabled',
+                'value' => '1', // 1 = enabled, 0 = disabled
+            ],
         ];
 
         foreach ($settings as $setting) {

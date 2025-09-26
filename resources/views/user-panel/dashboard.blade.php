@@ -223,7 +223,7 @@
                                     <p class="mb-2"><strong>Market will open at: {{ $open->format('h:i A') }}</strong></p>
                                     <p class="mb-2 small text-muted">Time shown in {{ $appTimezone }} timezone</p>
                                     <div class="mt-3">
-                                        <div id="count-down" data-time="{{$open->utc()}}">Loading countdown...</div>
+                                        <div id="count-down" data-time="{{$open->utc()->toISOString()}}">Loading countdown...</div>
                                     </div>
                                 </div>
                             @endif
@@ -350,7 +350,7 @@
                                             </button>
                                         </div>
                                         
-                                        <div class="announcement-content" id="announcement-content-{{ $announcement->id }}">
+                                        <div class="announcement-content" id="announcement-content-{{ $announcement->id }}" style="max-height: 0; opacity: 0; overflow: hidden;">
                                             <div class="announcement-content-inner">
                                                 @if($announcement->description)
                                                     <div class="announcement-description">
@@ -420,8 +420,23 @@
     <script src="{{ URL::asset('/assets/js/announcement-card.js') }}?v={{ time() }}"></script>
 
     <script>
-        // Enhanced Counter Animation
+        // Prevent unwanted scrolling on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Save current scroll position on load
+            const scrollY = window.scrollY;
+            
+            // Restore scroll position if it changed unexpectedly
+            setTimeout(() => {
+                if (window.scrollY !== scrollY && scrollY === 0) {
+                    window.scrollTo(0, 0);
+                }
+            }, 100);
+            
+            // Clear any hash in URL that might cause scrolling
+            if (window.location.hash && !window.location.hash.includes('#tab-')) {
+                history.replaceState(null, null, ' ');
+            }
+            
             const counterElements = document.querySelectorAll('.counter-value');
             
             counterElements.forEach(counter => {
@@ -479,28 +494,31 @@
                                         <div class="countdown-digit days" data-digit="days-tens">${daysStr[0]}</div>
                                         <div class="countdown-digit days" data-digit="days-ones">${daysStr[1]}</div>
                                     </div>
-                                    <div class="countdown-label">DAYS</div>
+                                    <div class="countdown-label" data-short="D">DAYS</div>
                                 </div>
+                                <div class="countdown-separator">:</div>
                                 <div class="countdown-unit">
                                     <div class="countdown-digits-group">
                                         <div class="countdown-digit hours" data-digit="hours-tens">${hoursStr[0]}</div>
                                         <div class="countdown-digit hours" data-digit="hours-ones">${hoursStr[1]}</div>
                                     </div>
-                                    <div class="countdown-label">HOURS</div>
+                                    <div class="countdown-label" data-short="H">HOURS</div>
                                 </div>
+                                <div class="countdown-separator">:</div>
                                 <div class="countdown-unit">
                                     <div class="countdown-digits-group">
                                         <div class="countdown-digit minutes" data-digit="minutes-tens">${minutesStr[0]}</div>
                                         <div class="countdown-digit minutes" data-digit="minutes-ones">${minutesStr[1]}</div>
                                     </div>
-                                    <div class="countdown-label">MINUTES</div>
+                                    <div class="countdown-label" data-short="M">MINS</div>
                                 </div>
+                                <div class="countdown-separator">:</div>
                                 <div class="countdown-unit">
                                     <div class="countdown-digits-group">
                                         <div class="countdown-digit seconds" data-digit="seconds-tens">${secondsStr[0]}</div>
                                         <div class="countdown-digit seconds" data-digit="seconds-ones">${secondsStr[1]}</div>
                                     </div>
-                                    <div class="countdown-label">SECONDS</div>
+                                    <div class="countdown-label" data-short="S">SECS</div>
                                 </div>
                             </div>
                         </div>
@@ -541,8 +559,48 @@
                 };
                 
                 const getCounterTime = (startTime, id) => {
-                    // Parse the input date string into a UTC date object
-                    const countDownDate = new Date(startTime + ' UTC').getTime();
+                    // Safari-compatible date parsing
+                    let countDownDate;
+                    try {
+                        // First try direct parsing (works in most browsers)
+                        countDownDate = new Date(startTime).getTime();
+                        
+                        // If the result is NaN, try alternative parsing for Safari
+                        if (isNaN(countDownDate)) {
+                            // Replace spaces and format for Safari compatibility
+                            const safariDate = startTime.replace(/\s/g, 'T');
+                            countDownDate = new Date(safariDate).getTime();
+                        }
+                        
+                        // If still NaN, try parsing with explicit UTC
+                        if (isNaN(countDownDate)) {
+                            countDownDate = new Date(startTime + 'Z').getTime();
+                        }
+                        
+                        // Final fallback - manual parsing for Safari
+                        if (isNaN(countDownDate)) {
+                            const dateStr = startTime.replace(/[-]/g, '/');
+                            countDownDate = new Date(dateStr).getTime();
+                        }
+                    } catch (error) {
+                        console.error('Date parsing error:', error);
+                        // Set a default future date (1 hour from now) if parsing fails
+                        countDownDate = new Date().getTime() + (60 * 60 * 1000);
+                    }
+                    
+                    // Validate the parsed date
+                    if (isNaN(countDownDate)) {
+                        console.error('Unable to parse date:', startTime);
+                        document.getElementById(id).innerHTML = `
+                            <div class="enhanced-countdown-container">
+                                <div class="countdown-header">
+                                    <h3 class="countdown-title">Date Parse Error</h3>
+                                    <p class="text-muted">Please refresh the page</p>
+                                </div>
+                            </div>
+                        `;
+                        return;
+                    }
                     
                     let isInitialized = false;
                     
@@ -555,24 +613,37 @@
                         const distance = countDownDate - now;
                         
                         // Time calculations for days, hours, minutes, and seconds
-                        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                        // Add safety checks to prevent NaN values in Safari
+                        const days = Math.max(0, Math.floor(distance / (1000 * 60 * 60 * 24))) || 0;
+                        const hours = Math.max(0, Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))) || 0;
+                        const minutes = Math.max(0, Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))) || 0;
+                        const seconds = Math.max(0, Math.floor((distance % (1000 * 60)) / 1000)) || 0;
                         
-                        // If the count down is over, show completion message and refresh
+                        // Debug logging for Safari issues
+                        if (isNaN(days) || isNaN(hours) || isNaN(minutes) || isNaN(seconds)) {
+                            console.warn('NaN values detected in countdown:', {days, hours, minutes, seconds, distance, countDownDate, now});
+                            return; // Skip this update cycle
+                        }
+                        
+                        // If the count down is over, show completion message (no auto-refresh)
                         if (distance < 0) {
                             clearInterval(x);
                             document.getElementById(id).innerHTML = `
                                 <div class="enhanced-countdown-container countdown-ended">
                                     <div class="countdown-header">
-                                        <h3 class="countdown-title">Market Open Now!</h3>
+                                        <h3 class="countdown-title">Market Should Be Open!</h3>
+                                        <p class="text-muted">Please refresh to check current market status</p>
+                                        <button class="btn btn-primary btn-sm mt-2" onclick="window.location.reload()">
+                                            <i data-feather="refresh-cw" style="width: 14px; height: 14px; margin-right: 5px;"></i>
+                                            Check Market Status
+                                        </button>
                                     </div>
                                 </div>
                             `;
-                            setTimeout(() => {
-                                window.location.reload();
-                            }, 3000);
+                            // Re-initialize feather icons for the button
+                            if (typeof feather !== 'undefined') {
+                                feather.replace();
+                            }
                             return;
                         }
                         

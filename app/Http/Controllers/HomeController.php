@@ -474,6 +474,14 @@ class HomeController extends Controller
                            ->whereIn('status', ['completed', 'sold', 'paired'])
                            ->whereNotNull('start_date')
                            ->where('start_date', '!=', '');
+                })
+                ->orWhere(function($subQuery) {
+                    // OR show matured referral bonuses that have been paired with buyers
+                    $subQuery->where('get_from', 'refferal-bonus')
+                           ->where('status', 'completed')
+                           ->whereNotNull('matured_at') // Only matured bonuses
+                           ->where('is_ready_to_sell', 1) // Ready to sell
+                           ->whereHas('pairedWithThis'); // Only paired bonuses
                 });
             })
             ->orderBy('id', 'desc')
@@ -534,6 +542,14 @@ class HomeController extends Controller
                            ->whereIn('status', ['completed', 'sold', 'paired'])
                            ->whereNotNull('start_date')
                            ->where('start_date', '!=', '');
+                })
+                ->orWhere(function($subQuery) {
+                    // OR show matured referral bonuses that have been paired with buyers
+                    $subQuery->where('get_from', 'refferal-bonus')
+                           ->where('status', 'completed')
+                           ->whereNotNull('matured_at') // Only matured bonuses
+                           ->where('is_ready_to_sell', 1) // Ready to sell
+                           ->whereHas('pairedWithThis'); // Only paired bonuses
                 });
             })
             ->get();
@@ -551,6 +567,15 @@ class HomeController extends Controller
         $totalEarnings = $allSoldShares->sum('profit_share');
         $totalReturn = $totalInvestment + $totalEarnings;
 
+        // Get all referral bonuses (automatically floated to market)
+        $availableReferralBonuses = UserShare::with(['trade', 'invoice.reff_user', 'pairedWithThis'])
+            ->where('user_id', \auth()->user()->id)
+            ->where('get_from', 'refferal-bonus')
+            ->where('status', 'completed')
+            ->where('is_ready_to_sell', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return view('user-panel.sold-shares', compact(
             'pageTitle', 
             'soldShares', 
@@ -559,7 +584,8 @@ class HomeController extends Controller
             'runningShares', 
             'totalInvestment', 
             'totalEarnings', 
-            'totalReturn'
+            'totalReturn',
+            'availableReferralBonuses'
         ));
     }
     public function support()
@@ -572,8 +598,9 @@ class HomeController extends Controller
     public function supportNew()
     {
         $pageTitle = __('translation.support');
+        $supportFormEnabled = get_gs_value('support_form_enabled', false) ?? 1;
 
-        return view('user-panel.support-new', compact('pageTitle'));
+        return view('user-panel.support-new', compact('pageTitle', 'supportFormEnabled'));
     }
 
     public function howItWorksPage()

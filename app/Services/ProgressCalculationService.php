@@ -11,9 +11,9 @@ class ProgressCalculationService
 {
     /**
      * Compute the correct progress percentage for a trade
-     * This handles the core logic for calculating how much of a trade has been completed
-     * Formula: (bought shares / total market shares) * 100
-     * Where: total market shares = available shares + bought shares
+     * Progress bar shows availability percentage (inverted logic)
+     * Formula: (available shares / total initial shares) * 100
+     * Where: 100% = all shares available, 0% = all shares sold out
      *
      * @param int $tradeId
      * @return array
@@ -37,9 +37,9 @@ class ProgressCalculationService
             // Get total shares available for this trade (from trade quantity)
             $totalShares = $trade->quantity ?? 80000; // Default fallback
             
-            // Count bought shares that are paid up and completed
-            // This includes both market-bought shares (with paid pairs) and admin-allocated shares
-            $marketBoughtShares = UserShare::where('trade_id', $tradeId)
+            // Only count shares that were actually SOLD (purchased from the market with payment)
+            // This excludes admin-allocated and referral-bonus shares which are inventory, not sales
+            $actuallySoldShares = UserShare::where('trade_id', $tradeId)
                 ->where('status', 'completed')
                 ->where('get_from', 'purchase')
                 ->whereHas('pairedShares', function($query) {
@@ -47,61 +47,49 @@ class ProgressCalculationService
                 })
                 ->sum('share_will_get');
             
-            // Count admin-allocated shares that are completed (they don't have paired shares)
+            // Get currently available shares for sale (inventory waiting to be sold)
+            $availableShares = checkAvailableSharePerTrade($tradeId);
+            
+            // Count total initial shares that were made available (including sold ones)
+            // This represents the full market size when it started
+            $totalInitialShares = $availableShares + $actuallySoldShares;
+            
+            // Calculate progress percentage based on availability (inverted logic)
+            $progressPercentage = 0;
+            
+            // Progress logic: show how much of the market is still available
+            if ($totalInitialShares > 0) {
+                // Calculate availability percentage: more available shares = higher percentage
+                $progressPercentage = ($availableShares / $totalInitialShares) * 100;
+                Log::info("Trade {$tradeId}: {$availableShares} available out of {$totalInitialShares} initial shares, availability = {$progressPercentage}%");
+            } else {
+                // No market activity yet
+                $progressPercentage = 0;
+                Log::info("Trade {$tradeId}: No market activity yet, availability = 0%");
+            }
+            
+            // Count different share types for reporting (but don't include in progress calculation)
             $adminAllocatedShares = UserShare::where('trade_id', $tradeId)
                 ->where('status', 'completed')
                 ->where('get_from', 'allocated-by-admin')
                 ->sum('share_will_get');
             
-            // Count referral bonus shares that are completed
             $referralBonusShares = UserShare::where('trade_id', $tradeId)
                 ->where('status', 'completed')
                 ->where('get_from', 'refferal-bonus')
                 ->sum('share_will_get');
-            
-            // Total bought shares = market bought + admin allocated + referral bonus
-            $boughtShares = $marketBoughtShares + $adminAllocatedShares + $referralBonusShares;
 
-            // Get currently available shares (not yet bought)
-            $availableShares = checkAvailableSharePerTrade($tradeId);
-            
-            // Calculate progress percentage using the correct logic
-            $progressPercentage = 0;
-            
-            // Get total market shares (available + bought shares in the market)
-            // This represents all shares that have been or could be traded in the market
-            $totalMarketShares = $availableShares + $boughtShares;
-            
-            // Special case handling:
-            if ($availableShares == 0 && $boughtShares == 0) {
-                // No shares available and none bought = market hasn't started yet
-                $progressPercentage = 0;
-                Log::info("Trade {$tradeId}: No shares in market and none bought yet, setting progress to 0%");
-            } elseif ($availableShares == 0 && $boughtShares > 0) {
-                // Market is truly sold out (shares were bought and now unavailable)
-                $progressPercentage = 100;
-                Log::info("Trade {$tradeId}: Market sold out with {$boughtShares} shares bought, setting progress to 100%");
-            } elseif ($totalMarketShares > 0) {
-                // Active trading: calculate based on actual market shares (available + bought)
-                // This shows what percentage of the available market has been purchased
-                $progressPercentage = ($boughtShares / $totalMarketShares) * 100;
-                Log::info("Trade {$tradeId}: Active market - {$boughtShares} bought out of {$totalMarketShares} total market shares");
-            }
-            
-            // Ensure progress is between 0 and 100
-            $progressPercentage = max(0, min($progressPercentage, 100));
-
-            Log::info("Progress calculated for trade {$tradeId}: {$progressPercentage}% (market bought: {$marketBoughtShares}, admin allocated: {$adminAllocatedShares}, referral bonus: {$referralBonusShares}, total bought: {$boughtShares}, available: {$availableShares}, total market: {$totalMarketShares})");
+            Log::info("Availability calculated for trade {$tradeId}: {$progressPercentage}% available (sold: {$actuallySoldShares}, still available: {$availableShares}, admin inventory: {$adminAllocatedShares}, referral inventory: {$referralBonusShares})");
 
             return [
                 'progress_percentage' => round($progressPercentage, 2),
-                'shares_bought' => $boughtShares,
-                'market_bought_shares' => $marketBoughtShares,
-                'admin_allocated_shares' => $adminAllocatedShares,
-                'referral_bonus_shares' => $referralBonusShares,
+                'shares_bought' => $actuallySoldShares, // Only actually sold shares
+                'market_bought_shares' => $actuallySoldShares,
+                'admin_allocated_shares' => $adminAllocatedShares, // Inventory, not sales
+                'referral_bonus_shares' => $referralBonusShares, // Inventory, not sales
                 'available_shares' => $availableShares,
                 'total_shares' => $totalShares, // Total trade capacity
-                'total_market_shares' => $totalMarketShares, // Actual market size (available + bought)
+                'total_market_shares' => $availableShares, // Only available shares count for market size
                 'trade_id' => $tradeId,
                 'trade_name' => $trade->name
             ];

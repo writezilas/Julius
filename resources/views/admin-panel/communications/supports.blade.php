@@ -9,8 +9,23 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between">
+                <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">{{$pageTitle}}</h5>
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 fw-bold text-dark">Support Form:</span>
+                        <div class="form-check form-switch me-2">
+                            <input class="form-check-input" type="checkbox" id="supportFormToggle" 
+                                   {{ $supportFormEnabled ? 'checked' : '' }}>
+                            <label class="form-check-label" for="supportFormToggle">
+                                <span id="toggleStatus" class="badge fs-6 px-3 py-2 {{ $supportFormEnabled ? 'bg-success text-white' : 'bg-danger text-white' }}">
+                                    {{ $supportFormEnabled ? 'ENABLED' : 'DISABLED' }}
+                                </span>
+                            </label>
+                        </div>
+                        <a href="{{ route('admin.supportFormSettings') }}" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="ri-settings-3-line"></i> Advanced Settings
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table id="alternative-pagination" class="table nowrap dt-responsive align-middle table-hover table-bordered" style="width:100%">
@@ -148,5 +163,107 @@
 
 @endsection
 @section('script')
-
+<script>
+$(document).ready(function() {
+    // Ensure CSRF token is available
+    if (!window.Laravel) {
+        window.Laravel = {};
+    }
+    window.Laravel.csrfToken = $('meta[name="csrf-token"]').attr('content');
+    
+    // Handle support form toggle
+    $('#supportFormToggle').on('change', function() {
+        const toggleElement = $(this);
+        const enabled = toggleElement.is(':checked') ? 1 : 0;
+        const toggleStatus = $('#toggleStatus');
+        const originalChecked = !enabled; // Store original state for rollback
+        
+        // Show loading state
+        toggleStatus.removeClass('bg-success bg-danger text-white')
+                   .addClass('bg-warning text-dark')
+                   .text('UPDATING...');
+        
+        // Disable toggle during request
+        toggleElement.prop('disabled', true);
+        
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': window.Laravel.csrfToken
+            }
+        });
+        
+        $.post('{{ route("admin.support.toggleForm") }}', {
+            enabled: enabled
+        })
+        .done(function(response) {
+            if (response.success) {
+                // Update status badge with better colors
+                toggleStatus.removeClass('bg-warning text-dark');
+                if (enabled) {
+                    toggleStatus.addClass('bg-success text-white').text('ENABLED');
+                } else {
+                    toggleStatus.addClass('bg-danger text-white').text('DISABLED');
+                }
+                
+                // Show success message
+                if (typeof toastr !== 'undefined') {
+                    toastr.success(response.message);
+                } else {
+                    alert(response.message);
+                }
+            } else {
+                // Rollback toggle state
+                toggleElement.prop('checked', originalChecked);
+                toggleStatus.removeClass('bg-warning text-dark')
+                           .addClass(originalChecked ? 'bg-success text-white' : 'bg-danger text-white')
+                           .text(originalChecked ? 'ENABLED' : 'DISABLED');
+                           
+                const errorMsg = 'Failed to update support form setting';
+                if (typeof toastr !== 'undefined') {
+                    toastr.error(errorMsg);
+                } else {
+                    alert(errorMsg);
+                }
+            }
+        })
+        .fail(function(xhr, status, error) {
+            console.error('AJAX Error:', {
+                status: xhr.status,
+                statusText: xhr.statusText,
+                responseText: xhr.responseText,
+                error: error
+            });
+            
+            // Rollback toggle state
+            toggleElement.prop('checked', originalChecked);
+            toggleStatus.removeClass('bg-warning text-dark')
+                       .addClass(originalChecked ? 'bg-success text-white' : 'bg-danger text-white')
+                       .text(originalChecked ? 'ENABLED' : 'DISABLED');
+            
+            let errorMsg = 'Network error occurred while updating support form setting';
+            
+            // Provide more specific error messages
+            if (xhr.status === 403) {
+                errorMsg = 'Access denied. You may not have permission to perform this action.';
+            } else if (xhr.status === 404) {
+                errorMsg = 'Service endpoint not found. Please contact administrator.';
+            } else if (xhr.status === 419) {
+                errorMsg = 'Session expired. Please refresh the page and try again.';
+            } else if (xhr.status === 500) {
+                errorMsg = 'Server error occurred. Please try again or contact administrator.';
+            }
+            
+            if (typeof toastr !== 'undefined') {
+                toastr.error(errorMsg);
+            } else {
+                alert(errorMsg);
+            }
+        })
+        .always(function() {
+            // Re-enable toggle
+            toggleElement.prop('disabled', false);
+        });
+    });
+});
+</script>
 @endsection

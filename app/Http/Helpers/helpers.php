@@ -492,11 +492,60 @@ if (!function_exists('get_next_market_open_time')) {
         return \Carbon\Carbon::parse($todayDate . ' ' . $firstMarket->open_time, $appTimezone)->addDay();
     }
 }
+if (!function_exists('findTradeWithMostLiquidity')) {
+    /**
+     * Find the trade with the most available shares for optimal referral bonus liquidity
+     * This ensures referral bonuses are assigned to trades with the highest availability
+     */
+    function findTradeWithMostLiquidity()
+    {
+        $trades = \App\Models\Trade::where('status', '1')->get();
+        $bestTrade = null;
+        $maxAvailableShares = 0;
+        
+        foreach ($trades as $trade) {
+            $availableShares = checkAvailableSharePerTrade($trade->id);
+            
+            if ($availableShares > $maxAvailableShares) {
+                $maxAvailableShares = $availableShares;
+                $bestTrade = $trade;
+            }
+        }
+        
+        \Log::info('Referral bonus trade selection', [
+            'selected_trade' => $bestTrade ? $bestTrade->name : 'None',
+            'selected_trade_id' => $bestTrade ? $bestTrade->id : 'None',
+            'available_shares' => $maxAvailableShares,
+            'reason' => 'Most liquid trade for referral bonus'
+        ]);
+        
+        return $bestTrade;
+    }
+}
 if (!function_exists('createRefferalBonus')) {
     function createRefferalBonus($user, $refferal){
-        $trade = Trade::where('id', 1)->first();
+        // Find the trade with the most available shares for better liquidity
+        $trade = findTradeWithMostLiquidity();
+        
+        // Fallback to Safaricom if no liquid trades found
+        if (!$trade) {
+            $trade = Trade::where('id', 1)->first();
+        }
 
-        $sharesWillGet = get_gs_value('reffaral_bonus') ?? 100;
+        // Use the referral bonus amount that was active when the user registered
+        // This ensures the bonus amount is not affected by subsequent admin changes
+        $sharesWillGet = $user->referral_bonus_at_registration ?? get_gs_value('reffaral_bonus') ?? 100;
+        
+        // Log which bonus amount was used for transparency
+        $bonusSource = $user->referral_bonus_at_registration ? 'registration_time' : 'current_global';
+        \Log::info("Creating referral bonus for user {$user->username}", [
+            'bonus_amount' => $sharesWillGet,
+            'bonus_source' => $bonusSource,
+            'user_registration_bonus' => $user->referral_bonus_at_registration,
+            'current_global_bonus' => get_gs_value('reffaral_bonus'),
+            'referrer_user' => $refferal->username
+        ]);
+        
         $data = [
             'trade_id' => $trade->id,
             'amount' => $trade->price * $sharesWillGet,
@@ -520,10 +569,12 @@ if (!function_exists('createRefferalBonus')) {
         $data['user_id'] = $refferal->id;
         $data['share_will_get']    = $sharesWillGet;
         $data['total_share_count'] = $sharesWillGet;
-        $data['start_date']        = date_format(now(),"Y/m/d H:i:s");
+        $data['start_date']        = date_format(now(),"Y/m/d H:i:s"); // When bonus was created
         $data['status']            = 'completed';
         $data['is_ready_to_sell']  = 1;
         $data['get_from']          = 'refferal-bonus';
+        $data['selling_started_at'] = now(); // When the bonus becomes available for selling
+        $data['matured_at'] = now(); // Referral bonuses are immediately mature (no growth period)
 
         $createdShare = UserShare::create($data);
 

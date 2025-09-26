@@ -153,12 +153,16 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
         Route::get('sms', [AnnouncementController::class, 'createSms'])->name('sms.create')->middleware('permission:send-sms');
         Route::post('sms/send', [AnnouncementController::class, 'sendSms'])->name('sms.send')->middleware('permission:send-sms');
         Route::get('support', [SupportController::class, 'supportsForAdmin'])->name('admin.support')->middleware('permission:support-index');
+        Route::post('support/toggle-form', [SupportController::class, 'toggleSupportForm'])->name('admin.support.toggleForm');
 
         Route::get('set/min-max-trading-amount', [GeneralSettingController::class, 'updateTradingPrice'])->name('admin.updateTradingPrice')->middleware('permission:set-min-max-trading-amount-view');
         Route::post('set/min-max-trading-amount', [GeneralSettingController::class, 'saveTradingPrice'])->name('admin.saveTradingPrice')->middleware('permission:set-min-max-trading-amount-update');
 
         Route::get('set/text-rate', [GeneralSettingController::class, 'setTaxRate'])->name('admin.setTaxRate')->middleware('permission:set-income-tax-rate-view');
         Route::post('set/text-rate', [GeneralSettingController::class, 'saveTaxRate'])->name('admin.saveTaxRate')->middleware('permission:set-income-tax-rate-update');
+
+        Route::get('support-form-settings', [GeneralSettingController::class, 'supportFormSettings'])->name('admin.supportFormSettings')->middleware('permission:support-index');
+        Route::post('support-form-settings', [GeneralSettingController::class, 'saveSupportFormSettings'])->name('admin.saveSupportFormSettings')->middleware('permission:support-index');
 
 
         Route::get('allocate/share/history', [AllocateShareController::class, 'allocateShareHistory'])->name('admin.allocate.share.history')->middleware('permission:allocate-share-to-user-history');

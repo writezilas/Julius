@@ -5,9 +5,11 @@
     padding: 24px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     max-width: 600px;
+    width: 100%;
     margin: 0 auto;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 .enhanced-countdown-container::before {
@@ -65,7 +67,7 @@
     justify-content: center;
     align-items: center;
     gap: 12px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     position: relative;
     z-index: 2;
 }
@@ -75,6 +77,43 @@
     flex-direction: column;
     align-items: center;
     gap: 8px;
+    flex-shrink: 1;
+    min-width: 0;
+}
+
+.countdown-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+    height: 60px;
+    min-width: 8px;
+    width: 8px;
+    opacity: 0.8;
+    animation: blink 2s infinite;
+    flex-shrink: 0;
+    margin: 0 2px;
+    line-height: 1;
+    align-self: flex-start;
+    margin-top: 8px;
+}
+
+@keyframes blink {
+    0%, 45% { 
+        opacity: 0.9; 
+        transform: scale(1);
+    }
+    50%, 95% { 
+        opacity: 0.4;
+        transform: scale(0.9);
+    }
+    100% { 
+        opacity: 0.9;
+        transform: scale(1);
+    }
 }
 
 .countdown-digits-group {
@@ -147,6 +186,7 @@
     letter-spacing: 1px;
     text-align: center;
     margin-top: 4px;
+    position: relative;
 }
 
 /* Flip animation for digit changes */
@@ -166,64 +206,317 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .enhanced-countdown-container {
-        padding: 20px 16px;
-        margin: 0 16px;
+        padding: 14px 10px;
+        margin: 0 10px;
+        max-width: 100%;
+        min-width: 260px;
+        box-sizing: border-box;
     }
     
     .countdown-title {
-        font-size: 20px;
+        font-size: 18px;
         letter-spacing: 1px;
     }
     
     .countdown-title::before,
     .countdown-title::after {
-        width: 40px;
+        width: 30px;
     }
     
     .countdown-title::before {
-        left: -50px;
+        left: -40px;
     }
     
     .countdown-title::after {
-        right: -50px;
+        right: -40px;
     }
     
     .countdown-digits {
-        gap: 8px;
+        gap: 4px;
+        justify-content: space-around;
     }
     
     .countdown-digit {
-        width: 40px;
-        height: 48px;
-        font-size: 22px;
-    }
-    
-    .countdown-digits-group {
-        gap: 6px;
-    }
-    
-    .countdown-label {
-        font-size: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .countdown-digits {
-        gap: 6px;
-    }
-    
-    .countdown-digit {
-        width: 35px;
-        height: 42px;
-        font-size: 18px;
+        width: 30px;
+        height: 38px;
+        font-size: 17px;
     }
     
     .countdown-digits-group {
         gap: 4px;
     }
     
+    .countdown-label {
+        font-size: 9px;
+        letter-spacing: 0.5px;
+    }
+    
+    .countdown-separator {
+        font-size: 18px;
+        height: 38px;
+        min-width: 6px;
+        margin-top: 0px;
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .enhanced-countdown-container {
+        padding: 12px 6px;
+        margin: 0 6px;
+        min-width: 220px;
+    }
+    
+    .countdown-title {
+        font-size: 14px;
+        letter-spacing: 0.5px;
+    }
+    
+    .countdown-title::before,
+    .countdown-title::after {
+        display: none; /* Hide decorative lines on very small screens */
+    }
+    
+    .countdown-digits {
+        gap: 3px;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .countdown-digit {
+        width: 22px;
+        height: 28px;
+        font-size: 14px;
+        border-radius: 4px;
+    }
+    
+    .countdown-digits-group {
+        gap: 2px;
+    }
+    
+    .countdown-label {
+        font-size: 7px;
+        letter-spacing: 0px;
+        margin-top: 2px;
+        white-space: nowrap;
+    }
+    
+    .countdown-unit {
+        gap: 3px;
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 23%;
+    }
+}
+
+/* Extra small screens - use abbreviations */
+@media (max-width: 375px) {
+    .enhanced-countdown-container {
+        padding: 8px 4px;
+        margin: 0 2px;
+        min-width: 180px;
+    }
+    
+    .countdown-title {
+        font-size: 12px;
+    }
+    
+    .countdown-digits {
+        gap: 1px;
+        justify-content: space-between;
+    }
+    
+    .countdown-digit {
+        width: 18px;
+        height: 24px;
+        font-size: 12px;
+    }
+    
+    .countdown-digits-group {
+        gap: 1px;
+    }
+    
+    .countdown-unit {
+        gap: 1px;
+        max-width: 20%;
+        min-width: 26px;
+    }
+    
+    .countdown-label {
+        font-size: 6px;
+        white-space: nowrap;
+    }
+    
+    /* Use abbreviations for small screens */
+    .countdown-label {
+        font-size: 0;
+    }
+    
+    .countdown-label::after {
+        content: attr(data-short);
+        font-size: 6px;
+        display: block;
+        color: #b8c5cc;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0px;
+        text-align: center;
+    }
+    
+    .countdown-separator {
+        font-size: 12px;
+        height: 28px;
+        min-width: 3px;
+        margin-top: -5px;
+        align-self: center;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 768px) and (orientation: landscape) {
+    .enhanced-countdown-container {
+        padding: 12px 16px;
+    }
+    
     .countdown-title {
         font-size: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .countdown-digit {
+        width: 32px;
+        height: 38px;
+        font-size: 18px;
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    .enhanced-countdown-container {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+    
+    .countdown-digit {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+    }
+}
+
+/* iPhone specific breakpoints */
+@media only screen 
+    and (device-width : 375px) 
+    and (device-height : 667px) 
+    and (-webkit-device-pixel-ratio : 2) { 
+    /* iPhone 6, 7, 8 */
+    .countdown-digit {
+        width: 26px;
+        height: 34px;
+        font-size: 15px;
+    }
+}
+
+@media only screen 
+    and (device-width : 414px) 
+    and (device-height : 736px) 
+    and (-webkit-device-pixel-ratio : 3) { 
+    /* iPhone 6+, 7+, 8+ */
+    .countdown-digit {
+        width: 30px;
+        height: 38px;
+        font-size: 17px;
+    }
+}
+
+@media only screen 
+    and (device-width : 375px) 
+    and (device-height : 812px) 
+    and (-webkit-device-pixel-ratio : 3) { 
+    /* iPhone X, XS */
+    .countdown-digit {
+        width: 28px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+/* Ultra-narrow screens protection */
+@media (max-width: 320px) {
+    .enhanced-countdown-container {
+        padding: 6px 2px;
+        margin: 0 1px;
+        min-width: 160px;
+    }
+    
+    .countdown-title {
+        font-size: 10px;
+    }
+    
+    .countdown-digits {
+        gap: 1px;
+        justify-content: space-between;
+    }
+    
+    .countdown-digit {
+        width: 15px;
+        height: 20px;
+        font-size: 10px;
+    }
+    
+    .countdown-digits-group {
+        gap: 0px;
+    }
+    
+    .countdown-unit {
+        gap: 2px;
+        max-width: 22%;
+        min-width: 30px;
+    }
+    
+    .countdown-label {
+        font-size: 0;
+    }
+    
+    .countdown-label::after {
+        content: attr(data-short);
+        font-size: 5px;
+        display: block;
+        color: #b8c5cc;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0px;
+        text-align: center;
+    }
+    
+    .countdown-separator {
+        font-size: 8px;
+        height: 20px;
+        min-width: 2px;
+        margin-top: -3px;
+        align-self: center;
+    }
+}
+
+/* Fix for iOS Safari viewport issues */
+@media screen and (max-width: 480px) {
+    .enhanced-countdown-container {
+        min-height: 0;
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+        overflow: hidden;
+    }
+    
+    .countdown-digits {
+        display: flex;
+        flex-wrap: nowrap !important;
+        overflow: hidden;
     }
 }
 

@@ -89,7 +89,7 @@ if($now->gt($close)){
                 @if($open)
                     <p class="text-muted">Market will open at: <strong>{{ $open->format('h:i A') }}</strong></p>
                     <p class="text-muted small">Time shown in {{ $appTimezone }} timezone</p>
-                    <span id="count-down" data-time="{{$open->utc()}}">0d 0h 0m 0s</span>
+                    <span id="count-down" data-time="{{$open->utc()->toISOString()}}">0d 0h 0m 0s</span>
                 @endif
                 <div class="mt-3">
                     <a href="{{ route('user.dashboard') }}" class="btn btn-primary">Refresh</a>
@@ -101,8 +101,8 @@ if($now->gt($close)){
 @section('script')
 <script>
     function getCounterTime(startTime, id) {
-        // Parse the input date string into a UTC date object
-        var countDownDate = new Date(startTime + ' UTC').getTime();
+        // Parse ISO format datetime (already includes timezone info)
+        var countDownDate = new Date(startTime).getTime();
         // Update the count down every 1 second
         var x = setInterval(function() {
             // Get the current UTC date and time
@@ -128,7 +128,7 @@ if($now->gt($close)){
         }, 1000);
     }
     @if($open)
-        getCounterTime('{{ $open->utc() }}', "count-down");
+        getCounterTime('{{ $open->utc()->toISOString() }}', "count-down");
     @endif
 </script>
 

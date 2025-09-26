@@ -24,4 +24,9 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'reff_user_id', 'id');
     }
+
+    public function reff_user()
+    {
+        return $this->belongsTo(User::class, 'reff_user_id', 'id');
+    }
 }
