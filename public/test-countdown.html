@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Countdown Timer Test</title>
+    <link href="assets/css/enhanced-countdown.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+        }
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enhanced Countdown Timer Test</h1>
+        
+        <!-- Test countdown with sample values -->
+        <div class="enhanced-countdown-container">
+            <div class="countdown-header">
+                <h3 class="countdown-title">TIME REMAINING</h3>
+            </div>
+            <div class="countdown-digits">
+                <div class="countdown-unit">
+                    <div class="countdown-digits-group">
+                        <div class="countdown-digit days">0</div>
+                        <div class="countdown-digit days">0</div>
+                    </div>
+                    <div class="countdown-label">DAYS</div>
+                </div>
+                <div class="countdown-unit">
+                    <div class="countdown-digits-group">
+                        <div class="countdown-digit hours">0</div>
+                        <div class="countdown-digit hours">3</div>
+                    </div>
+                    <div class="countdown-label">HOURS</div>
+                </div>
+                <div class="countdown-unit">
+                    <div class="countdown-digits-group">
+                        <div class="countdown-digit minutes">2</div>
+                        <div class="countdown-digit minutes">5</div>
+                    </div>
+                    <div class="countdown-label">MINUTES</div>
+                </div>
+                <div class="countdown-unit">
+                    <div class="countdown-digits-group">
+                        <div class="countdown-digit seconds">4</div>
+                        <div class="countdown-digit seconds">9</div>
+                    </div>
+                    <div class="countdown-label">SECONDS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live countdown test -->
+        <div style="margin-top: 50px;">
+            <h2 style="color: white; text-align: center;">Live Countdown Test (60 seconds)</h2>
+            <div id="live-countdown"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test live countdown
+        function startTestCountdown() {
+            const container = document.getElementById('live-countdown');
+            let timeLeft = 60; // 60 seconds test
+            
+            function padNumber(num) {
+                return num.toString().padStart(2, '0');
+            }
+            
+            function createCountdownHTML(seconds) {
+                const days = Math.floor(seconds / (24 * 60 * 60));
+                const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
+                const minutes = Math.floor((seconds % (60 * 60)) / 60);
+                const secs = seconds % 60;
+                
+                const daysStr = padNumber(days);
+                const hoursStr = padNumber(hours);
+                const minutesStr = padNumber(minutes);
+                const secondsStr = padNumber(secs);
+                
+                return `
+                    <div class="enhanced-countdown-container">
+                        <div class="countdown-header">
+                            <h3 class="countdown-title">LIVE TEST COUNTDOWN</h3>
+                        </div>
+                        <div class="countdown-digits">
+                            <div class="countdown-unit">
+                                <div class="countdown-digits-group">
+                                    <div class="countdown-digit days">${daysStr[0]}</div>
+                                    <div class="countdown-digit days">${daysStr[1]}</div>
+                                </div>
+                                <div class="countdown-label">DAYS</div>
+                            </div>
+                            <div class="countdown-unit">
+                                <div class="countdown-digits-group">
+                                    <div class="countdown-digit hours">${hoursStr[0]}</div>
+                                    <div class="countdown-digit hours">${hoursStr[1]}</div>
+                                </div>
+                                <div class="countdown-label">HOURS</div>
+                            </div>
+                            <div class="countdown-unit">
+                                <div class="countdown-digits-group">
+                                    <div class="countdown-digit minutes">${minutesStr[0]}</div>
+                                    <div class="countdown-digit minutes">${minutesStr[1]}</div>
+                                </div>
+                                <div class="countdown-label">MINUTES</div>
+                            </div>
+                            <div class="countdown-unit">
+                                <div class="countdown-digits-group">
+                                    <div class="countdown-digit seconds">${secondsStr[0]}</div>
+                                    <div class="countdown-digit seconds">${secondsStr[1]}</div>
+                                </div>
+                                <div class="countdown-label">SECONDS</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function updateCountdown() {
+                if (timeLeft <= 0) {
+                    container.innerHTML = `
+                        <div class="enhanced-countdown-container countdown-ended">
+                            <div class="countdown-header">
+                                <h3 class="countdown-title">TEST COMPLETE!</h3>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = createCountdownHTML(timeLeft);
+                timeLeft--;
+                setTimeout(updateCountdown, 1000);
+            }
+            
+            updateCountdown();
+        }
+        
+        // Start the test countdown when page loads
+        document.addEventListener('DOMContentLoaded', startTestCountdown);
+    </script>
+</body>
+</html>

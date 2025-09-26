@@ -92,16 +92,32 @@ Account Suspended
         <h1 class="h3 mb-3">Account Suspended</h1>
         
         <div class="suspension-message">
-            <strong>Your account has been automatically suspended due to 3 consecutive payment failures.</strong><br><br>
-            You have been logged out from all devices and sessions. Your account will be automatically reactivated when the suspension period expires.
+            @if($user->suspension_reason === 'payment_failure')
+                <strong>Your account has been automatically suspended due to 3 consecutive payment failures.</strong><br><br>
+                You have been logged out from all devices and sessions. Your account will be automatically reactivated when the suspension period expires.
+            @elseif($user->suspension_reason === 'manual')
+                <strong>Your account has been suspended by an administrator.</strong><br><br>
+                You have been logged out from all devices and sessions. Please contact support if you believe this was done in error.
+            @elseif($user->suspension_reason === 'automatic')
+                <strong>Your account has been automatically suspended by the system.</strong><br><br>
+                You have been logged out from all devices and sessions. The suspension will be reviewed and lifted when appropriate.
+            @else
+                <strong>Your account has been suspended.</strong><br><br>
+                You have been logged out from all devices and sessions. Please contact support for more information.
+            @endif
         </div>
         
         <div class="suspension-details">
             <strong>Suspension Details:</strong><br>
-            <small>Account: {{ $user->username }} ({{ $user->email }})</small><br>
-            <small>Suspended until: {{ $user->suspension_until->format('F d, Y \a\t H:i') }}</small>
+            <small>Account: {{ $user->username ?? 'N/A' }} ({{ $user->email ?? 'N/A' }})</small><br>
+            @if($user->suspension_until)
+                <small>Suspended until: {{ $user->suspension_until->format('F d, Y \a\t H:i') }}</small>
+            @else
+                <small>Suspension Duration: Indefinite</small>
+            @endif
         </div>
         
+        @if($user->suspension_until)
         <div class="countdown-container">
             <div class="countdown-time" id="countdown-display">
                 Loading...
@@ -110,6 +126,16 @@ Account Suspended
                 Time remaining until account reactivation
             </div>
         </div>
+        @else
+        <div class="countdown-container">
+            <div class="countdown-time" style="color: #dc3545; font-size: 1.8rem;">
+                <i class="ri-time-line me-2"></i>INDEFINITE
+            </div>
+            <div class="countdown-label">
+                Please contact support for assistance with your account
+            </div>
+        </div>
+        @endif
         
         <div class="support-info">
             <i class="ri-customer-service-2-line me-2"></i>
@@ -127,10 +153,16 @@ Account Suspended
 @endsection
 
 @section('script')
+@if($user->suspension_until)
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const suspensionUntil = new Date('{{ $user->suspension_until->toISOString() }}');
     const countdownDisplay = document.getElementById('countdown-display');
+    
+    if (!countdownDisplay) {
+        console.error('Countdown display element not found');
+        return;
+    }
     
     function updateCountdown() {
         const now = new Date();
@@ -138,7 +170,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (diff <= 0) {
             countdownDisplay.innerHTML = '<span style="color: #28a745;">EXPIRED</span>';
-            countdownDisplay.nextElementSibling.textContent = 'Your account should now be reactivated. Please try logging in again.';
+            const labelElement = countdownDisplay.nextElementSibling;
+            if (labelElement) {
+                labelElement.textContent = 'Your account should now be reactivated. Please try logging in again.';
+            }
             
             // Auto redirect after 5 seconds
             setTimeout(() => {
@@ -172,5 +207,13 @@ document.addEventListener('DOMContentLoaded', function() {
     updateCountdown();
     setInterval(updateCountdown, 1000);
 });
+</script>
+@endif
+<script>
+// Console logging for debugging
+console.log('Suspended user page loaded');
+console.log('User:', '{{ $user->username ?? "N/A" }}');
+console.log('Status:', '{{ $user->status ?? "N/A" }}');
+console.log('Suspension until:', '{{ $user->suspension_until ? $user->suspension_until->toISOString() : "null" }}');
 </script>
 @endsection

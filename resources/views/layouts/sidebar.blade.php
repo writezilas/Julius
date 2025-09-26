@@ -5,19 +5,19 @@
         <!-- Dark Logo-->
         <a href="{{ route('admin.index') }}" class="logo logo-dark">
             <span class="logo-sm">
-                <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
             </span>
             <span class="logo-lg">
-                <img src="{{ URL::asset('assets/images/autobidder_dark.png') }}" alt="" height="17">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
             </span>
         </a>
         <!-- Light Logo-->
         <a href="{{ route('admin.index') }}" class="logo logo-light">
             <span class="logo-sm">
-                <img src="{{ URL::asset('assets/images/logo-sm.png') }}" alt="" height="22">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="28" class="autobidder-logo">
             </span>
             <span class="logo-lg">
-                <img src="{{ URL::asset('assets/images/autobidder_light.png') }}" alt="" height="17">
+                <img src="{{ URL::asset('assets/images/autobidder_logo.svg') }}" alt="Auto Bidder" height="35" class="autobidder-logo">
             </span>
         </a>
         <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
@@ -46,26 +46,9 @@
                         <ul class="nav nav-sm flex-column">
                             @can('customer-index')
                             <li class="nav-item">
-                                <a class="nav-link menu-link" href="#sidebarCustomer" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['users.status']) }}" aria-controls="sidebarUsers">
-                                    <span>@lang('Customer Management')</span>
+                                <a href="{{ route('admin.users.unified') }}" class="nav-link {{ Request::is('admin/users-management') ? 'active' : '' }}">
+                                    <i class="ri-group-line me-1"></i><span>@lang('User Management')</span>
                                 </a>
-                                <div class="collapse menu-dropdown {{ areActiveRoutesBool(['users.status']) ? 'show' : '' }}" id="sidebarCustomer">
-                                    <ul class="nav nav-sm flex-column">
-
-                                        <li class="nav-item">
-                                            <a href="{{route('users.status', 'block')}}" class="nav-link {{ Request::is('users/block') ? 'active' : '' }}">@lang('Block Users')</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{route('users.status', 'suspend')}}" class="nav-link {{ Request::is('users/suspend') ? 'active' : '' }}">@lang('Suspend Users')</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{route('users.status', 'fine')}}" class="nav-link {{ Request::is('users/fine') ? 'active' : '' }}">@lang('Active Users')</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a href="{{route('users.status', 'all')}}" class="nav-link {{ Request::is('users/all') ? 'active' : '' }}">@lang('All Users')</a>
-                                        </li>
-                                    </ul>
-                                </div>
                             </li>
                             @endcan
                             @can('role-index')
@@ -83,12 +66,12 @@
                     
                 </li>
                 @endcanAny
-                @canAny(['allocate-share-to-user', 'transfer-share-from-user', 'allocate-share-history'])
+                @canAny(['allocate-share-to-user', 'transfer-share-from-user', 'allocate-share-history', 'pending-payment-confirmation-index'])
                 <li class="nav-item">
-                    <a class="nav-link menu-link {{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) ? 'active' : '' }}" href="#sidebarShare" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) }}" aria-controls="sidebarShare">
+                    <a class="nav-link menu-link {{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history', 'admin.share.pending-payment-confirmations']) ? 'active' : '' }}" href="#sidebarShare" data-bs-toggle="collapse" role="button" aria-expanded="{{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history', 'admin.share.pending-payment-confirmations']) }}" aria-controls="sidebarShare">
                         <i class="ri-pie-chart-2-line"></i> <span>@lang('Share Management')</span>
                     </a>
-                    <div class="collapse menu-dropdown {{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history']) ? 'show' : '' }}" id="sidebarShare">
+                    <div class="collapse menu-dropdown {{ areActiveRoutesBool(['admin.allocate.share', 'admin.transfer.share', 'admin.allocate.share.history', 'admin.share.pending-payment-confirmations']) ? 'show' : '' }}" id="sidebarShare">
                         <ul class="nav nav-sm flex-column">
                             @can('allocate-share-to-user')
                             <li class="nav-item">
@@ -103,6 +86,13 @@
                             @can('transfer-share-from-user')
                             <li class="nav-item">
                                 <a href="{{ route('admin.transfer.share') }}" class="nav-link {{ areActiveRoutes(['admin.transfer.share']) }}">@lang('Transfer share from user')</a>
+                            </li>
+                            @endcan
+                            @can('pending-payment-confirmation-index')
+                            <li class="nav-item">
+                                <a href="{{ route('admin.share.pending-payment-confirmations') }}" class="nav-link {{ areActiveRoutes(['admin.share.pending-payment-confirmations']) }}">
+                                    <i class="ri-time-line me-1"></i>@lang('Pending Payment Confirmations')
+                                </a>
                             </li>
                             @endcan
                         </ul>

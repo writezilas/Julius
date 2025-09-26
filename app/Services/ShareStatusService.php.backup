@@ -1,0 +1,562 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\UserShare;
+use App\Models\UserSharePair;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+class ShareStatusService
+{
+    /**
+     * Get the accurate status for a share with context awareness
+     * 
+     * @param UserShare $share The share to get status for
+     * @param string|null $context 'bought' for bought-shares page, 'sold' for sold-shares page, null for auto-detect
+     */
+    public function getShareStatus(UserShare $share, ?string $context = null): array
+    {
+        // Check database status first for accuracy - prioritize explicit statuses
+        if ($share->status === 'sold') {
+            return [
+                'status' => 'Sold',
+                'class' => 'bg-dark',
+                'description' => 'Share has been completely sold'
+            ];
+        }
+        
+        // If share has failed - show failed status regardless of other conditions
+        if ($share->status === 'failed') {
+            return [
+                'status' => 'Failed',
+                'class' => 'bg-danger',
+                'description' => 'Share transaction failed'
+            ];
+        }
+
+        // If share has been fully sold (no shares left and has sold some)
+        if ($share->total_share_count == 0 && $share->hold_quantity == 0 && $share->sold_quantity > 0) {
+            return [
+                'status' => 'Sold',
+                'class' => 'bg-dark',
+                'description' => 'All shares have been sold'
+            ];
+        }
+
+        // If share is explicitly paired
+        if ($share->status === 'paired') {
+            // Check for payment submission for paired shares
+            $pairingStats = $this->getPairingStats($share);
+            if ($pairingStats['awaiting_confirmation'] > 0) {
+                // Determine perspective: buyer vs seller
+                if ($share->get_from === 'purchase') {
+                    // This is a buyer's share - they submitted payment and are waiting
+                    return [
+                        'status' => 'Payment Submitted',
+                        'class' => 'bg-info',
+                        'description' => 'Payment submitted, awaiting seller confirmation'
+                    ];
+                } else {
+                    // This is a seller's share - they need to confirm payment
+                    return [
+                        'status' => 'Confirm Payment',
+                        'class' => 'bg-warning',
+                        'description' => 'Payment received - confirm to complete transaction'
+                    ];
+                }
+            }
+            return [
+                'status' => 'Paired',
+                'class' => 'bg-warning',
+                'description' => 'Share is paired and waiting for payments'
+            ];
+        }
+
+        // Check if share has actually matured (real-time check)
+        $hasMatured = $this->hasShareMatured($share);
+        
+        // If share is matured (either by flag or real-time check) - but handle context for bought-shares page
+        if ((isset($share->is_ready_to_sell) && $share->is_ready_to_sell == 1) || $hasMatured) {
+            // For bought-shares page: admin-allocated and referral shares should show as "Completed"
+            // since from buyer's perspective, they successfully received the shares
+            if ($context === 'bought') {
+                if ($share->get_from === 'allocated-by-admin') {
+                    return [
+                        'status' => 'Completed',
+                        'class' => 'bg-success',
+                        'description' => 'Admin-allocated shares matured successfully'
+                    ];
+                }
+                
+                if ($share->get_from === 'refferal-bonus') {
+                    return [
+                        'status' => 'Completed',
+                        'class' => 'bg-success',
+                        'description' => 'Referral bonus shares matured successfully'
+                    ];
+                }
+                
+                // CRITICAL FIX: For market-purchased shares, always show as "Completed" in bought context
+                // Don't check pairing stats because purchased shares shouldn't be treated as selling shares
+                if ($share->get_from === 'purchase') {
+                    return [
+                        'status' => 'Completed',
+                        'class' => 'bg-success', 
+                        'description' => 'Market-purchased shares matured successfully'
+                    ];
+                }
+            }
+            
+            // For sold-shares page or other contexts: use matured share logic
+            return $this->getMaturedShareStatus($share);
+        }
+
+        // If share is active and running - context-sensitive logic
+        if ($share->status === 'completed' && $share->is_ready_to_sell === 0) {
+            // Auto-detect context if not provided
+            if ($context === null) {
+                // If it's admin-allocated, assume bought context by default
+                if ($share->get_from === 'allocated-by-admin') {
+                    $context = 'bought';
+                } elseif ($share->get_from === 'purchase') {
+                    $context = 'bought'; // Purchased shares are primarily buyer's perspective
+                } else {
+                    $context = 'sold'; // Default for other cases
+                }
+            }
+            
+            // For bought-shares page: completed transactions should show as "Completed"
+            if ($context === 'bought') {
+                // Check if this is a purchased share with confirmed payment
+                if ($share->get_from === 'purchase') {
+                    // Check if payment has been confirmed (has paid pairs)
+                    $hasPaidPairs = $share->pairedShares()->where('is_paid', 1)->exists();
+                    if ($hasPaidPairs) {
+                        return [
+                            'status' => 'Completed',
+                            'class' => 'bg-success', 
+                            'description' => 'Payment confirmed and shares acquired successfully'
+                        ];
+                    }
+                }
+                
+                // Admin-allocated completed shares should show as "Completed"
+                if ($share->get_from === 'allocated-by-admin') {
+                    return [
+                        'status' => 'Completed',
+                        'class' => 'bg-success',
+                        'description' => 'Share allocation completed successfully'
+                    ];
+                }
+                
+                // Referral bonus shares should show as "Completed"
+                if ($share->get_from === 'refferal-bonus') {
+                    return [
+                        'status' => 'Completed',
+                        'class' => 'bg-success',
+                        'description' => 'Referral bonus shares awarded successfully'
+                    ];
+                }
+            }
+            
+            // For sold-shares page or other contexts: show as "Running" (in countdown)
+            return [
+                'status' => 'Running',
+                'class' => 'bg-info',
+                'description' => 'Share is active and running in maturation period'
+            ];
+        }
+
+
+        // If share is partially sold
+        if ($share->sold_quantity > 0 && ($share->total_share_count > 0 || $share->hold_quantity > 0)) {
+            return [
+                'status' => 'Partially Sold',
+                'class' => 'bg-success',
+                'description' => 'Some shares have been sold'
+            ];
+        }
+
+        // Default pending status
+        return [
+            'status' => 'Pending',
+            'class' => 'bg-secondary',
+            'description' => 'Share is pending processing'
+        ];
+    }
+
+    /**
+     * Get status for matured shares based on pairing information
+     * IMPORTANT: Only use this for shares that are meant to be SOLD
+     */
+    private function getMaturedShareStatus(UserShare $share): array
+    {
+        // CRITICAL FIX: Do not use pairing logic for purchased shares
+        // Purchased shares (get_from = 'purchase') should not be treated as selling shares
+        if ($share->get_from === 'purchase') {
+            // This is a purchased share that has matured - it should show as available
+            return [
+                'status' => 'Available',
+                'class' => 'bg-info', 
+                'description' => 'Matured purchased shares available for sale'
+            ];
+        }
+        
+        $pairingStats = $this->getPairingStats($share);
+
+        // Handle awaiting confirmation (payments submitted but not confirmed)
+        if ($pairingStats['awaiting_confirmation'] > 0) {
+            if ($pairingStats['paid'] > 0 || $pairingStats['unpaid'] > 0) {
+                // Mixed state: some paid, some awaiting confirmation, some genuinely unpaid
+                return [
+                    'status' => 'Mixed Payments',
+                    'class' => 'bg-primary',
+                    'description' => 'Payments in various stages'
+                ];
+            } else {
+                // Only awaiting confirmation payments
+                return [
+                    'status' => 'Confirm Payment',
+                    'class' => 'bg-warning',
+                    'description' => 'Payment received - confirm to complete transaction'
+                ];
+            }
+        }
+
+        if ($pairingStats['paid'] > 0 && $pairingStats['unpaid'] > 0) {
+            // Mixed paid and unpaid - partially paired
+            return [
+                'status' => 'Partially Paid',
+                'class' => 'bg-primary',
+                'description' => 'Some buyers have paid, others pending'
+            ];
+        }
+
+        if ($pairingStats['paid'] > 0 && $pairingStats['unpaid'] == 0) {
+            // All active pairs are paid - check if fully sold
+            if ($share->total_share_count == 0 && $share->hold_quantity == 0) {
+                return [
+                    'status' => 'Sold',
+                    'class' => 'bg-dark',
+                    'description' => 'All shares have been sold and paid'
+                ];
+            } else {
+                return [
+                    'status' => 'Partially Sold',
+                    'class' => 'bg-success',
+                    'description' => 'Some shares sold, others available'
+                ];
+            }
+        }
+
+        if ($pairingStats['unpaid'] > 0 && $pairingStats['paid'] == 0) {
+            return [
+                'status' => 'Waiting for Payment',
+                'class' => 'bg-warning',
+                'description' => 'Buyers paired but payments pending'
+            ];
+        }
+
+        if ($pairingStats['failed'] > 0 && $pairingStats['paid'] == 0 && $pairingStats['unpaid'] == 0) {
+            return [
+                'status' => 'Available',
+                'class' => 'bg-info',
+                'description' => 'All payments failed, available for purchase'
+            ];
+        }
+
+        if ($pairingStats['total'] == 0) {
+            return [
+                'status' => 'Available',
+                'class' => 'bg-info',
+                'description' => 'Available for purchase'
+            ];
+        }
+
+        // Fallback - mixed state
+        return [
+            'status' => 'Processing',
+            'class' => 'bg-secondary',
+            'description' => 'Share is being processed'
+        ];
+    }
+
+    /**
+     * Get pairing statistics for a share
+     */
+    public function getPairingStats(UserShare $share): array
+    {
+        // Aggregate pairing stats from BOTH perspectives:
+        // - As seller: user_share_id = $share->id (payments live on the buyer's share)
+        // - As buyer: paired_user_share_id = $share->id (payments live on this share)
+        
+        $paidPairings = 0;
+        $failedPairings = 0;
+        $awaitingConfirmation = 0;
+        $genuinelyUnpaid = 0;
+
+        // Seller-side stats
+        $sellerPaid = UserSharePair::where('user_share_id', $share->id)
+            ->where('is_paid', 1)
+            ->count();
+        $paidPairings += $sellerPaid;
+
+        $sellerUnpaidPairs = UserSharePair::where('user_share_id', $share->id)
+            ->where('is_paid', 0)
+            ->with('pairedShare.payments')
+            ->get();
+        foreach ($sellerUnpaidPairs as $pair) {
+            if ($pair->pairedShare) {
+                $hasSubmittedPayment = $pair->pairedShare->payments()->where('status', 'paid')->exists();
+                if ($hasSubmittedPayment) {
+                    $awaitingConfirmation++;
+                } else {
+                    $genuinelyUnpaid++;
+                }
+            } else {
+                $genuinelyUnpaid++;
+            }
+        }
+        $sellerFailed = UserSharePair::where('user_share_id', $share->id)
+            ->where('is_paid', 2)
+            ->count();
+        $failedPairings += $sellerFailed;
+
+        // Buyer-side stats
+        $buyerPaid = UserSharePair::where('paired_user_share_id', $share->id)
+            ->where('is_paid', 1)
+            ->count();
+        $paidPairings += $buyerPaid;
+
+        $buyerUnpaidPairs = UserSharePair::where('paired_user_share_id', $share->id)
+            ->where('is_paid', 0)
+            ->with('userShare.payments')
+            ->get();
+        foreach ($buyerUnpaidPairs as $pair) {
+            // Payments for buyer-side pairs are on the BUYER's share (userShare)
+            if ($pair->userShare) {
+                $hasSubmittedPayment = $pair->userShare->payments()->where('status', 'paid')->exists();
+                if ($hasSubmittedPayment) {
+                    $awaitingConfirmation++;
+                } else {
+                    $genuinelyUnpaid++;
+                }
+            } else {
+                $genuinelyUnpaid++;
+            }
+        }
+        $buyerFailed = UserSharePair::where('paired_user_share_id', $share->id)
+            ->where('is_paid', 2)
+            ->count();
+        $failedPairings += $buyerFailed;
+
+        return [
+            'paid' => $paidPairings,
+            'unpaid' => $genuinelyUnpaid,
+            'awaiting_confirmation' => $awaitingConfirmation,
+            'failed' => $failedPairings,
+            'total' => $paidPairings + $genuinelyUnpaid + $awaitingConfirmation + $failedPairings
+        ];
+    }
+
+    /**
+     * Update share status based on current state
+     */
+    public function updateShareStatusFromQuantities(UserShare $share): bool
+    {
+        try {
+            $originalStatus = $share->status;
+
+            // If share is completely sold (no shares left, some sold)
+            if ($share->total_share_count == 0 && 
+                $share->hold_quantity == 0 && 
+                $share->sold_quantity > 0 && 
+                $share->status !== 'sold') {
+                
+                $share->status = 'sold';
+                $share->is_sold = 1;
+                $share->save();
+
+                Log::info("Updated share status from '{$originalStatus}' to 'sold'", [
+                    'share_id' => $share->id,
+                    'ticket_no' => $share->ticket_no,
+                    'sold_quantity' => $share->sold_quantity
+                ]);
+
+                return true;
+            }
+
+            return false;
+
+        } catch (\Exception $e) {
+            Log::error('Error updating share status from quantities', [
+                'share_id' => $share->id,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Get time remaining information for a share
+     */
+    public function getTimeRemaining(UserShare $share): array
+    {
+        if (isset($share->is_ready_to_sell) && $share->is_ready_to_sell == 1) {
+            return [
+                'text' => 'Share Matured',
+                'class' => 'countdown-timer matured',
+                'color' => '#27ae60'
+            ];
+        }
+
+        if (isset($share->status)) {
+            switch ($share->status) {
+                case 'paired':
+                    // Check for payment submission
+                    $pairingStats = $this->getPairingStats($share);
+                    if ($pairingStats['awaiting_confirmation'] > 0) {
+                        return [
+                            'text' => 'Payment received - confirm to complete',
+                            'class' => 'countdown-timer payment-received',
+                            'color' => '#17a2b8'
+                        ];
+                    }
+                    return [
+                        'text' => 'Waiting for payments',
+                        'class' => 'countdown-timer waiting',
+                        'color' => '#f39c12'
+                    ];
+                case 'pending':
+                    return [
+                        'text' => 'Waiting for pairing',
+                        'class' => 'countdown-timer waiting',
+                        'color' => '#3498db'
+                    ];
+                case 'pairing':
+                    return [
+                        'text' => 'Finding pairs',
+                        'class' => 'countdown-timer waiting',
+                        'color' => '#3498db'
+                    ];
+                case 'failed':
+                    return [
+                        'text' => 'Transaction failed',
+                        'class' => 'countdown-timer failed',
+                        'color' => '#e74c3c'
+                    ];
+                case 'completed':
+                    if (isset($share->start_date) && isset($share->period)) {
+                        return [
+                            'text' => 'timer-active', // Special marker for JavaScript timer
+                            'class' => 'countdown-timer',
+                            'color' => '#3498db'
+                        ];
+                    }
+                    break;
+            }
+        }
+
+        return [
+            'text' => 'Status unknown',
+            'class' => 'countdown-timer',
+            'color' => '#95a5a6'
+        ];
+    }
+    
+    /**
+     * Determine if the Details button should be unlocked for a share
+     * This uses the same logic as status checking - real-time maturity + database flag
+     */
+    public function shouldUnlockDetailsButton(UserShare $share): bool
+    {
+        // If already flagged as ready to sell, unlock
+        if (isset($share->is_ready_to_sell) && $share->is_ready_to_sell == 1) {
+            return true;
+        }
+        
+        // If share has matured in real-time, also unlock
+        return $this->hasShareMatured($share);
+    }
+
+    /**
+     * Validate and fix share quantity inconsistencies
+     */
+    public function validateAndFixQuantities(UserShare $share): array
+    {
+        $issues = [];
+        $fixes = [];
+
+        // Check for negative quantities
+        if ($share->total_share_count < 0) {
+            $issues[] = "Negative total_share_count: {$share->total_share_count}";
+            $share->total_share_count = 0;
+            $fixes[] = "Reset total_share_count to 0";
+        }
+
+        if ($share->hold_quantity < 0) {
+            $issues[] = "Negative hold_quantity: {$share->hold_quantity}";
+            $share->hold_quantity = 0;
+            $fixes[] = "Reset hold_quantity to 0";
+        }
+
+        if ($share->sold_quantity < 0) {
+            $issues[] = "Negative sold_quantity: {$share->sold_quantity}";
+            $share->sold_quantity = 0;
+            $fixes[] = "Reset sold_quantity to 0";
+        }
+
+        // Check quantity conservation (allow 10% tolerance for profit additions)
+        $total = $share->total_share_count + $share->hold_quantity + $share->sold_quantity;
+        $expected = $share->share_will_get + ($share->profit_share ?? 0);
+        $tolerance = max(1, $expected * 0.1); // 10% tolerance or minimum 1 share
+
+        if (abs($total - $expected) > $tolerance) {
+            $issues[] = "Quantity mismatch - Expected: {$expected}, Actual: {$total}";
+        }
+
+        if (!empty($fixes)) {
+            $share->save();
+            Log::info('Fixed share quantity issues', [
+                'share_id' => $share->id,
+                'ticket_no' => $share->ticket_no,
+                'issues' => $issues,
+                'fixes' => $fixes
+            ]);
+        }
+
+        return [
+            'issues' => $issues,
+            'fixes' => $fixes,
+            'has_issues' => !empty($issues)
+        ];
+    }
+    
+    /**
+     * Check if a share has actually matured based on start date and period
+     * This provides real-time maturity checking regardless of is_ready_to_sell flag
+     */
+    private function hasShareMatured(UserShare $share): bool
+    {
+        // Only check maturity for shares with proper start date and period
+        if (!$share->start_date || !$share->period || $share->status !== 'completed') {
+            return false;
+        }
+        
+        try {
+            $maturityDate = \Carbon\Carbon::parse($share->start_date)->addDays($share->period);
+            $now = \Carbon\Carbon::now();
+            
+            return $maturityDate <= $now;
+        } catch (\Exception $e) {
+            \Log::warning('Error checking share maturity', [
+                'share_id' => $share->id,
+                'start_date' => $share->start_date,
+                'period' => $share->period,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+}

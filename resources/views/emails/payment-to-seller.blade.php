@@ -4,10 +4,16 @@
 
 {{ __('You have received a payment from') }} {{$payment->sender->username}}
 
+@php
+    // Get appropriate payment details using PaymentHelper
+    $senderBusinessProfile = json_decode($payment->sender->business_profile);
+    $senderPaymentDetails = \App\Helpers\PaymentHelper::getPaymentDetails($senderBusinessProfile, $payment->sender);
+@endphp
+
 @component('mail::table')
     | <!-- -->    | <!-- -->    |
     |-------------|-------------|
-    | {{ __('Sender Name') }}: | {{ json_decode($payment->sender->business_profile)->mpesa_name }} |
+    | {{ __('Sender Name') }}: | {{ $senderPaymentDetails['payment_name'] }} |
     | {{ __('Sender M-PESA no') }}: | {{ $payment->number }} |
     | {{ __('Amount Sent') }}:  | {{ formatPrice($payment->amount) }} |
     | {{ __('Transaction Id') }}: | {{ $payment->txs_id }} |

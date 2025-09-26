@@ -5,6 +5,8 @@
 
 class DashboardEnhancer {
     constructor() {
+        this.isTouch = 'ontouchstart' in window;
+        this.currentTheme = document.documentElement.getAttribute('data-layout-mode') || 'light';
         this.init();
     }
 
@@ -15,6 +17,9 @@ class DashboardEnhancer {
         this.setupResponsiveFeatures();
         this.setupAccessibility();
         this.setupLoadingStates();
+        this.setupThemeDetection();
+        this.setupMobileOptimizations();
+        this.setupPerformanceOptimizations();
     }
 
     /**
@@ -309,7 +314,24 @@ class DashboardEnhancer {
     setupErrorHandling() {
         window.addEventListener('error', (e) => {
             console.error('Dashboard error:', e.error);
-            this.showUserFriendlyError('Something went wrong. Please refresh the page.');
+            // Only show error for critical errors, not minor issues like API empty responses
+            if (e.error && e.error.message) {
+                // Check if it's a critical error that should be shown to user
+                const isCritical = e.error.message.includes('undefined') || 
+                                 e.error.message.includes('null') || 
+                                 e.error.message.includes('Cannot read') ||
+                                 e.error.message.includes('TypeError') ||
+                                 e.error.message.includes('is not a function') ||
+                                 e.error.message.includes('Cannot access');
+                
+                if (isCritical) {
+                    console.warn('Critical dashboard error detected:', e.error.message);
+                    this.showUserFriendlyError('A technical issue occurred. Please refresh the page if problems persist.');
+                } else {
+                    // Just log non-critical errors without showing to user
+                    console.warn('Non-critical dashboard error suppressed:', e.error.message);
+                }
+            }
         });
 
         // Network error detection
@@ -415,26 +437,321 @@ class DashboardEnhancer {
     /**
      * Performance optimization for animations
      */
-    optimizePerformance() {
-        // Throttle resize events
-        let resizeTimeout;
-        const originalResize = window.onresize;
-        
-        window.onresize = function() {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                if (originalResize) originalResize();
-            }, 250);
-        };
-
-        // Optimize scroll events
-        let scrollTimeout;
-        window.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                // Handle scroll-based optimizations
-            }, 100);
+    /**
+     * Setup theme detection and handling
+     */
+    setupThemeDetection() {
+        // Watch for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-layout-mode') {
+                    this.currentTheme = document.documentElement.getAttribute('data-layout-mode');
+                    this.handleThemeChange();
+                }
+            });
         });
+        
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-layout-mode']
+        });
+        
+        // Handle system theme preference
+        if (window.matchMedia) {
+            const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            darkModeQuery.addEventListener('change', (e) => {
+                if (!localStorage.getItem('theme-preference')) {
+                    this.currentTheme = e.matches ? 'dark' : 'light';
+                    this.handleThemeChange();
+                }
+            });
+        }
+    }
+    
+    /**
+     * Handle theme changes
+     */
+    handleThemeChange() {
+        // Update chart colors if charts exist
+        this.updateChartsTheme();
+        
+        // Update custom elements
+        this.updateCustomElementsTheme();
+        
+        // Dispatch theme change event
+        window.dispatchEvent(new CustomEvent('themeChanged', {
+            detail: { theme: this.currentTheme }
+        }));
+    }
+    
+    /**
+     * Update charts theme colors
+     */
+    updateChartsTheme() {
+        // This can be extended to update any charts or visualizations
+        const isDark = this.currentTheme === 'dark';
+        const textColor = isDark ? '#e2e8f0' : '#334155';
+        
+        // Update any ApexCharts instances if they exist
+        if (window.ApexCharts && window.ApexCharts.exec) {
+            // Update chart text colors
+            document.querySelectorAll('[data-apexcharts]').forEach(chart => {
+                try {
+                    const chartId = chart.id;
+                    if (chartId) {
+                        window.ApexCharts.exec(chartId, 'updateOptions', {
+                            chart: {
+                                foreColor: textColor
+                            }
+                        });
+                    }
+                } catch (e) {
+                    // Chart might not be initialized yet
+                }
+            });
+        }
+    }
+    
+    /**
+     * Update custom elements for theme
+     */
+    updateCustomElementsTheme() {
+        // Update any custom tooltips or elements that need theme updates
+        document.querySelectorAll('.custom-tooltip').forEach(tooltip => {
+            const isDark = this.currentTheme === 'dark';
+            tooltip.style.background = isDark ? 'rgba(30, 41, 59, 0.9)' : 'rgba(0, 0, 0, 0.8)';
+        });
+    }
+    
+    /**
+     * Mobile-specific optimizations
+     */
+    setupMobileOptimizations() {
+        if (!this.isTouch) return;
+        
+        // Optimize touch interactions
+        this.setupTouchInteractions();
+        
+        // Mobile-specific performance optimizations
+        this.setupMobilePerformance();
+        
+        // Handle orientation changes
+        this.setupOrientationHandling();
+    }
+    
+    /**
+     * Setup touch interactions
+     */
+    setupTouchInteractions() {
+        // Add touch feedback to interactive elements
+        document.querySelectorAll('.btn, .card, .badge').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.style.opacity = '0.8';
+            }, { passive: true });
+            
+            element.addEventListener('touchend', function() {
+                this.style.opacity = '1';
+            }, { passive: true });
+        });
+        
+        // Prevent zoom on double-tap for form inputs
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('touchend', function(e) {
+                e.preventDefault();
+                this.focus();
+            });
+        });
+    }
+    
+    /**
+     * Mobile performance optimizations
+     */
+    setupMobilePerformance() {
+        // Disable hover effects on touch devices
+        if (this.isTouch) {
+            document.body.classList.add('touch-device');
+            
+            // Add CSS to disable hover animations
+            const style = document.createElement('style');
+            style.textContent = `
+                .touch-device .card:hover,
+                .touch-device .stats-card:hover .stats-icon,
+                .touch-device .activity-item:hover {
+                    transform: none !important;
+                    animation: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Optimize animations for mobile
+        if ('ontouchstart' in window && navigator.userAgent.match(/Mobi/)) {
+            document.body.classList.add('mobile-device');
+        }
+    }
+    
+    /**
+     * Handle orientation changes
+     */
+    setupOrientationHandling() {
+        window.addEventListener('orientationchange', () => {
+            // Delay to ensure orientation change is complete
+            setTimeout(() => {
+                // Trigger resize events for responsive components
+                window.dispatchEvent(new Event('resize'));
+                
+                // Refresh any charts or complex layouts
+                this.refreshResponsiveComponents();
+            }, 300);
+        });
+    }
+    
+    /**
+     * Refresh responsive components after orientation change
+     */
+    refreshResponsiveComponents() {
+        // Refresh live statistics if they exist
+        const refreshButton = document.getElementById('refresh-stats-btn');
+        if (refreshButton && window.loadLiveStatistics) {
+            window.loadLiveStatistics();
+        }
+        
+        // Recalculate any dynamic layouts
+        document.querySelectorAll('.card').forEach(card => {
+            card.style.height = 'auto';
+        });
+    }
+    
+    /**
+     * Performance optimizations
+     */
+    setupPerformanceOptimizations() {
+        // Intersection Observer for lazy loading
+        this.setupLazyLoading();
+        
+        // Debounce expensive operations
+        this.setupDebouncedOperations();
+        
+        // Memory management
+        this.setupMemoryManagement();
+    }
+    
+    /**
+     * Setup lazy loading for images and heavy content
+     */
+    setupLazyLoading() {
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) {
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        observer.unobserve(img);
+                    }
+                }
+            });
+        });
+        
+        document.querySelectorAll('img[data-src]').forEach(img => {
+            imageObserver.observe(img);
+        });
+    }
+    
+    /**
+     * Setup debounced operations
+     */
+    setupDebouncedOperations() {
+        // Debounce resize handler
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                this.handleResize();
+            }, 250);
+        });
+        
+        // Debounce scroll handler
+        let scrollTimer;
+        window.addEventListener('scroll', () => {
+            clearTimeout(scrollTimer);
+            scrollTimer = setTimeout(() => {
+                this.handleScroll();
+            }, 100);
+        }, { passive: true });
+    }
+    
+    /**
+     * Handle resize events
+     */
+    handleResize() {
+        // Update responsive breakpoints
+        const isMobile = window.innerWidth < 768;
+        document.body.classList.toggle('mobile-layout', isMobile);
+        
+        // Update card layouts
+        this.updateCardLayouts();
+    }
+    
+    /**
+     * Handle scroll events
+     */
+    handleScroll() {
+        // Update scroll-based animations or effects
+        const scrollY = window.pageYOffset;
+        
+        // Add scroll classes for styling
+        document.body.classList.toggle('scrolled', scrollY > 100);
+    }
+    
+    /**
+     * Update card layouts for responsive design
+     */
+    updateCardLayouts() {
+        const isMobile = window.innerWidth < 768;
+        
+        document.querySelectorAll('.enhanced-dashboard .row').forEach(row => {
+            if (isMobile) {
+                row.classList.add('mobile-row');
+            } else {
+                row.classList.remove('mobile-row');
+            }
+        });
+    }
+    
+    /**
+     * Setup memory management
+     */
+    setupMemoryManagement() {
+        // Clean up event listeners on page unload
+        window.addEventListener('beforeunload', () => {
+            // Remove custom event listeners
+            this.cleanup();
+        });
+    }
+    
+    /**
+     * Cleanup resources
+     */
+    cleanup() {
+        // Clear any intervals or timeouts
+        if (this.statsInterval) {
+            clearInterval(this.statsInterval);
+        }
+        
+        // Remove event listeners
+        document.querySelectorAll('.enhanced-dashboard *').forEach(element => {
+            // Clone node to remove all event listeners
+            const newElement = element.cloneNode(true);
+            if (element.parentNode) {
+                element.parentNode.replaceChild(newElement, element);
+            }
+        });
+    }
+    
+    optimizePerformance() {
+        // This method is maintained for backward compatibility
+        this.setupPerformanceOptimizations();
     }
 }
 

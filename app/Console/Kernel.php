@@ -34,6 +34,20 @@ class Kernel extends ConsoleKernel
         $schedule->command('paymentfailedshare:cron')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/paymentfailedforshare.log", true);
         $schedule->command('unblockTemporaryBlockedUsers:cron')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/unblockTemporaryBlockedUsers.log", true);
         $schedule->command('update-shares')->everyMinute()->timezone(env('APP_TIMEZONE'))->sendOutputTo(storage_path()."/logs/update-shares.log", true);
+        
+        // Suspension management tasks
+        $schedule->command('suspension:manage --lift-expired')
+                 ->everyMinute()
+                 ->timezone(env('APP_TIMEZONE'))
+                 ->sendOutputTo(storage_path()."/logs/suspension-management.log", true)
+                 ->description('Process expired user suspensions');
+        
+        // Reset suspension levels for users with good payment history (daily)
+        $schedule->command('suspension:manage --reset-levels')
+                 ->daily()
+                 ->timezone(env('APP_TIMEZONE'))
+                 ->sendOutputTo(storage_path()."/logs/suspension-level-resets.log", true)
+                 ->description('Reset suspension levels for users with good payment history');
     }
 
     /**

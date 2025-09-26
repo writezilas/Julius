@@ -31,7 +31,7 @@ if($now->gt($close)){
         $open = get_next_market_open_time();
     }
 @endphp
-@if($isTradeOpen || count($timeSlots) == 0)
+@if($isTradeOpen) {{-- Show available shares only when market is open --}}
 <div class="row">
     @php
     $trades = \App\Models\Trade::where('status', 1)->OrderBy('id', 'desc')->get();

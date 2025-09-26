@@ -1,0 +1,80 @@
+/* Autobidder Logo Styling */
+
+/* Default logo styling for light mode */
+.logo img[src*="autobidder.svg"] {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ensure SVG logo maintains aspect ratio */
+.navbar-brand-box .logo img {
+    height: auto;
+    max-height: 30px;
+}
+
+.navbar-brand-box .logo-sm img {
+    max-height: 22px;
+}
+
+.navbar-brand-box .logo-lg img {
+    max-height: 30px;
+}
+
+/* Light mode specific styling */
+[data-layout-mode="light"] .logo img[src*="autobidder.svg"] {
+    filter: none;
+    opacity: 1;
+}
+
+/* Dark mode specific styling (if needed in future) */
+[data-layout-mode="dark"] .logo img[src*="autobidder.svg"] {
+    filter: brightness(0.9) contrast(1.1);
+}
+
+/* Horizontal logo styling */
+.horizontal-logo .logo img {
+    max-height: 30px;
+}
+
+.horizontal-logo .logo-sm img {
+    max-height: 22px;
+}
+
+.horizontal-logo .logo-lg img {
+    max-height: 30px;
+}
+
+/* Responsive logo adjustments */
+@media (max-width: 768px) {
+    .navbar-brand-box .logo img {
+        max-height: 25px;
+    }
+    
+    .horizontal-logo .logo img {
+        max-height: 25px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand-box .logo img {
+        max-height: 20px;
+    }
+    
+    .horizontal-logo .logo img {
+        max-height: 20px;
+    }
+}
+
+/* Logo hover effects */
+.logo:hover img {
+    transform: scale(1.02);
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Logo focus styling for accessibility */
+.logo:focus img {
+    outline: 2px solid var(--vz-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}

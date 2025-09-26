@@ -13,9 +13,9 @@
             <div class="text-center mb-4">
                 <h4 class="fw-semibold fs-22">Official Channels</h4>
                 <p class="text-muted mb-2 fs-15">Join our Telegram channel here:</p>
-                <p class="text-muted mb-2 fs-15"><a href="https://t.me/+0kkvjg6icXM5YTc0">https://t.me/+0kkvjg6icXM5YTc0</a></p>
+                <p class="text-muted mb-2 fs-15"><a href="https://t.me/autobidder_live">Telegram Channel</a></p>
                 <p class="text-muted mb-2 fs-15">Join our Telegram Group here:</p>
-                <p class="text-muted mb-2 fs-15"><a href="https://t.me/+OKuCnLKZzxVlMmQ0">https://t.me/+OKuCnLKZzxVlMmQ0</a></p>
+                <p class="text-muted mb-2 fs-15"><a href="h#">Telegram Group</a></p>
                 
             </div>
         </div><!--end col-->

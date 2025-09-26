@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Market Toggle Debug</title>
+    <meta name="csrf-token" content="test-token">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Market Toggle Debug</h1>
+    <div>
+        <label>
+            <input type="checkbox" class="market-status-toggle" data-market-id="1" id="marketToggle1">
+            <span>Market 1 Status</span>
+        </label>
+        <span class="badge" id="statusBadge1">Test Badge</span>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        console.log('Debug script loaded');
+        console.log('jQuery version:', $.fn.jquery);
+        
+        // Check if CSRF token exists
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
+        console.log('CSRF token:', csrfToken);
+        
+        // Use event delegation to handle toggle switches
+        $(document).on('change', '.market-status-toggle', function() {
+            const marketId = $(this).data('market-id');
+            const isChecked = $(this).is(':checked');
+            const toggle = $(this);
+            const statusBadge = $(`#statusBadge${marketId}`);
+            
+            console.log('Toggle clicked for market', marketId, 'New state:', isChecked);
+            console.log('Status badge element:', statusBadge);
+            
+            // Show loading state
+            toggle.prop('disabled', true);
+            
+            // Make AJAX request to toggle status
+            $.ajax({
+                url: `/admin/market/toggle-status/${marketId}`,
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                data: {
+                    _token: csrfToken
+                },
+                beforeSend: function(xhr) {
+                    console.log('Sending AJAX request to:', `/admin/market/toggle-status/${marketId}`);
+                    console.log('Request headers:', xhr.getAllResponseHeaders());
+                },
+                success: function(response) {
+                    console.log('AJAX response:', response);
+                    if (response.success) {
+                        // Update badge based on new status
+                        if (response.is_active) {
+                            statusBadge.removeClass('bg-danger').addClass('bg-success').text('Active');
+                        } else {
+                            statusBadge.removeClass('bg-success').addClass('bg-danger').text('Inactive');
+                        }
+                        
+                        alert('Success: ' + response.message);
+                    } else {
+                        // Revert checkbox state on failure
+                        toggle.prop('checked', !isChecked);
+                        alert('Error: ' + (response.message || 'Failed to update market status'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error details:');
+                    console.error('Status:', status);
+                    console.error('Error:', error);
+                    console.error('Response Text:', xhr.responseText);
+                    console.error('Response Status:', xhr.status);
+                    
+                    // Revert checkbox state on error
+                    toggle.prop('checked', !isChecked);
+                    
+                    let errorMessage = 'An error occurred while updating market status';
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        if (errorResponse.message) {
+                            errorMessage = errorResponse.message;
+                        }
+                    } catch (e) {
+                        console.error('Could not parse error response:', e);
+                    }
+                    
+                    alert('Error: ' + errorMessage);
+                },
+                complete: function() {
+                    // Re-enable toggle
+                    toggle.prop('disabled', false);
+                    console.log('AJAX request completed');
+                }
+            });
+        });
+        
+        // Test button
+        $('#testButton').click(function() {
+            console.log('Test button clicked');
+            $('#marketToggle1').trigger('change');
+        });
+    });
+    </script>
+    
+    <button id="testButton">Test Toggle</button>
+</body>
+</html>

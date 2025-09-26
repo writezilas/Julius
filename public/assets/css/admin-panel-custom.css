@@ -1,0 +1,216 @@
+/* Enhanced Admin Panel Styling */
+
+/* General Enhancements */
+.main-content {
+    background: #f8fafc;
+    min-height: 100vh;
+}
+
+.page-content {
+    padding: 24px;
+}
+
+/* Card Enhancements */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 0 35px rgba(154, 161, 171, 0.15);
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 50px rgba(154, 161, 171, 0.2);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    color: white;
+    padding: 20px 24px;
+}
+
+.card-header .card-title {
+    color: white;
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* Button Enhancements */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 12px 24px;
+    border: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: all 0.5s;
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #0ab39c 0%, #00d4aa 100%);
+    box-shadow: 0 4px 15px rgba(10, 179, 156, 0.4);
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(10, 179, 156, 0.6);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #f06548 0%, #e73c7e 100%);
+    box-shadow: 0 4px 15px rgba(240, 101, 72, 0.4);
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(240, 101, 72, 0.6);
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, #f7b84b 0%, #fcc468 100%);
+    box-shadow: 0 4px 15px rgba(247, 184, 75, 0.4);
+}
+
+.btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(247, 184, 75, 0.6);
+}
+
+.btn-info {
+    background: linear-gradient(135deg, #299cdb 0%, #3dd5f3 100%);
+    box-shadow: 0 4px 15px rgba(41, 156, 219, 0.4);
+}
+
+.btn-info:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(41, 156, 219, 0.6);
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+}
+
+/* Table Enhancements */
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 0;
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border: none;
+    padding: 16px;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+    background: #f8f9fa;
+    transform: scale(1.01);
+}
+
+.table tbody td {
+    border-color: #e9ecef;
+    padding: 16px;
+    vertical-align: middle;
+}
+
+/* Badge Enhancements */
+.badge {
+    font-weight: 500;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+}
+
+/* Statistics Cards */
+.stats-card {
+    background: white;
+    border-radius: 16px;
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.stats-card .card-body {
+    padding: 24px;
+}
+
+.stats-card .avatar-title {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* Filter Section Enhancements */
+.filter-section {
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 100\" fill=\"%23ffffff\" opacity=\"0.1\"><polygon points=\"1000,100 1000,0 0,0 0,60 1000,100\"/></svg>');
+    background-size: cover;
+    background-position: bottom;
+}\n\n.filter-section .form-control,\n.filter-section .form-select {\n    border-radius: 8px;\n    backdrop-filter: blur(10px);\n    transition: all 0.3s ease;\n}\n\n.filter-section .form-control:hover,\n.filter-section .form-select:hover {\n    background-color: rgba(255, 255, 255, 0.2);\n}\n\n.filter-section .btn {\n    backdrop-filter: blur(10px);\n    border: 1px solid rgba(255, 255, 255, 0.3);\n}\n\n.filter-section .btn:hover {\n    background-color: rgba(255, 255, 255, 0.2);\n    border-color: rgba(255, 255, 255, 0.5);\n}\n\n/* Sidebar Enhancements */\n.app-menu .navbar-nav .nav-link {\n    transition: all 0.3s ease;\n    border-radius: 8px;\n    margin: 2px 8px;\n}\n\n.app-menu .navbar-nav .nav-link:hover {\n    background: rgba(255, 255, 255, 0.1);\n    transform: translateX(5px);\n}\n\n.app-menu .navbar-nav .nav-link.active {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);\n}\n\n/* Topbar Enhancements */\n.navbar-header {\n    background: white;\n    box-shadow: 0 2px 15px rgba(154, 161, 171, 0.15);\n    border-bottom: none;\n}\n\n/* Empty State */\n.empty-state {\n    padding: 60px 20px;\n    text-align: center;\n}\n\n.empty-state .avatar-xl {\n    width: 100px;\n    height: 100px;\n    margin: 0 auto 24px;\n}\n\n.empty-state .avatar-title {\n    border-radius: 50px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n\n/* Pagination Enhancements */\n.pagination .page-link {\n    border-radius: 8px;\n    margin: 0 2px;\n    border: none;\n    color: #6c757d;\n    transition: all 0.3s ease;\n}\n\n.pagination .page-link:hover {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    color: white;\n    transform: translateY(-2px);\n}\n\n.pagination .page-item.active .page-link {\n    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\n    border-color: #667eea;\n}\n\n/* Loading Animation */\n.loading {\n    position: relative;\n    overflow: hidden;\n}\n\n.loading::after {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: -100%;\n    width: 100%;\n    height: 100%;\n    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);\n    animation: loading 1.5s infinite;\n}\n\n@keyframes loading {\n    0% { left: -100%; }\n    100% { left: 100%; }\n}\n\n/* Responsive Enhancements */\n@media (max-width: 768px) {\n    .filter-section {\n        padding: 16px;\n    }\n    \n    .filter-section .row {\n        margin: 0;\n    }\n    \n    .filter-section .col-md-3,\n    .filter-section .col-md-2,\n    .filter-section .col-md-4 {\n        padding: 4px;\n        margin-bottom: 12px;\n    }\n    \n    .stats-card {\n        margin-bottom: 16px;\n    }\n    \n    .table-responsive {\n        border-radius: 8px;\n    }\n    \n    .btn {\n        padding: 10px 20px;\n        font-size: 0.875rem;\n    }\n    \n    .card-body {\n        padding: 16px;\n    }\n}\n\n@media (max-width: 576px) {\n    .page-content {\n        padding: 16px;\n    }\n    \n    .filter-section {\n        padding: 12px;\n        border-radius: 8px;\n    }\n    \n    .stats-card .card-body {\n        padding: 16px;\n    }\n    \n    .btn {\n        padding: 8px 16px;\n        font-size: 0.8125rem;\n    }\n}\n\n/* Dark Mode Enhancements */\n@media (prefers-color-scheme: dark) {\n    .main-content {\n        background: #1a1d29;\n    }\n    \n    .card {\n        background: #212529;\n        color: #e9ecef;\n    }\n    \n    .table tbody tr:hover {\n        background: #2c3034;\n    }\n    \n    .filter-section .form-control,\n    .filter-section .form-select {\n        background-color: rgba(255, 255, 255, 0.05);\n        color: #e9ecef;\n    }\n}\n\n/* Print Styles */\n@media print {\n    .filter-section,\n    .btn,\n    .pagination {\n        display: none !important;\n    }\n    \n    .card {\n        box-shadow: none;\n        border: 1px solid #dee2e6;\n    }\n    \n    .table {\n        font-size: 12px;\n    }\n}\n

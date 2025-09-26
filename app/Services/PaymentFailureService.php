@@ -42,16 +42,20 @@ class PaymentFailureService
             // Check if user should be suspended (3 consecutive failures)
             if ($paymentFailure->shouldSuspend()) {
                 $suspensionUntil = $user->suspendForPaymentFailures();
-                $paymentFailure->markSuspended();
+                
+                // Get the updated payment failure record to get suspension info
+                $paymentFailure->refresh();
 
                 // Automatically logout the user from all sessions
                 $this->logoutUserFromAllSessions($user);
 
                 $response['suspended'] = true;
                 $response['suspension_until'] = $suspensionUntil;
+                $response['suspension_level'] = $paymentFailure->suspension_level;
+                $response['suspension_duration_hours'] = $paymentFailure->suspension_duration_hours;
                 $response['auto_logged_out'] = true;
 
-                Log::warning("User {$user->username} suspended due to 3 consecutive payment failures until {$suspensionUntil} and automatically logged out");
+                Log::warning("User {$user->username} suspended due to 3 consecutive payment failures until {$suspensionUntil} (Level {$paymentFailure->suspension_level}, Duration: {$paymentFailure->suspension_duration_hours}h) and automatically logged out");
             }
 
             DB::commit();
@@ -93,7 +97,12 @@ class PaymentFailureService
      */
     public function processExpiredSuspensions(): int
     {
-        $suspendedUsers = User::where('status', 'suspend')
+        // Find users with expired suspensions - check both status='suspend' and inconsistent states
+        $suspendedUsers = User::where(function($query) {
+                $query->where('status', 'suspend')
+                      ->orWhere('suspension_until', '<=', now());
+            })
+            ->whereNotNull('suspension_until')
             ->where('suspension_until', '<=', now())
             ->get();
 
@@ -101,9 +110,12 @@ class PaymentFailureService
 
         foreach ($suspendedUsers as $user) {
             try {
-                $user->liftSuspension();
-                $lifted++;
-                Log::info("Suspension lifted for user {$user->username}");
+                // Only lift if suspension is actually expired
+                if ($user->suspension_until && $user->suspension_until->isPast()) {
+                    $user->liftSuspension();
+                    $lifted++;
+                    Log::info("Suspension lifted for user {$user->username} (was in inconsistent state: status={$user->status})");
+                }
             } catch (\Exception $e) {
                 Log::error("Error lifting suspension for user {$user->username}: " . $e->getMessage());
             }
@@ -157,7 +169,48 @@ class PaymentFailureService
             'users_approaching_suspension' => UserPaymentFailure::where('consecutive_failures', 2)->whereNull('suspended_at')->count(),
             'currently_suspended' => User::where('status', 'suspend')->whereNotNull('suspension_until')->count(),
             'suspensions_lifted_today' => UserPaymentFailure::whereDate('suspension_lifted_at', today())->count(),
+            'level_1_suspensions' => UserPaymentFailure::where('suspension_level', 1)->whereNotNull('suspended_at')->count(),
+            'level_2_suspensions' => UserPaymentFailure::where('suspension_level', 2)->whereNotNull('suspended_at')->count(),
+            'level_3_plus_suspensions' => UserPaymentFailure::where('suspension_level', '>=', 3)->whereNotNull('suspended_at')->count(),
         ];
+    }
+
+    /**
+     * Process suspension level resets for users who have been good
+     *
+     * @return int Number of levels reset
+     */
+    public function processSuspensionLevelResets(): int
+    {
+        $resetCount = 0;
+        
+        $usersToReset = UserPaymentFailure::where('suspension_level', '>', 0)
+            ->where('consecutive_failures', 0)
+            ->where(function($query) {
+                $query->whereNull('last_failure_at')
+                      ->orWhere('last_failure_at', '<=', now()->subDays(30));
+            })
+            ->with('user')
+            ->get();
+
+        foreach ($usersToReset as $paymentFailure) {
+            try {
+                $oldLevel = $paymentFailure->suspension_level;
+                $paymentFailure->resetSuspensionLevel();
+                $resetCount++;
+                
+                Log::info("Suspension level reset from {$oldLevel} to 0 for user {$paymentFailure->user->username} due to 30 days without failures");
+                
+            } catch (\Exception $e) {
+                Log::error("Error resetting suspension level for user {$paymentFailure->user->username}: " . $e->getMessage());
+            }
+        }
+
+        if ($resetCount > 0) {
+            Log::info("Reset suspension levels for {$resetCount} users");
+        }
+
+        return $resetCount;
     }
 
     /**

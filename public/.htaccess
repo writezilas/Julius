@@ -4,6 +4,11 @@
     </IfModule>
 
     RewriteEngine On
+    
+    # Custom Error Pages
+    ErrorDocument 404 /index.php
+    ErrorDocument 403 /index.php
+    ErrorDocument 500 /index.php
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

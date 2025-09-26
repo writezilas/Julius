@@ -1,0 +1,79 @@
+/* 
+ * Notification Bell Badge Fix
+ * Fixes oversized notification counter badge on the notification bell
+ */
+
+.topbar-badge {
+    /* Size and positioning fixes */
+    font-size: 9px !important; /* Smaller font size than default fs-10 */
+    line-height: 1.2 !important; /* Tighter line height */
+    padding: 2px 4px !important; /* Smaller padding */
+    min-width: 14px !important; /* Minimum width to ensure it's circular for single digits */
+    height: 14px !important; /* Fixed height */
+    
+    /* Position adjustments */
+    top: 8px !important; /* Position from top of button */
+    right: 8px !important; /* Position from right of button */
+    transform: none !important; /* Remove translate-middle that was causing positioning issues */
+    
+    /* Visual improvements */
+    font-weight: 600 !important; /* Slightly bolder text */
+    border: 1px solid rgba(255, 255, 255, 0.3) !important; /* Subtle border for better visibility */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important; /* Small shadow for depth */
+    
+    /* Ensure text is centered */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+}
+
+/* Ensure the parent button has relative positioning */
+#page-header-notifications-dropdown {
+    position: relative !important;
+}
+
+/* Handle double-digit numbers */
+.topbar-badge:has-text() {
+    min-width: 18px !important; /* Wider for 2+ digit numbers */
+    padding: 2px 5px !important;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .topbar-badge {
+        font-size: 8px !important;
+        min-width: 12px !important;
+        height: 12px !important;
+        top: 6px !important;
+        right: 6px !important;
+        padding: 1px 3px !important;
+    }
+}
+
+/* Dark mode adjustments */
+[data-layout-mode="dark"] .topbar-badge {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Animation for new notifications */
+@keyframes notificationPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.topbar-badge.new-notification {
+    animation: notificationPulse 0.6s ease-in-out;
+}
+
+/* Fix for when count is 0 - hide the badge */
+.topbar-badge:empty {
+    display: none !important;
+}
+
+/* Ensure badge doesn't interfere with button click */
+.topbar-badge {
+    pointer-events: none !important;
+}

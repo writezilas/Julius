@@ -66,12 +66,20 @@ class RegisterController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone'    => ['required', 'unique:users'],
-            'username' => ['required', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'avatar'   => ['image' ,'mimes:jpg,jpeg,png','max:1024'],
+            'name'                => ['required', 'string', 'max:255'],
+            'email'               => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'phone'               => ['required', 'unique:users'],
+            'username'            => ['required', 'unique:users'],
+            'password'            => ['required', 'string', 'min:8', 'confirmed'],
+            'avatar'              => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+            'refferal'            => ['nullable', 'string', 'exists:users,username'],
+            'business_account_id' => ['required', 'integer', 'in:1,2'],
+            'mpesa_no'            => ['required', 'string', 'max:20'],
+            'mpesa_name'          => ['required', 'string', 'max:255'],
+            'mpesa_till_no'       => ['nullable', 'string', 'max:20'],
+            'mpesa_till_name'     => ['nullable', 'string', 'max:255'],
+            'trade_id'            => ['required', 'integer', 'exists:trades,id'],
+            'terms'               => ['required', 'accepted'],
         ]);
     }
 
@@ -83,16 +91,25 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        if($data['refferal']) {
+        // Handle referral validation (already handled in validator, but keep for additional checks)
+        if(isset($data['refferal']) && !empty($data['refferal'])) {
+            // Prevent self-referral
+            if($data['refferal'] === $data['username']) {
+                $error = ValidationException::withMessages([
+                   'refferal' => ['You cannot refer yourself!'],
+                ]);
+                throw $error;
+            }
+            
             $refferal = User::where('username', $data['refferal'])->first();
             if(!$refferal){
                 $error = ValidationException::withMessages([
-                   'refferal' => ['Refferal code not present in our database!'],
+                   'refferal' => ['Referral code not present in our database!'],
                 ]);
                 throw $error;
             }
         }
-        $avatarName = 'assets/images/users/default.png';
+        $avatarName = 'assets/images/users/default.jpg';
         if (request()->has('avatar')) {
             $avatar = request()->file('avatar');
             $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
@@ -115,7 +132,7 @@ class RegisterController extends Controller
             'email'               => $data['email'],
             'phone'               => $data['phone'],
             'username'            => $data['username'],
-            'refferal_code'       => $data['refferal'],
+            'refferal_code'       => $data['refferal'] ?? null,
             'password'            => Hash::make($data['password']),
             'avatar'              => $avatarName,
             'business_profile'    => json_encode($business_profile, true),
@@ -129,6 +146,32 @@ class RegisterController extends Controller
         $log->value   = 0;
         $log->user_id = $user->id;
         $user->logs()->save($log);
+
+        // Set referral amount but keep status as pending until bonus shares are sold
+        if(isset($data['refferal']) && !empty($data['refferal'])) {
+            try {
+                $referrer = User::where('username', $data['refferal'])->first();
+                if($referrer) {
+                    // Set the referral amount for the new user (potential earnings)
+                    $bonusAmount = get_gs_value('reffaral_bonus') ?? 100;
+                    $user->ref_amount = $bonusAmount;
+                    $user->save();
+                    
+                    // Log the referral setup
+                    $refLog = new Log();
+                    $refLog->remarks = "Referral setup: Potential earning of KSH {$bonusAmount} for being referred by {$referrer->username}. Status: Pending until bonus shares are sold.";
+                    $refLog->type = "referral_setup";
+                    $refLog->value = $bonusAmount;
+                    $refLog->user_id = $user->id;
+                    $user->logs()->save($refLog);
+                    
+                    \Log::info("Referral setup: User {$user->username} has potential earning of KSH {$bonusAmount} for referral by {$referrer->username}. Waiting for bonus shares to be created and sold.");
+                }
+            } catch (\Exception $e) {
+                \Log::error("Failed to set up referral for user {$user->username}: " . $e->getMessage());
+                // Continue with registration even if referral setup fails
+            }
+        }
 
         return $user;
     }

@@ -1,6 +1,6 @@
 <!doctype html >
 
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{ auth()->check() && auth()->user()->role_id != 2 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-mode="{{auth()->check() ? auth()->user()->mode : 'light' }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-layout="{{ auth()->check() && auth()->user()->role_id != 2 ? 'vertical' : 'horizontal'}}" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-mode="{{auth()->check() && auth()->user()->mode ? auth()->user()->mode : 'light' }}">
 
 <head>
     <meta charset="utf-8" />
@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Autobidder.live is peer-to-peer investment platform that simulates the stock exchange market." name="description" />
     <meta content="Autobidder" name="author" />
+    <!-- CSRF Token -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- App favicon -->
     <link rel="shortcut icon" href="{{ URL::asset('assets/images/favicon.ico')}}">
     @include('layouts.head-css')
@@ -53,16 +55,18 @@
     @include('layouts.vendor-scripts')
     
     @auth
-    <!-- Suspension Monitor -->
+    <!-- User Status Monitor -->
     <script>
         window.Laravel = {
             user: {
                 id: {{ auth()->user()->id }},
-                username: '{{ auth()->user()->username }}'
+                username: '{{ auth()->user()->username }}',
+                status: '{{ auth()->user()->status }}'
             }
         };
     </script>
     <script src="{{ asset('assets/js/suspension-monitor.js') }}"></script>
+    <script src="{{ asset('assets/js/user-status-monitor.js') }}"></script>
     
     @if(auth()->user()->role_id === 2)
     <!-- Global chat unread count functionality -->

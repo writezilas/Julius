@@ -1,0 +1,435 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Log;
+use App\Models\Policy;
+use App\Models\Trade;
+use App\Models\User;
+use App\Models\UserShare;
+use App\Models\UserSharePair;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+
+class HomeController extends Controller
+{
+
+    //    /**
+    //     * Show the application dashboard.
+    //     *
+    //     * @return \Illuminate\Contracts\Support\Renderable
+    //     */
+    //    public function index(Request $request)
+    //    {
+    //        if(auth()->user()->role_id != 2){
+    ////            if (view()->exists($request->path())) {
+    ////                return view($request->path());
+    ////            }
+    ////            return abort(404);
+    //            return view('index');
+    //        }else{
+    //
+    //            if (view()->exists('user-panel.'.$request->path())) {
+    //                return view('user-panel.'.$request->path());
+    //            }
+    //            return abort(404);
+    //        }
+    //        return abort(404);
+    //    }
+
+    public function index(Request $request)
+    {
+        $trades = Trade::with('userShares')->whereStatus(1)->get();
+
+        $recentShares = UserShare::latest()->limit(5)->get();
+        $topCategory = Trade::with('userShares')
+                    ->withcount('userShares')
+                    ->whereStatus(1)->orderBy('user_shares_count', 'DESC')->get();
+
+        $topTraders = User::where('role_id', 2)->orderBy('balance', 'DESC')->limit(5)->get();
+
+        $pendingShares = UserSharePair::with('pairedUserShare:id,status,ticket_no,trade_id', 
+            'pairedShare:id,user_id,status,ticket_no,trade_id', 'pairedShare.user', 'payment')
+            ->where('is_paid', 0)
+            ->whereHas('payment')
+            ->orderBy('id')->get();
+
+        // return $pendingShares;
+        
+        return view('index', compact('trades', 'recentShares', 'topCategory', 'topTraders', 'pendingShares'));
+    }
+
+    public function root()
+    {          
+        $isTradeOpen = true;
+        return view('user-panel.dashboard', compact('isTradeOpen'));
+    }
+
+    /*Language Translation*/
+    public function lang($locale)
+    {
+        if ($locale) {
+            App::setLocale($locale);
+            Session::put('lang', $locale);
+            Session::save();
+            return redirect()->back()->with('locale', $locale);
+        } else {
+            return redirect()->back();
+        }
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'avatar' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:1024'],
+        ]);
+
+        $user = User::find($id);
+        $user->name = $request->get('name');
+
+        if ($request->file('avatar')) {
+            $avatar = $request->file('avatar');
+            $avatarName = time() . '.' . $avatar->getClientOriginalExtension();
+            $avatarPath = public_path('/images/');
+            $avatar->move($avatarPath, $avatarName);
+            $user->avatar =  'images/' .$avatarName;
+        }
+
+
+        if ($user->update()) {
+            toastr()->success('User profile details Updated successfully!');
+            $log = new Log();
+            $log->remarks = "profile updated successfully";
+            $log->type    = "update_profile";
+            $log->value   = 0;
+            $log->user_id = $user->id;
+            $user->logs()->save($log);
+        } else {
+            toastr()->error('Failed to update user profile');
+        }
+        return back();
+    }
+
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'current_password' => ['required', 'string'],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
+        ]);
+
+        if (!(Hash::check($request->get('current_password'), Auth::user()->password))) {
+            toastr()->info('Your Current password does not matches with the password you provided. Please try again.');
+        } else {
+            $user = User::find($id);
+            $user->password = Hash::make($request->get('password'));
+            $user->update();
+            if ($user) {
+                toastr()->success('Your password has been updated successfully');
+                $log = new Log();
+                $log->remarks = "Password updated successfully";
+                $log->type    = "update_password";
+                $log->value   = 0;
+                $log->user_id = $user->id;
+                $user->logs()->save($log);
+            } else {
+                toastr()->error('Failed to update password. please try again');
+            }
+        }
+        return back();
+    }
+
+    public function profile()
+    {
+        if (\auth()->user()->role_id === 2) {
+            return view('user-panel.profile');
+        } else {
+            $pageTitle = 'Admin profile';
+            return view('admin-panel.settings.profile', compact('pageTitle'));
+        }
+    }
+
+    public function referrals()
+    {
+        $pageTitle = __('translation.refferals');
+        $refferals = User::where('refferal_code', \auth()->user()->username)->latest()->get();
+        
+        // Calculate referral statistics
+        $totalReferrals = $refferals->count();
+        $totalEarnings = $refferals->sum('ref_amount');
+        $pendingPayments = $refferals->where('ref_amount', 0)->count();
+        $paidReferrals = $refferals->where('ref_amount', '>', 0)->count();
+        
+        // Recent referrals (last 7 days)
+        $recentReferrals = $refferals->filter(function($referral) {
+            return $referral->created_at >= now()->subDays(7);
+        })->count();
+        
+        return view('user-panel.refferals', compact(
+            'pageTitle', 
+            'refferals', 
+            'totalReferrals',
+            'totalEarnings',
+            'pendingPayments',
+            'paidReferrals',
+            'recentReferrals'
+        ));
+    }
+    public function boughtShares()
+    {
+        $pageTitle = __('translation.boughtshares');
+
+        // Get paginated results (10 items per page) - FIXED: ONLY purchased shares
+        // Previously showed all user shares regardless of type, now properly filtered
+        $boughtShares = UserShare::where('user_id', \auth()->user()->id)
+            ->where('get_from', 'purchase') // Only purchased shares
+            ->orderBy('id', 'DESC')
+            ->paginate(10);
+
+        // Get statistics for all purchased shares (not just current page)
+        $allShares = UserShare::where('user_id', \auth()->user()->id)
+            ->where('get_from', 'purchase') // Only purchased shares
+            ->get();
+        $totalShares = $allShares->count();
+        $activeShares = $allShares->where('status', 'pending')->count();
+        $completedShares = $allShares->where('status', 'completed')->count();
+        $failedShares = $allShares->where('status', 'failed')->count();
+        // Only count investment from completed shares
+        $totalInvestment = $allShares->where('status', 'completed')->sum('amount');
+
+        return view('user-panel.bought-shares', compact(
+            'pageTitle', 
+            'boughtShares', 
+            'totalShares', 
+            'activeShares', 
+            'completedShares', 
+            'failedShares', 
+            'totalInvestment'
+        ));
+    }
+
+    public function soldShares()
+    {   
+        $pageTitle = __('translation.soldshares');
+
+        // Get paginated results (10 items per page) with trade relationship
+        // FIXED: ONLY include shares where user is the seller (exclude purchased shares)
+        // Previously, this method incorrectly showed ALL user shares including those purchased by the user
+        // Now properly filters to only show shares allocated-by-admin or other non-purchase sources
+        $soldShares = UserShare::with('trade')
+            ->where('user_id', \auth()->user()->id)
+            ->where('get_from', '!=', 'purchase') // Exclude purchased shares
+            ->whereIn('status', ['completed', 'sold', 'paired'])
+            ->where('start_date', '!=', '')
+            ->orderBy('id', 'desc')
+            ->paginate(10);
+
+        // Get statistics for all sold shares (not just current page)
+        $allSoldShares = UserShare::where('user_id', \auth()->user()->id)
+            ->where('get_from', '!=', 'purchase') // Exclude purchased shares
+            ->whereIn('status', ['completed', 'sold', 'paired'])
+            ->where('start_date', '!=', '')
+            ->get();
+            
+        $totalSoldShares = $allSoldShares->count();
+        // Count matured shares: those that are ready to sell OR fully sold
+        $maturedShares = $allSoldShares->filter(function($share) {
+            return $share->is_ready_to_sell == 1 || $share->status === 'sold';
+        })->count();
+        // Count running shares: those not ready to sell and not fully sold
+        $runningShares = $allSoldShares->filter(function($share) {
+            return $share->is_ready_to_sell == 0 && $share->status !== 'sold';
+        })->count();
+        $totalInvestment = $allSoldShares->sum('share_will_get');
+        $totalEarnings = $allSoldShares->sum('profit_share');
+        $totalReturn = $totalInvestment + $totalEarnings;
+
+        return view('user-panel.sold-shares', compact(
+            'pageTitle', 
+            'soldShares', 
+            'totalSoldShares', 
+            'maturedShares', 
+            'runningShares', 
+            'totalInvestment', 
+            'totalEarnings', 
+            'totalReturn'
+        ));
+    }
+    public function support()
+    {
+        $pageTitle = __('translation.support');
+
+        return view('user-panel.support', compact('pageTitle'));
+    }
+
+    public function howItWorksPage()
+    {
+        $pageTitle = 'How it works';
+
+        $policy = Policy::where('slug', 'how-it-work')->first();
+
+        return view('user-panel.how-it-works', compact('pageTitle', 'policy'));
+    }
+    public function privacyPolicy()
+    {
+        $policy = Policy::where('slug', 'privacy-policy')->first();
+        $pageTitle = $policy->title;
+
+        return view('user-panel.privacy-policy', compact('pageTitle', 'policy'));
+    }
+    public function termsAndConditions()
+    {
+        $policy = Policy::where('slug', 'terms-and-conditions')->first();
+        $pageTitle = $policy->title;
+
+        return view('user-panel.terms-conditions', compact('pageTitle', 'policy'));
+    }
+    public function confidentialityPolicy()
+    {
+
+        $policy = Policy::where('slug', 'confidentiality-policy')->first();
+        $pageTitle = $policy->title;
+
+        return view('user-panel.confidentiality-policy', compact('pageTitle', 'policy'));
+    }
+
+    /**
+     * Get live statistics data for dashboard
+     */
+    public function getLiveStatistics(Request $request)
+    {
+        $type = $request->get('type', 'all');
+        
+        switch ($type) {
+            case 'leaderboard':
+                $data = $this->getLeaderboardData();
+                return response()->json([
+                    'leaderboard' => $data,
+                    'last_updated' => now()->format('Y-m-d H:i:s')
+                ]);
+                
+            case 'realtime':
+                $data = $this->getRealtimeStatsData();
+                return response()->json([
+                    'activities' => $data,
+                    'last_updated' => now()->format('Y-m-d H:i:s')
+                ]);
+                
+            case 'referrers':
+                $data = $this->getTopReferrersData();
+                return response()->json([
+                    'referrers' => $data,
+                    'last_updated' => now()->format('Y-m-d H:i:s')
+                ]);
+                
+            default:
+                return response()->json([
+                    'leaderboard' => $this->getLeaderboardData(),
+                    'activities' => $this->getRealtimeStatsData(),
+                    'referrers' => $this->getTopReferrersData(),
+                    'last_updated' => now()->format('Y-m-d H:i:s')
+                ]);
+        }
+    }
+
+    /**
+     * Get top traders leaderboard - only users with completed shares
+     */
+    private function getLeaderboardData()
+    {
+        return User::select('users.username')
+            ->selectRaw('COALESCE(SUM(user_shares.amount), 0) as total_investment')
+            ->join('user_shares', function($join) {
+                $join->on('users.id', '=', 'user_shares.user_id')
+                     ->where('user_shares.status', '=', 'completed'); // Only completed shares
+            })
+            ->where('users.role_id', 2) // Only regular users
+            ->whereIn('users.status', ['pending', 'fine'])
+            ->groupBy('users.id', 'users.username')
+            ->having('total_investment', '>', 0)
+            ->orderBy('total_investment', 'DESC')
+            ->limit(10)
+            ->get();
+    }
+
+    /**
+     * Get real-time user activities (bought and sold shares)
+     */
+    private function getRealtimeStatsData()
+    {
+        // Recent bought shares (last 24 hours)
+        $recentBought = UserShare::select('user_shares.id', 'user_shares.ticket_no', 'user_shares.amount', 'user_shares.created_at')
+            ->selectRaw('users.username, trades.name as trade_name')
+            ->join('users', 'user_shares.user_id', '=', 'users.id')
+            ->join('trades', 'user_shares.trade_id', '=', 'trades.id')
+            ->where('user_shares.created_at', '>=', now()->subDay())
+            ->orderBy('user_shares.created_at', 'DESC')
+            ->limit(15)
+            ->get()
+            ->map(function($share) {
+                return [
+                    'id' => $share->id,
+                    'username' => $share->username,
+                    'trade_name' => $share->trade_name,
+                    'ticket_no' => $share->ticket_no,
+                    'amount' => $share->amount,
+                    'type' => 'bought',
+                    'time' => $share->created_at->diffForHumans(),
+                    'created_at' => $share->created_at
+                ];
+            });
+
+        // Recent sold shares (shares that became ready to sell in last 24 hours)
+        $recentSold = UserShare::select('user_shares.id', 'user_shares.ticket_no', 'user_shares.amount', 'user_shares.profit_share', 'user_shares.updated_at')
+            ->selectRaw('users.username, trades.name as trade_name')
+            ->join('users', 'user_shares.user_id', '=', 'users.id')
+            ->join('trades', 'user_shares.trade_id', '=', 'trades.id')
+            ->where('user_shares.is_ready_to_sell', 1)
+            ->where('user_shares.updated_at', '>=', now()->subDay())
+            ->whereNotNull('user_shares.matured_at')
+            ->orderBy('user_shares.updated_at', 'DESC')
+            ->limit(15)
+            ->get()
+            ->map(function($share) {
+                return [
+                    'id' => $share->id,
+                    'username' => $share->username,
+                    'trade_name' => $share->trade_name,
+                    'ticket_no' => $share->ticket_no,
+                    'amount' => $share->amount + $share->profit_share,
+                    'type' => 'sold',
+                    'time' => $share->updated_at->diffForHumans(),
+                    'created_at' => $share->updated_at
+                ];
+            });
+
+        // Merge and sort by time, limit to exactly 10 items
+        $allActivities = $recentBought->concat($recentSold)
+            ->sortByDesc('created_at')
+            ->take(10)
+            ->values();
+
+        return $allActivities;
+    }
+
+    /**
+     * Get top 10 referrers by referral count
+     */
+    private function getTopReferrersData()
+    {
+        return User::select('users.id', 'users.username', 'users.name')
+            ->selectRaw('COUNT(referrals.id) as referral_count')
+            ->leftJoin('users as referrals', 'users.username', '=', 'referrals.refferal_code')
+            ->where('users.role_id', 2) // Only regular users
+            ->whereIn('users.status', ['pending', 'fine'])
+            ->groupBy('users.id', 'users.username', 'users.name')
+            ->having('referral_count', '>', 0)
+            ->orderBy('referral_count', 'DESC')
+            ->limit(10)
+            ->get();
+    }
+}

@@ -13,6 +13,18 @@ class UserShare extends Model
     use HasFactory;
     protected $guarded = [];
     
+    protected $fillable = [
+        'trade_id', 'user_id', 'reff_id', 'ticket_no', 'amount', 'balance', 
+        'period', 'share_will_get', 'total_share_count', 'sold_quantity', 'hold_quantity',
+        'status', 'status_before_suspension', 'get_from', 'is_ready_to_sell', 'is_sold', 'start_date', 'matured_at',
+        // Legacy timer fields (kept for backward compatibility)
+        'timer_paused', 'timer_paused_at', 'paused_duration_seconds', 'payment_deadline_minutes',
+        // Separate timer system
+        'selling_started_at', 'selling_timer_paused', 'selling_timer_paused_at', 'selling_paused_duration_seconds',
+        'payment_timer_paused', 'payment_timer_paused_at', 'payment_paused_duration_seconds',
+        'profit_share'
+    ];
+    
     // Model Events
     protected static function booted()
     {
@@ -42,9 +54,9 @@ class UserShare extends Model
     {
         return $this->hasMany(UserSharePair::class);
     }
-   public function pairedWithThis(): BelongsTo
+   public function pairedWithThis(): HasMany
    {
-       return $this->belongsTo(UserSharePair::class,  'id', 'paired_user_share_id');
+       return $this->hasMany(UserSharePair::class, 'paired_user_share_id', 'id');
    }
     public function payments(): HasMany
     {

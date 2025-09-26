@@ -1,123 +1,102 @@
-/* Live Statistics Section Styling */
-.live-stats-container {
-    margin-bottom: 2rem;
+/* Microsoft Logo Blur Override for Authentication Pages */
+.auth-one-bg::after {
+    content: '';
+    position: absolute;
+    /* Adjust these coordinates to match Microsoft logo position in your background image */
+    top: 15%; /* Adjust based on actual logo position */
+    right: 10%; /* Adjust based on actual logo position */
+    width: 150px; /* Adjust based on actual logo size */
+    height: 150px; /* Adjust based on actual logo size */
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) brightness(1.1);
+    z-index: 2;
+    border-radius: 15px;
+    opacity: 0.95;
 }
 
-.live-stats-card {
-    border-radius: 0.5rem;
-    overflow: hidden;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    min-height: 400px; /* Ensure equal heights */
+/* Auto Bidder Logo Styling */
+.autobidder-logo {
+    max-width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
 }
 
-.live-stats-card .card-body {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+/* Logo sizing for different contexts */
+.logo-sm .autobidder-logo {
+    max-height: 32px;
+    width: auto;
 }
 
-.live-stats-card .card-body > div:last-child {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    max-height: 320px;
-    overflow-y: auto;
+.logo-lg .autobidder-logo {
+    max-height: 40px;
+    width: auto;
 }
 
-.live-stats-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+/* Authentication page logo styling */
+.auth-logo-img {
+    filter: brightness(0) invert(1);
+    max-height: 45px;
+    width: auto;
 }
 
-.live-stats-item {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.75rem 0;
-    animation: fadeIn 0.5s ease-in-out;
-    min-height: 50px;
-    display: flex;
-    align-items: center;
-}
-
-.live-stats-item:last-child {
-    border-bottom: none;
-}
-
-.live-stats-position {
-    width: 30px;
+/* Logo visibility for light and dark modes */
+.logo-dark .autobidder-logo,
+[data-layout-mode="light"] .logo-dark .autobidder-logo {
     display: inline-block;
 }
 
-.live-stats-value {
-    font-weight: 600;
-    font-size: 0.9rem;
+.logo-light .autobidder-logo,
+[data-layout-mode="dark"] .logo-light .autobidder-logo {
+    display: none;
 }
 
-.live-stats-subtitle {
-    font-size: 0.75rem;
-    opacity: 0.9;
+/* Dark mode logo visibility */
+[data-layout-mode="dark"] .logo-dark .autobidder-logo {
+    display: none;
 }
 
-/* Ensure equal heights for all live stats cards */
-.live-stats-container .row {
-    display: flex;
-    flex-wrap: wrap;
+[data-layout-mode="dark"] .logo-light .autobidder-logo {
+    display: inline-block;
+    filter: brightness(0) invert(1);
 }
 
-.live-stats-container .col-xl-4,
-.live-stats-container .col-lg-6,
-.live-stats-container .col-lg-12 {
-    display: flex;
-    flex-direction: column;
+/* Dark sidebar specific styling */
+[data-sidebar="dark"] .logo-dark .autobidder-logo {
+    display: none;
 }
 
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
+[data-sidebar="dark"] .logo-light .autobidder-logo {
+    display: inline-block;
+    filter: brightness(0) invert(1);
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Responsive adjustments */
+/* Responsive logo sizing */
 @media (max-width: 768px) {
-    .live-stats-card {
-        margin-bottom: 1rem;
+    .logo-sm .autobidder-logo {
+        max-height: 28px;
     }
     
-    .live-stats-item {
-        padding: 0.5rem 0;
+    .logo-lg .autobidder-logo {
+        max-height: 35px;
     }
     
-    .live-stats-value {
-        font-size: 0.8rem;
-    }
-    
-    .live-stats-subtitle {
-        font-size: 0.7rem;
+    .auth-logo-img {
+        max-height: 38px;
     }
 }
 
-/* Loading state */
-.live-stats-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 120px;
-}
-
-/* Error state */
-.live-stats-error {
-    color: rgba(255, 255, 255, 0.8);
-    text-align: center;
-    padding: 1rem;
-    font-style: italic;
+@media (max-width: 576px) {
+    .logo-sm .autobidder-logo {
+        max-height: 24px;
+    }
+    
+    .logo-lg .autobidder-logo {
+        max-height: 30px;
+    }
+    
+    .auth-logo-img {
+        max-height: 32px;
+    }
 }

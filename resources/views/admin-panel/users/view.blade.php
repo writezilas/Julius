@@ -125,8 +125,8 @@
                                     <th>Status</th>
                                     <td>
                                         <div class="status-info mb-2">
-                                            {{ $user->status === 'pending' ? 'Active' : ucfirst($user->status) }}
-                                            @if($user->status === 'block')
+                                            {{ $user->status === 'active' ? 'Active' : ucfirst($user->status) }}
+                                            @if($user->status === 'blocked')
                                                 <br><small class="text-danger">
                                                     <i class="ri-lock-2-line me-1"></i>Permanently Blocked
                                                 </small>
@@ -135,7 +135,7 @@
                                                     Suspended until: {{ $user->suspension_until->format('M d, Y H:i') }}
                                                     <br>Time remaining: <span id="suspension-countdown">{{ $user->suspension_until->diffForHumans() }}</span>
                                                 </small>
-                                            @elseif($user->status === 'pending')
+                                            @elseif($user->status === 'active')
                                                 <br><small class="text-success">
                                                     <i class="ri-check-circle-line me-1"></i>Account Active
                                                 </small>
@@ -206,8 +206,8 @@
                             <tr>
                                 <th>Status</th>
                                 <td>
-                                    {{ $user->status === 'pending' ? 'Active' : ucfirst($user->status) }}
-                                    @if($user->status === 'block')
+                                    {{ $user->status === 'active' ? 'Active' : ucfirst($user->status) }}
+                                    @if($user->status === 'blocked')
                                         <br><small class="text-danger">
                                             <i class="ri-lock-2-line me-1"></i>Permanently Blocked
                                         </small>
@@ -216,7 +216,7 @@
                                             Suspended until: {{ $user->suspension_until->format('M d, Y H:i') }}
                                             <br>Time remaining: <span id="suspension-countdown">{{ $user->suspension_until->diffForHumans() }}</span>
                                         </small>
-                                    @elseif($user->status === 'pending')
+                                    @elseif($user->status === 'active')
                                         <br><small class="text-success">
                                             <i class="ri-check-circle-line me-1"></i>Account Active
                                         </small>
@@ -245,9 +245,9 @@
                                     <div class="form-group">
                                     <label>User status</label>
                                     <select class="form-control" id="userstatus" name="status">
-                                        <option value="pending" @selected($user->status == 'pending')>Active</option>
-                                        <option value="suspend" @selected($user->status == 'suspend')>Suspend</option>
-                                        <option value="block" @selected($user->status == 'block')>Block</option>
+                                        <option value="active" @selected($user->status == 'active')>Active</option>
+                                        <option value="suspended" @selected($user->status == 'suspended')>Suspend</option>
+                                        <option value="blocked" @selected($user->status == 'blocked')>Block</option>
                                     </select>
                                     </div>
                                 </div>
@@ -293,17 +293,17 @@
 <script>
     $('#userstatus').change(function(){
         $('.suspend, .block').hide();
-        if($(this).val() === 'suspend'){
+        if($(this).val() === 'suspended'){
             $('.suspend').show();
-        } else if($(this).val() === 'block'){
+        } else if($(this).val() === 'blocked'){
             $('.block').show();
         }
     })
     
     // Show appropriate fields on page load
-    if($('#userstatus').val() == 'suspend'){
+    if($('#userstatus').val() == 'suspended'){
         $('.suspend').show();
-    } else if($('#userstatus').val() == 'block'){
+    } else if($('#userstatus').val() == 'blocked'){
         $('.block').show();
     }
     

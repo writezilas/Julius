@@ -15,7 +15,8 @@ class UserSharePair extends Model
         'user_id',
         'user_share_id',
         'paired_user_share_id',
-        'share'
+        'share',
+        'is_paid'
     ];
     
     // Model Events
@@ -45,6 +46,11 @@ class UserSharePair extends Model
     }
 
     public function pairedUserShare(): BelongsTo
+    {
+        return $this->belongsTo(UserShare::class, 'user_share_id', 'id');
+    }
+    
+    public function buyerUserShare(): BelongsTo
     {
         return $this->belongsTo(UserShare::class, 'user_share_id', 'id');
     }

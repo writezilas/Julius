@@ -1,5 +1,15 @@
 /******/ (() => { // webpackBootstrap
 var __webpack_exports__ = {};
+/*!********************************************************!*\
+  !*** ./resources/js/pages/dashboard-ecommerce.init.js ***!
+  \********************************************************/
+/*
+Template Name: Velzon - Admin & Dashboard Template
+Author: Themesbrand
+Website: https://Themesbrand.com/
+Contact: Themesbrand@gmail.com
+File: Ecommerce Dashboard init js
+*/
 // get colors array from the string
 function getChartColorsArray(chartId) {
   if (document.getElementById(chartId) !== null) {
@@ -151,133 +161,7 @@ if (linechartcustomerColors) {
   };
   var chart = new ApexCharts(document.querySelector("#customer_impression_charts"), options);
   chart.render();
-}
-
-
-
-    // var linechartcustomerColorsNew = getChartColorsArray("customer-daily-earning-chart");
-    //
-    // if (linechartcustomerColorsNew) {
-    //     var options = {
-    //         series: [{
-    //             name: "Orders",
-    //             type: "area",
-    //             data: [34, 65, 46, 68, 49, 61, 42]
-    //         }, {
-    //             name: "Earnings",
-    //             type: "bar",
-    //             data: [89.25, 98.58, 68.74, 108.87, 77.54, 84.03, 51.24]
-    //         }, {
-    //             name: "Refunds",
-    //             type: "line",
-    //             data: [8, 12, 7, 17, 21, 11, 5]
-    //         }],
-    //         chart: {
-    //             height: 370,
-    //             type: "line",
-    //             toolbar: {
-    //                 show: false
-    //             }
-    //         },
-    //         stroke: {
-    //             curve: "straight",
-    //             dashArray: [0, 0, 8],
-    //             width: [2, 0, 2.2]
-    //         },
-    //         fill: {
-    //             opacity: [0.1, 0.9, 1]
-    //         },
-    //         markers: {
-    //             size: [0, 0, 0],
-    //             strokeWidth: 2,
-    //             hover: {
-    //                 size: 4
-    //             }
-    //         },
-    //         xaxis: {
-    //             categories: ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"],
-    //             axisTicks: {
-    //                 show: false
-    //             },
-    //             axisBorder: {
-    //                 show: false
-    //             }
-    //         },
-    //         grid: {
-    //             show: true,
-    //             xaxis: {
-    //                 lines: {
-    //                     show: true
-    //                 }
-    //             },
-    //             yaxis: {
-    //                 lines: {
-    //                     show: false
-    //                 }
-    //             },
-    //             padding: {
-    //                 top: 0,
-    //                 right: -2,
-    //                 bottom: 15,
-    //                 left: 10
-    //             }
-    //         },
-    //         legend: {
-    //             show: true,
-    //             horizontalAlign: "center",
-    //             offsetX: 0,
-    //             offsetY: -5,
-    //             markers: {
-    //                 width: 9,
-    //                 height: 9,
-    //                 radius: 6
-    //             },
-    //             itemMargin: {
-    //                 horizontal: 10,
-    //                 vertical: 0
-    //             }
-    //         },
-    //         plotOptions: {
-    //             bar: {
-    //                 columnWidth: "30%",
-    //                 barHeight: "70%"
-    //             }
-    //         },
-    //         colors: linechartcustomerColorsNew,
-    //         tooltip: {
-    //             shared: true,
-    //             y: [{
-    //                 formatter: function formatter(y) {
-    //                     if (typeof y !== "undefined") {
-    //                         return y.toFixed(0);
-    //                     }
-    //
-    //                     return y;
-    //                 }
-    //             }, {
-    //                 formatter: function formatter(y) {
-    //                     if (typeof y !== "undefined") {
-    //                         return "$" + y.toFixed(2) + "k";
-    //                     }
-    //
-    //                     return y;
-    //                 }
-    //             }, {
-    //                 formatter: function formatter(y) {
-    //                     if (typeof y !== "undefined") {
-    //                         return y.toFixed(0) + " Sales";
-    //                     }
-    //
-    //                     return y;
-    //                 }
-    //             }]
-    //         }
-    //     };
-    //     var chart = new ApexCharts(document.querySelector("#customer-daily-earning-chart"), options);
-    //     chart.render();
-    // }
-
-
+} // Simple Donut Charts
 
 
 var chartDonutBasicColors = getChartColorsArray("store-visits-source");

@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('user_share_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_share_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_share_pair_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_share_pair_id')->constrained('user_share_pairs')->cascadeOnDelete();
             $table->unsignedBigInteger('receiver_id');
             $table->unsignedBigInteger('sender_id');
             $table->double('amount', 15,2)->default(0.00);
@@ -39,6 +39,8 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('user_share_payments');
+        Schema::enableForeignKeyConstraints();
     }
 };

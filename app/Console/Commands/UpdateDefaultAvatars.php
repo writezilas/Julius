@@ -76,7 +76,7 @@ class UpdateDefaultAvatars extends Command
             return Command::SUCCESS;
         }
 
-        if (!$this->confirm('Do you want to update these users to use the new default avatar (images/default.jpg)?')) {
+        if (!$this->confirm('Do you want to update these users to use the new default avatar (assets/images/users/default.jpg)?')) {
             $this->info('Operation cancelled.');
             return Command::SUCCESS;
         }
@@ -92,7 +92,7 @@ class UpdateDefaultAvatars extends Command
         }
 
         $this->info("Successfully updated {$updatedCount} users to use the new default avatar.");
-        $this->info("These users will now see 'images/default.jpg' as their profile picture.");
+        $this->info("These users will now see 'assets/images/users/default.jpg' as their profile picture.");
 
         return Command::SUCCESS;
     }

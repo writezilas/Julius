@@ -61,15 +61,23 @@
                                             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#soldShareDetails{{ $pairedShare->id }}">
                                                 Details
                                             </button>
-                                            @if($payment)
-                                                <div class="modal fade" id="soldShareDetails{{ $pairedShare->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                                    <div class="modal-dialog modal-lg">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="staticBackdropLabel">Payment confirmation</h5>
-                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">
+                                            {{-- FIXED: Always show modal, regardless of payment status --}}
+                                            <div class="modal fade" id="soldShareDetails{{ $pairedShare->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="staticBackdropLabel">
+                                                                @if($payment)
+                                                                    Payment Confirmation
+                                                                @else
+                                                                    Waiting for Payment
+                                                                @endif
+                                                            </h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            @if($payment)
+                                                                {{-- Payment exists - show payment details --}}
                                                                 <table class="table table-bordered">
                                                                     <tbody>
                                                                         <tr>
@@ -95,8 +103,7 @@
                                                                     </tbody>
                                                                 </table>
 
-
-                                                                @if($payment && $payment->status === 'conformed')
+                                                                @if($payment->status === 'conformed')
                                                                     <div class="border border-dashed border-success p-3 my-3">
                                                                         <h3 class="text-center m-0 p-0">Payment completed. Thanks you</h3>
                                                                     </div>
@@ -111,12 +118,31 @@
                                                                         <button type="button" onclick="handlePaymentConformSubmit({{ $payment->id }})" class="btn btn-success mt-3 float-end">Confirm payment</button>
                                                                     </form>
                                                                 @endif
-
-                                                            </div>
+                                                            @else
+                                                                {{-- No payment yet - show waiting message --}}
+                                                                <div class="alert alert-info">
+                                                                    <h5><i class="fas fa-clock me-2"></i>Waiting for Payment</h5>
+                                                                    <p>The buyer has not submitted payment for this pair yet.</p>
+                                                                    <hr>
+                                                                    <h6>Pair Details:</h6>
+                                                                    <ul class="mb-0">
+                                                                        <li><strong>Buyer:</strong> {{ $pairedShare->pairedUserShare->user->name }} ({{ $pairedShare->pairedUserShare->user->username }})</li>
+                                                                        <li><strong>Share Amount:</strong> {{ number_format($pairedShare->share) }}</li>
+                                                                        <li><strong>Paired Date:</strong> {{ $pairedShare->created_at->format('d M Y, H:i') }}</li>
+                                                                        <li><strong>Payment Deadline:</strong> 
+                                                                            @if(\Carbon\Carbon::parse($pairedShare->created_at)->addHours(3) >= now())
+                                                                                <span class="text-success">{{ \Carbon\Carbon::parse($pairedShare->created_at)->addHours(3)->format('d M Y, H:i') }}</span>
+                                                                            @else
+                                                                                <span class="text-danger">Expired ({{ \Carbon\Carbon::parse($pairedShare->created_at)->addHours(3)->format('d M Y, H:i') }})</span>
+                                                                            @endif
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
-                                            @endif
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
