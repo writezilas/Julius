@@ -135,6 +135,19 @@ $pageTitle = __('translation.soldshares');
         gap: 2px;
     }
 }
+
+/* Filter form styling */
+.form-select option {
+    background: #fff !important;
+    color: #000 !important;
+}
+
+.form-select:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
+}</style>
 </style>
 @endsection
 
@@ -242,6 +255,8 @@ $pageTitle = __('translation.soldshares');
             </div>
         </div>
     </div>
+
+
 
     <!-- Referral Bonus Trading Section - Hidden from sold-shares page -->
     {{-- 
@@ -372,7 +387,6 @@ $pageTitle = __('translation.soldshares');
                                         <td>
                                             @if($share->get_from === 'refferal-bonus')
                                                 <span class="text-muted">KSH 0.00</span>
-                                                <br><small class="text-muted">No interest</small>
                                             @else
                                                 KSH {{ number_format($share->profit_share ?? 0, 2) }}
                                             @endif
@@ -380,7 +394,6 @@ $pageTitle = __('translation.soldshares');
                                         <td>
                                             @if($share->get_from === 'refferal-bonus')
                                                 <strong class="text-primary">KSH {{ number_format($share->share_will_get ?? 0, 2) }}</strong>
-                                                <br><small class="text-muted">Face value only</small>
                                             @else
                                                 KSH {{ number_format(($share->share_will_get ?? 0) + ($share->profit_share ?? 0), 2) }}
                                             @endif
