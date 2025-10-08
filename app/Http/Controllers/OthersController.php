@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdminNotification;
 use App\Models\GeneralSetting;
 use App\Models\Log;
 use App\Models\Trade;
 use App\Models\UserShare;
 use App\Models\UserSharePair;
 use App\Models\UserSharePayment;
+use App\Mail\NewSharePurchaseMail;
+use App\Helpers\SettingHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class OthersController extends Controller
 {
@@ -246,9 +250,46 @@ class OthersController extends Controller
                 $log->value = $sharesWillGet;
                 $log->user_id = auth()->user()->id;
                 $createdShare->logs()->save($log);
+                
+                // Create admin notification for new share purchase
+                try {
+                    AdminNotification::newSharePurchase(
+                        $user,
+                        $trade,
+                        $request->amount,
+                        $sharesWillGet,
+                        $ticketNo
+                    );
+                } catch (\Exception $e) {
+                    \Log::warning('Failed to create admin notification for share purchase: ' . $e->getMessage());
+                    // Don't fail the transaction for notification errors
+                }
+                
+                // Send admin email notification for new share purchase
+                try {
+                    $adminEmail = SettingHelper::get('admin_email');
+                    if ($adminEmail && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                        Mail::to($adminEmail)->send(new NewSharePurchaseMail(
+                            $user,
+                            $trade,
+                            $request->amount,
+                            $sharesWillGet,
+                            $ticketNo
+                        ));
+                        \Log::info("Admin email sent successfully for share purchase: {$user->username} - {$ticketNo} to {$adminEmail}");
+                    } else {
+                        \Log::warning("Admin email not configured or invalid - skipping email notification for share purchase: {$user->username} - {$ticketNo}");
+                    }
+                } catch (\Exception $e) {
+                    \Log::error("Failed to send admin email for share purchase {$user->username} - {$ticketNo}: " . $e->getMessage());
+                    // Don't fail the transaction for email errors
+                }
 
                 DB::commit();
                 toastr()->success('Share bought successfully. Navigate to bought shares page and make payment');
+                
+                // Redirect to bought-shares page instead of going back
+                return redirect()->route('users.bought_shares');
                 
             } catch (\Illuminate\Database\QueryException $e) {
                 DB::rollBack();
