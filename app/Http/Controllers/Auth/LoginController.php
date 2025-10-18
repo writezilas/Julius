@@ -7,9 +7,12 @@ use App\Models\Log;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use App\Services\AuthenticationService;
+use App\Services\OnlineUserService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
@@ -188,6 +191,34 @@ class LoginController extends Controller
        }
        
        return view('auth.blocked', compact('user'));
+   }
+   
+   /**
+    * Log the user out of the application.
+    *
+    * @param  \Illuminate\Http\Request  $request
+    * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+    */
+   public function logout(Request $request)
+   {
+       // Remove user from online list before logout
+       if (Auth::check()) {
+           OnlineUserService::removeUserFromOnline(Auth::id());
+       }
+       
+       $this->guard()->logout();
+
+       $request->session()->invalidate();
+
+       $request->session()->regenerateToken();
+
+       if ($response = $this->loggedOut($request)) {
+           return $response;
+       }
+
+       return $request->wantsJson()
+           ? new JsonResponse([], 204)
+           : redirect('/');
    }
 
 }

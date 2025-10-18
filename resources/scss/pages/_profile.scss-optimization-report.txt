@@ -1,0 +1,20 @@
+CSS Optimization Report for _profile.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- &::before
+- 0.8);
+
+            &::before
+- .profile-project-card
+- &.profile-project-#
+- .profile-foreground-img-file-input
+- background-color: transparent;
+
+            &::after
+- &::before
+- &::before
+- &::before
+- .profile-foreground-img-file-input
+- .profile-foreground

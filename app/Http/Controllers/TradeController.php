@@ -120,6 +120,139 @@ class TradeController extends Controller
     }
 
     /**
+     * Show the detailed view of the specified trade with user shares.
+     *
+     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function view($id, Request $request)
+    {
+        $trade = Trade::with(['userShares.user', 'userShares.tradePeriod'])->findOrFail($id);
+        
+        // Build query for user shares related to this trade
+        $query = \App\Models\UserShare::with(['user', 'tradePeriod', 'payments', 'pairedShares'])
+                    ->where('trade_id', $trade->id);
+        
+        // Apply share type filter (bought vs sold)
+        if ($request->filled('share_type') && $request->share_type !== 'all') {
+            if ($request->share_type === 'bought') {
+                // Bought shares: shares purchased by users (get_from = 'purchase')
+                $query->where('get_from', 'purchase');
+            } elseif ($request->share_type === 'sold') {
+                // Sold shares: shares being sold by users (not purchase transactions)
+                $query->where(function($subQuery) {
+                    $subQuery->where('get_from', '!=', 'purchase')
+                             ->orWhere(function($purchaseQuery) {
+                                 // Include purchased shares that are now in selling phase
+                                 $purchaseQuery->where('get_from', 'purchase')
+                                              ->where('status', 'completed')
+                                              ->whereNotNull('start_date')
+                                              ->where('start_date', '!=', '');
+                             });
+                });
+            }
+        }
+        
+        // Apply status filter
+        if ($request->filled('status') && $request->status !== 'all') {
+            if ($request->status === 'running') {
+                // Running shares are completed shares that have been sold and are in countdown phase
+                $query->where('status', 'completed')
+                      ->where('is_ready_to_sell', 0)
+                      ->whereNotNull('selling_started_at')
+                      ->whereHas('pairedShares', function($pairQuery) {
+                          $pairQuery->where('is_paid', 1);
+                      });
+            } else {
+                $query->where('status', $request->status);
+            }
+        }
+        
+        // Apply search filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('ticket_no', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function($userQuery) use ($search) {
+                      $userQuery->where('name', 'LIKE', "%{$search}%")
+                                ->orWhere('username', 'LIKE', "%{$search}%")
+                                ->orWhere('email', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+        
+        // Apply date range filters
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+        
+        // Apply amount filters
+        if ($request->filled('amount_min')) {
+            $query->where('amount', '>=', $request->amount_min);
+        }
+        
+        if ($request->filled('amount_max')) {
+            $query->where('amount', '<=', $request->amount_max);
+        }
+        
+        // Apply sorting
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortOrder = $request->get('sort_order', 'desc');
+        
+        $validSorts = ['created_at', 'ticket_no', 'amount', 'status', 'period', 'share_will_get'];
+        if (in_array($sortBy, $validSorts)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+        
+        // Get paginated results
+        $userShares = $query->paginate(20)->withQueryString();
+        
+        // Get statistics for this trade
+        $stats = [
+            'total_shares' => \App\Models\UserShare::where('trade_id', $trade->id)->count(),
+            'pending_shares' => \App\Models\UserShare::where('trade_id', $trade->id)->where('status', 'pending')->count(),
+            'pairing_shares' => \App\Models\UserShare::where('trade_id', $trade->id)->where('status', 'pairing')->count(),
+            'paired_shares' => \App\Models\UserShare::where('trade_id', $trade->id)->where('status', 'paired')->count(),
+            'running_shares' => \App\Models\UserShare::where('trade_id', $trade->id)
+                                    ->where('status', 'completed')
+                                    ->where('is_ready_to_sell', 0)
+                                    ->whereNotNull('selling_started_at')
+                                    ->whereHas('pairedShares', function($pairQuery) {
+                                        $pairQuery->where('is_paid', 1);
+                                    })->count(),
+            'completed_shares' => \App\Models\UserShare::where('trade_id', $trade->id)->where('status', 'completed')->count(),
+            'failed_shares' => \App\Models\UserShare::where('trade_id', $trade->id)->where('status', 'failed')->count(),
+            'total_amount' => \App\Models\UserShare::where('trade_id', $trade->id)->sum('amount'),
+            // Add bought and sold shares statistics
+            'bought_shares' => \App\Models\UserShare::where('trade_id', $trade->id)
+                                   ->where('get_from', 'purchase')
+                                   ->count(),
+            'sold_shares' => \App\Models\UserShare::where('trade_id', $trade->id)
+                                ->where(function($query) {
+                                    $query->where('get_from', '!=', 'purchase')
+                                          ->orWhere(function($purchaseQuery) {
+                                              $purchaseQuery->where('get_from', 'purchase')
+                                                           ->where('status', 'completed')
+                                                           ->whereNotNull('start_date')
+                                                           ->where('start_date', '!=', '');
+                                          });
+                                })
+                                ->count(),
+        ];
+        
+        $pageTitle = 'Trade Details: ' . $trade->name;
+        
+        return view('admin-panel.trades.view', compact('pageTitle', 'trade', 'userShares', 'stats'));
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Models\Trade  $trade

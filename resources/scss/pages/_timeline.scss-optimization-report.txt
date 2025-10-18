@@ -1,0 +1,60 @@
+CSS Optimization Report for _timeline.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- position: relative;
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+
+    &::after
+- &::before
+- &::after
+- &::before
+- position: relative;
+
+    &::after
+- font-size: 14px;
+        font-weight: $font-weight-medium;
+        margin: 24px 0 0 0;
+        margin-left: 55px;
+
+        &::after
+- &::before
+- .timeline-text
+- margin-left: 0;
+
+            &::after
+- position: relative;
+    width: 100%;
+    margin: 0 auto;
+
+    &::before
+- margin: 227px 0px 0px;
+            background-color: transparent;
+            box-shadow: none;
+
+            &::after
+- min-height: 110px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: $timeline-color;
+
+            &::before
+- transform: rotate(180deg);
+
+                &::before
+- 2.5%);
+
+        &::after
+- &.swiper-button-disabled
+- right: 0;
+
+        &::after
+- left: 0;
+
+        &::after
+- &::before

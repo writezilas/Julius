@@ -100,15 +100,149 @@ $pageTitle = __('translation.boughtshares');
         box-shadow: 0 2px 4px rgba(240, 101, 72, 0.3);
     }
 }
+
+/* Custom background class for admin-allocated shares */
+.bg-success-admin {
+    background-color: #20c997 !important; /* Teal-green shade, different from default success green */
+    color: white !important;
+}
+
+/* Responsive Table Styles */
+.responsive-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.responsive-table {
+    min-width: 1000px; /* Minimum width to ensure readability */
+    width: 100%;
+}
+
+/* Mobile-first responsive approach */
+@media (max-width: 768px) {
+    .responsive-table-wrapper {
+        margin: -15px;
+        margin-top: 0;
+        border-radius: 0;
+    }
+    
+    .responsive-table {
+        min-width: 800px;
+        font-size: 0.875rem;
+    }
+    
+    .responsive-table th,
+    .responsive-table td {
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+    
+    .responsive-table th {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    /* Specific column width optimizations */
+    .responsive-table th:nth-child(1), /* SR No */
+    .responsive-table td:nth-child(1) {
+        width: 50px;
+        text-align: center;
+    }
+    
+    .responsive-table th:nth-child(2), /* Ticket No */
+    .responsive-table td:nth-child(2) {
+        width: 120px;
+    }
+    
+    .responsive-table th:nth-child(3), /* Share Type */
+    .responsive-table td:nth-child(3) {
+        width: 130px;
+    }
+    
+    .responsive-table th:nth-child(4), /* Date */
+    .responsive-table td:nth-child(4) {
+        width: 90px;
+    }
+    
+    .responsive-table th:nth-child(5), /* Amount */
+    .responsive-table td:nth-child(5) {
+        width: 90px;
+    }
+    
+    .responsive-table th:nth-child(6), /* Quantity */
+    .responsive-table td:nth-child(6) {
+        width: 80px;
+    }
+    
+    .responsive-table th:nth-child(7), /* Status */
+    .responsive-table td:nth-child(7) {
+        width: 80px;
+    }
+    
+    .responsive-table th:nth-child(8), /* Payment Deadline */
+    .responsive-table td:nth-child(8) {
+        width: 100px;
+    }
+    
+    .responsive-table th:nth-child(9), /* Action */
+    .responsive-table td:nth-child(9) {
+        width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .responsive-table {
+        min-width: 700px;
+        font-size: 0.8rem;
+    }
+    
+    .responsive-table th,
+    .responsive-table td {
+        padding: 6px 4px;
+    }
+    
+    .payment-deadline-timer {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Scroll indicator for mobile */
+@media (max-width: 768px) {
+    .table-scroll-indicator {
+        position: relative;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .table-scroll-indicator::before {
+        content: '← Scroll horizontally to view all columns →';
+        background: linear-gradient(90deg, transparent, #f8f9fa 20%, #f8f9fa 80%, transparent);
+        padding: 5px 20px;
+        border-radius: 15px;
+        display: inline-block;
+    }
+}
+
+@media (min-width: 769px) {
+    .table-scroll-indicator {
+        display: none;
+    }
+}
 </style>
 @endsection
 
 @section('content')
-    @component('components.breadcrumb')
-        @slot('li_1') @lang('translation.dashboard') @endslot
-        @slot('title') {{$pageTitle}} @endslot
-    @endcomponent
-
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-xl-2 col-md-6 col-sm-6 mb-3">
@@ -216,8 +350,9 @@ $pageTitle = __('translation.boughtshares');
                     <h5 class="card-title mb-0">{{$pageTitle}}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="alternative-pagination" class="table align-middle table-hover table-bordered" style="width:100%">
+                    <div class="table-scroll-indicator"></div>
+                    <div class="responsive-table-wrapper">
+                        <table id="alternative-pagination" class="table align-middle table-hover table-bordered responsive-table" style="width:100%">
                             <thead>
                             <tr>
                                 <th>SR No.</th>
@@ -266,7 +401,7 @@ $pageTitle = __('translation.boughtshares');
                                             @if($share->get_from === 'allocated-by-admin')
                                                 {{-- Admin-allocated shares don't have payment deadlines --}}
                                                 <span class="countdown-timer completed" style="color: #28a745; font-weight: bold;">
-                                                    <i class="fas fa-gift me-1"></i>Admin Allocated
+                                                    <i class="fas fa-gift me-1"></i>Payment Made
                                                 </span>
                                             @elseif($share->status === 'failed')
                                                 <span class="countdown-timer" style="color: #e74c3c;">Payment Expired</span>
@@ -312,6 +447,7 @@ $pageTitle = __('translation.boughtshares');
                             @endif
                             </tbody>
                         </table>
+                    </div>
                     </div>
                 </div>
             </div>

@@ -1,0 +1,22 @@
+CSS Optimization Report for _alerts.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .alert-link
+- // alert borderless
+
+.alert-borderless
+- // Alert border left example
+
+.alert-border-left
+- &.alert-#
+- &.alert-#
+- &.alert-#
+- &.alert-#
+- &.alert-#
+- &.alert-#
+- &.alert-#
+- &.alert-#
+- background: transparent !important;
+        &::after

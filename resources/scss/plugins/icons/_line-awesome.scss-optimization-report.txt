@@ -1,0 +1,56 @@
+CSS Optimization Report for _line-awesome.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .lar
+- .lal
+- .lad
+- .lab
+- .la-lg
+- .la-xs
+- .la-sm
+- .la-1x
+- .la-2x
+- .la-3x
+- .la-4x
+- .la-5x
+- .la-6x
+- .la-7x
+- .la-8x
+- .la-9x
+- .la-10x
+- .la-fw
+- .la-ul
+- .la-ul > li
+- .la-li
+- .la-border
+- .la-pull-left
+- .la-pull-right
+- .lar.la-pull-left
+- .lal.la-pull-left
+- .lab.la-pull-left
+- .lar.la-pull-right
+- .lal.la-pull-right
+- .lab.la-pull-right
+- .la-spin
+- .la-pulse
+- 0%
+- 100%
+- 0%
+- 100%
+- .la-rotate-90
+- .la-rotate-180
+- .la-rotate-270
+- .la-flip-horizontal
+- .la-flip-vertical
+- .la-flip-both
+- .la-flip-horizontal.la-flip-vertical
+- .la-stack
+- .la-stack-1x
+- .la-stack-2x
+- .la-stack-1x
+- .la-stack-2x
+- .la-inverse
+- .lab
+- .lar

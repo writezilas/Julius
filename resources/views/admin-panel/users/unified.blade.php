@@ -25,6 +25,60 @@
 .stats-card.active { border-left-color: #28a745; }
 .stats-card.blocked { border-left-color: #dc3545; }
 .stats-card.suspended { border-left-color: #ffc107; }
+.stats-card.online { border-left-color: #17a2b8; }
+
+/* Live Users Card Styles */
+.live-users-card {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.online-user-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.online-user-item:hover {
+    background: rgba(23, 162, 184, 0.05);
+    padding-left: 1rem;
+    border-radius: 8px;
+}
+
+.online-user-item:last-child {
+    border-bottom: none;
+}
+
+.online-indicator {
+    width: 10px;
+    height: 10px;
+    background: #28a745;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    border: 2px solid white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+.last-activity {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.refresh-btn {
+    transition: transform 0.3s ease;
+}
+
+.refresh-btn.spinning {
+    transform: rotate(360deg);
+}
 </style>
 @endsection
 
@@ -36,7 +90,7 @@
 
 <!-- Statistics Cards -->
 <div class="row mb-4">
-    <div class="col-xxl-3 col-md-6">
+    <div class="col-xxl-2 col-md-4">
         <div class="card stats-card">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -56,7 +110,7 @@
         </div>
     </div>
     
-    <div class="col-xxl-3 col-md-6">
+    <div class="col-xxl-2 col-md-4">
         <div class="card stats-card active">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -76,7 +130,7 @@
         </div>
     </div>
     
-    <div class="col-xxl-3 col-md-6">
+    <div class="col-xxl-2 col-md-4">
         <div class="card stats-card suspended">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -96,7 +150,7 @@
         </div>
     </div>
     
-    <div class="col-xxl-3 col-md-6">
+    <div class="col-xxl-2 col-md-4">
         <div class="card stats-card blocked">
             <div class="card-body">
                 <div class="d-flex align-items-center">
@@ -115,7 +169,93 @@
             </div>
         </div>
     </div>
+    
+    <div class="col-xxl-4 col-md-12">
+        <div class="card stats-card online">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            <div class="avatar-sm bg-info bg-gradient rounded">
+                                <div class="avatar-title text-white fs-16">
+                                    <i class="ri-user-line"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h5 class="mb-1" id="online-count">{{ $onlineUsersCount }}</h5>
+                            <p class="text-muted mb-0">Online Now</p>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <button class="btn btn-sm btn-outline-info refresh-btn" onclick="refreshOnlineUsers()" title="Refresh">
+                            <i class="ri-refresh-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+{{-- Live Users Detailed Card - Hidden --}}
+{{-- <div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0">
+                        <i class="ri-broadcast-line me-2 text-info"></i>
+                        Live Users Activity
+                        <span class="badge bg-success ms-2" id="live-count-badge">{{ $onlineUsersCount }}</span>
+                    </h5>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted" id="last-updated">Last updated: now</small>
+                        <button class="btn btn-sm btn-soft-info" onclick="refreshOnlineUsers()" id="refresh-live-users">
+                            <i class="ri-refresh-line me-1"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body live-users-card">
+                <div id="online-users-container">
+                    @forelse($onlineUsers as $user)
+                    <div class="online-user-item d-flex align-items-center" data-user-id="{{ $user['id'] }}">
+                        <div class="flex-shrink-0 position-relative">
+                            @if(isset($user['avatar']) && $user['avatar'])
+                                <img src="{{ URL::asset($user['avatar']) }}" alt="{{ $user['name'] }}" class="avatar-sm rounded-circle">
+                            @else
+                                <div class="avatar-sm">
+                                    <div class="avatar-title bg-soft-info text-info rounded-circle">
+                                        {{ substr($user['name'], 0, 1) }}
+                                    </div>
+                                </div>
+                            @endif
+                            <span class="online-indicator"></span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 fs-14">{{ $user['name'] }}</h6>
+                            <p class="text-muted mb-0 fs-12">{{ '@' . $user['username'] }}</p>
+                            @if(isset($user['last_seen']))
+                            <p class="last-activity mb-0">Active {{ \Carbon\Carbon::parse($user['last_seen'])->diffForHumans() }}</p>
+                            @endif
+                        </div>
+                        <div class="flex-shrink-0">
+                            <span class="badge bg-success-subtle text-success">Online</span>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center py-4" id="no-users-message">
+                        <i class="ri-user-unfollow-line fs-1 text-muted mb-2"></i>
+                        <h6 class="text-muted mb-1">No Users Online</h6>
+                        <p class="text-muted fs-14 mb-0">No users are currently active</p>
+                    </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </div>
+</div> --}}
 
 <div class="row">
     <div class="col-lg-12">
@@ -301,6 +441,7 @@
 <script src="{{ URL::asset('assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 
 <script>
 $(document).ready(function() {
@@ -339,6 +480,10 @@ $(document).ready(function() {
     $('#status-filter').on('change', function() {
         applyFilters();
     });
+    
+    // Initialize auto-refresh for online users
+    refreshOnlineUsers();
+    setInterval(refreshOnlineUsers, 30000); // Refresh every 30 seconds
 });
 
 function applyFilters() {
@@ -441,5 +586,98 @@ $('#block-form').on('submit', function(e) {
     updateUserStatus(userId, 'blocked', duration);
     $('#blockModal').modal('hide');
 });
+
+// Online Users Refresh Function
+function refreshOnlineUsers() {
+    // Add spinning animation to refresh buttons
+    $('.refresh-btn').addClass('spinning');
+    $('#refresh-live-users').prop('disabled', true);
+    
+    $.ajax({
+        url: '{{ route("admin.api.online-users") }}',
+        method: 'GET',
+        success: function(response) {
+            // Update counters
+            $('#online-count').text(response.count);
+            $('#live-count-badge').text(response.count);
+            
+            // Update last updated time
+            $('#last-updated').text('Last updated: ' + new Date().toLocaleTimeString());
+            
+            // Update online users list
+            updateOnlineUsersList(response.users);
+            
+        },
+        error: function(xhr, status, error) {
+            console.error('Failed to refresh online users:', error);
+        },
+        complete: function() {
+            // Remove spinning animation
+            setTimeout(() => {
+                $('.refresh-btn').removeClass('spinning');
+                $('#refresh-live-users').prop('disabled', false);
+            }, 500);
+        }
+    });
+}
+
+// Update the online users list in the DOM
+function updateOnlineUsersList(users) {
+    const container = $('#online-users-container');
+    
+    if (users.length === 0) {
+        container.html(`
+            <div class="text-center py-4" id="no-users-message">
+                <i class="ri-user-unfollow-line fs-1 text-muted mb-2"></i>
+                <h6 class="text-muted mb-1">No Users Online</h6>
+                <p class="text-muted fs-14 mb-0">No users are currently active</p>
+            </div>
+        `);
+        return;
+    }
+    
+    let html = '';
+    users.forEach(function(user) {
+        const lastSeen = user.last_seen ? getTimeAgo(user.last_seen) : 'Just now';
+        const avatar = user.avatar ? 
+            `<img src="{{ URL::asset('') }}${user.avatar}" alt="${user.name}" class="avatar-sm rounded-circle">` :
+            `<div class="avatar-sm">
+                <div class="avatar-title bg-soft-info text-info rounded-circle">
+                    ${user.name.charAt(0).toUpperCase()}
+                </div>
+            </div>`;
+            
+        html += `
+            <div class="online-user-item d-flex align-items-center" data-user-id="${user.id}">
+                <div class="flex-shrink-0 position-relative">
+                    ${avatar}
+                    <span class="online-indicator"></span>
+                </div>
+                <div class="flex-grow-1 ms-3">
+                    <h6 class="mb-1 fs-14">${user.name}</h6>
+                    <p class="text-muted mb-0 fs-12">@${user.username}</p>
+                    <p class="last-activity mb-0">Active ${lastSeen}</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <span class="badge bg-success-subtle text-success">Online</span>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.html(html);
+}
+
+// Helper function to get time ago
+function getTimeAgo(dateString) {
+    const now = new Date();
+    const date = new Date(dateString);
+    const seconds = Math.floor((now - date) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hr ago';
+    return Math.floor(seconds / 86400) + ' day ago';
+}
 </script>
 @endsection

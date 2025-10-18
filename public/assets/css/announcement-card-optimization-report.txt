@@ -1,0 +1,14 @@
+CSS Optimization Report for announcement-card.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .announcement-status
+- .announcement-priority-high
+- .announcement-priority-medium
+- .announcement-priority-low
+- .announcement-loading
+- from
+- to
+- from
+- to

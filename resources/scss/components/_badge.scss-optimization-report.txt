@@ -1,0 +1,15 @@
+CSS Optimization Report for _badge.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- // Outline badge
+@mixin badge-variant-outline($bg)
+- .badge-outline-#
+- .badge-soft-#
+- &.badge-#
+- &.bg-#
+- // badge-border
+
+.badge-border
+- #

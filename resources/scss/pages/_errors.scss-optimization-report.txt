@@ -1,0 +1,12 @@
+CSS Optimization Report for _errors.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 0%
+- 15%
+- 30%
+- 45%
+- 60%
+- 75%
+- 100%

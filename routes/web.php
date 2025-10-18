@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminNotificationController;
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\GeneralSettingController;
 use App\Http\Controllers\Admin\PolicyController;
@@ -68,6 +69,11 @@ Route::get('cache-clear', function () {
     return 'success';
 });
 
+// Payment Modal Light Mode Fix Test Route
+Route::get('/test-payment-modal-fix', function () {
+    return view('test-payment-modal-fix');
+})->middleware('auth')->name('test.payment.modal.fix');
+
 // Public policy pages - accessible without authentication
 Route::get('/privacy-policy', [HomeController::class, 'privacyPolicy'])->name('page.privacy_policy');
 Route::get('/terms-and-conditions', [HomeController::class, 'termsAndConditions'])->name('page.termsAndConditions');
@@ -80,6 +86,20 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
     Route::prefix('admin')->group(function () {
         Route::get('permission-sync', [PermissionController::class, 'update']);
         Route::get('/', [HomeController::class, 'index'])->name('admin.index');
+        
+        // Admin Notifications Routes
+        Route::prefix('notifications')->name('admin.notifications.')->group(function () {
+            Route::get('/recent', [AdminNotificationController::class, 'recent'])->name('recent');
+            Route::get('/unread', [AdminNotificationController::class, 'unread'])->name('unread');
+            Route::get('/count', [AdminNotificationController::class, 'count'])->name('count');
+            Route::post('/{id}/mark-as-read', [AdminNotificationController::class, 'markAsRead'])->name('mark-as-read');
+            Route::post('/mark-all-as-read', [AdminNotificationController::class, 'markAllAsRead'])->name('mark-all-as-read');
+            
+            // Debug route (remove in production)
+            Route::get('/debug', function () {
+                return view('admin-notification-debug');
+            })->name('debug');
+        });
 
         Route::prefix('roles')->group(function () {
             Route::get('/', [RoleController::class, 'index'])->middleware('permission:role-index')->name('admin.role.index');
@@ -114,6 +134,7 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
             Route::get('/', 'index')->name('admin.trade.index')->middleware('permission:trade-index');
             Route::get('/create', 'create')->name('admin.trade.create')->middleware('permission:trade-create');
             Route::post('/', 'store')->name('admin.trade.store')->middleware('permission:trade-create');
+            Route::get('/{id}/view', 'view')->name('admin.trade.view')->middleware('permission:trade-index');
             Route::get('/{id}/edit', 'edit')->name('admin.trade.edit')->middleware('permission:trade-edit');
             Route::patch('/{id}', 'update')->name('admin.trade.update')->middleware('permission:trade-update');
             Route::get('/delete/{id}', 'destroy')->name('admin.trade.delete')->middleware('permission:trade-delete');
@@ -154,6 +175,35 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
         Route::post('sms/send', [AnnouncementController::class, 'sendSms'])->name('sms.send')->middleware('permission:send-sms');
         Route::get('support', [SupportController::class, 'supportsForAdmin'])->name('admin.support')->middleware('permission:support-index');
         Route::post('support/toggle-form', [SupportController::class, 'toggleSupportForm'])->name('admin.support.toggleForm');
+        Route::get('support/{id}/details', [SupportController::class, 'getSupportDetails'])->name('admin.support.details')->middleware('permission:support-view');
+        Route::post('support/{id}/reply', [SupportController::class, 'sendAdminReply'])->name('admin.support.reply')->middleware('permission:support-view');
+        
+        // Test route for support notifications (remove in production)
+        Route::get('test/support-notification', function() {
+            if (auth()->check() && auth()->user()->role_id != 2) {
+                $testSupport = new \App\Models\Support([
+                    'id' => 999,
+                    'user_id' => auth()->user()->id,
+                    'first_name' => 'Test',
+                    'last_name' => 'User',
+                    'email' => 'test@example.com',
+                    'number' => '1234567890',
+                    'username' => auth()->user()->username,
+                    'message' => 'This is a test support request to verify notifications are working properly.',
+                    'created_at' => now()
+                ]);
+                
+                $notification = \App\Models\AdminNotification::newSupportRequest($testSupport, auth()->user());
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Test support notification created',
+                    'notification_id' => $notification->id
+                ]);
+            }
+            
+            return response()->json(['error' => 'Unauthorized'], 403);
+        })->middleware('auth');
 
         Route::get('set/min-max-trading-amount', [GeneralSettingController::class, 'updateTradingPrice'])->name('admin.updateTradingPrice')->middleware('permission:set-min-max-trading-amount-view');
         Route::post('set/min-max-trading-amount', [GeneralSettingController::class, 'saveTradingPrice'])->name('admin.saveTradingPrice')->middleware('permission:set-min-max-trading-amount-update');
@@ -180,6 +230,50 @@ Route::group(['middleware' => ['auth', 'if_user_blocked', 'checkSessionExpiratio
         
         // Unified User Management Route (placed before other user routes to avoid conflicts)
         Route::get('users-management', [UserController::class, 'unifiedIndex'])->name('admin.users.unified')->middleware('permission:customer-index');
+        
+        // Online Users API Route
+        Route::get('api/online-users', [UserController::class, 'getOnlineUsers'])->name('admin.api.online-users')->middleware('permission:customer-index');
+        
+        // Debug Online Users Route
+        Route::get('debug/online-users', [UserController::class, 'debugOnlineUsers'])->name('admin.debug.online-users')->middleware('permission:customer-index');
+        
+        // Test Online Users Route
+        Route::get('test/track-user', function() {
+            if (auth()->check()) {
+                $user = auth()->user();
+                
+                // Manually track the user
+                $userData = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'avatar' => $user->avatar,
+                    'email' => $user->email,
+                    'last_seen' => now(),
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent(),
+                ];
+                
+                $cacheKey = 'user_online_' . $user->id;
+                \Cache::put($cacheKey, $userData, now()->addMinutes(5));
+                
+                // Update the keys list
+                $keys = \Cache::get('online_users_keys', []);
+                if (!in_array($cacheKey, $keys)) {
+                    $keys[] = $cacheKey;
+                    \Cache::put('online_users_keys', $keys, now()->addMinutes(10));
+                }
+                
+                return response()->json([
+                    'status' => 'User tracked manually',
+                    'user' => $user->only(['id', 'username', 'role_id']),
+                    'cache_key' => $cacheKey,
+                    'keys_count' => count($keys)
+                ]);
+            }
+            
+            return response()->json(['error' => 'User not authenticated']);
+        })->middleware('auth');
         
         // Redirect old user management URLs to unified interface
         Route::get('users/all', function() {

@@ -1,0 +1,239 @@
+/**
+ * iOS Safari Payment Modal Compatibility Fixes
+ * Addresses specific issues with payment modals on iOS devices
+ */
+
+/* iOS Detection and Base Fixes */
+@supports (-webkit-touch-callout: none) {
+    /* This targets iOS Safari specifically */
+    
+    /* Fix modal backdrop issues */
+    .modal-backdrop {
+        background: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Remove problematic backdrop filters from modal content */
+    .afresh-payment-modal .modal-backdrop,
+    .compact-payment-modal .modal-backdrop,
+    .clean-payment-modal .modal-backdrop {
+        background: rgba(0, 0, 0, 0.5) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Fix modal content positioning */
+    .modal-content {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+    
+    /* Ensure modal shows above everything else */
+    .modal {
+        z-index: 9999 !important;
+    }
+    
+    .modal-backdrop {
+        z-index: 9998 !important;
+    }
+    
+    /* Fix glassmorphism effects that don't work on iOS */
+    .afresh-modal-content,
+    .compact-modal-content,
+    .clean-modal-content {
+        background: rgba(255, 255, 255, 0.95) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    }
+    
+    /* Fix modal header */
+    .afresh-modal-header,
+    .compact-modal-header,
+    .clean-modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Fix modal body */
+    .afresh-modal-body,
+    .compact-modal-body,
+    .clean-modal-body {
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+    }
+    
+    /* Fix close button */
+    .afresh-close-btn {
+        background: rgba(255, 255, 255, 0.3) !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    }
+    
+    /* Fix modal animations that cause issues on iOS */
+    .modal.fade .modal-dialog {
+        transform: translate3d(0, -50px, 0) !important;
+        transition: transform 0.3s ease-out !important;
+        -webkit-transform: translate3d(0, -50px, 0) !important;
+        -webkit-transition: -webkit-transform 0.3s ease-out !important;
+    }
+    
+    .modal.show .modal-dialog {
+        transform: translate3d(0, 0, 0) !important;
+        -webkit-transform: translate3d(0, 0, 0) !important;
+    }
+}
+
+/* Mobile-specific fixes for all devices */
+@media only screen and (max-width: 768px) {
+    /* Ensure modal is properly positioned on mobile */
+    .modal {
+        padding: 0 !important;
+        z-index: 9999 !important;
+    }
+    
+    .modal-dialog {
+        margin: 10px !important;
+        max-width: calc(100% - 20px) !important;
+        max-height: calc(100vh - 20px) !important;
+    }
+    
+    /* Fix modal content for mobile */
+    .modal-content {
+        max-height: calc(100vh - 40px) !important;
+        overflow: hidden !important;
+    }
+    
+    /* Make modal body scrollable on mobile */
+    .afresh-modal-body,
+    .compact-modal-body,
+    .clean-modal-body {
+        max-height: calc(100vh - 200px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Fix button sizes for touch */
+    .btn-sm {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        padding: 8px 16px !important;
+    }
+    
+    /* Fix input fields for mobile */
+    .form-control {
+        min-height: 44px !important;
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+    
+    /* Fix close button for touch */
+    .btn-close,
+    .afresh-close-btn {
+        min-height: 44px !important;
+        min-width: 44px !important;
+    }
+}
+
+/* iOS Safari specific touch fixes */
+@media only screen and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 2) {
+    /* iPhone specific fixes */
+    
+    /* Fix modal positioning on iPhone */
+    .modal-dialog-centered {
+        min-height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* Fix viewport issues */
+    .modal {
+        padding-top: env(safe-area-inset-top, 0) !important;
+        padding-bottom: env(safe-area-inset-bottom, 0) !important;
+    }
+    
+    /* Ensure touch events work properly */
+    .modal-content,
+    .modal-header,
+    .modal-body,
+    .modal-footer,
+    .btn {
+        -webkit-tap-highlight-color: transparent !important;
+        cursor: pointer !important;
+    }
+    
+    /* Fix button touch targets */
+    button,
+    .btn,
+    [data-bs-toggle],
+    [data-bs-dismiss] {
+        min-height: 44px !important;
+        min-width: 44px !important;
+        -webkit-appearance: none !important;
+        -webkit-tap-highlight-color: transparent !important;
+    }
+}
+
+/* Fix for iOS Safari version specific issues */
+@supports not (backdrop-filter: blur(1px)) {
+    /* Fallback for browsers that don't support backdrop-filter */
+    .afresh-modal-content,
+    .compact-modal-content,
+    .clean-modal-content {
+        background: rgba(255, 255, 255, 0.95) !important;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+    }
+    
+    .afresh-modal-header,
+    .compact-modal-header,
+    .clean-modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    }
+    
+    .afresh-modal-body,
+    .compact-modal-body,
+    .clean-modal-body {
+        background: white !important;
+    }
+}
+
+/* Force hardware acceleration for smoother animations on iOS */
+.modal,
+.modal-dialog,
+.modal-content {
+    -webkit-transform: translateZ(0) !important;
+    transform: translateZ(0) !important;
+    -webkit-backface-visibility: hidden !important;
+    backface-visibility: hidden !important;
+}
+
+/* Fix for dark mode on iOS */
+@media (prefers-color-scheme: dark) {
+    .modal-content {
+        background: rgba(40, 44, 52, 0.95) !important;
+        color: white !important;
+    }
+    
+    .afresh-modal-body,
+    .compact-modal-body,
+    .clean-modal-body {
+        background: rgba(40, 44, 52, 0.98) !important;
+        color: white !important;
+    }
+}
+
+/* Debug styles for testing (remove in production) */
+.ios-debug .modal {
+    border: 3px solid red !important;
+}
+
+.ios-debug .modal-backdrop {
+    border: 3px solid blue !important;
+}
+
+.ios-debug .modal-content {
+    border: 3px solid green !important;
+}

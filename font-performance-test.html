@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Material Design Icons - Performance Test</title>
+    
+    <!-- Preload the WOFF2 font for better performance -->
+    <link rel="preload" href="public/assets/fonts/materialdesignicons-webfont.woff2" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Load the optimized icons CSS -->
+    <link href="public/assets/css/icons.min.css" rel="stylesheet" type="text/css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .performance-info {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .icon-test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .icon-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            transition: background-color 0.2s;
+        }
+        
+        .icon-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .icon-item i {
+            font-size: 32px;
+            color: #414487;
+            margin-bottom: 8px;
+        }
+        
+        .icon-name {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            word-break: break-all;
+        }
+        
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .metric {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .metric h3 {
+            margin: 0 0 8px 0;
+            color: #2e7d32;
+            font-size: 14px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1b5e20;
+        }
+        
+        .loading-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #414487;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            display: none;
+        }
+        
+        .optimization-list {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .optimization-list h3 {
+            color: #856404;
+            margin: 0 0 10px 0;
+        }
+        
+        .optimization-list ul {
+            margin: 0;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="performance-info">
+        <h1>Material Design Icons - Performance Test</h1>
+        <p>This page tests the loading performance of Material Design Icons after optimization.</p>
+        
+        <div class="performance-metrics">
+            <div class="metric">
+                <h3>Font Load Time</h3>
+                <div class="metric-value" id="fontLoadTime">Measuring...</div>
+            </div>
+            <div class="metric">
+                <h3>Page Load Time</h3>
+                <div class="metric-value" id="pageLoadTime">Measuring...</div>
+            </div>
+            <div class="metric">
+                <h3>Icons Rendered</h3>
+                <div class="metric-value" id="iconCount">50+</div>
+            </div>
+            <div class="metric">
+                <h3>Font Format</h3>
+                <div class="metric-value">WOFF2</div>
+            </div>
+        </div>
+        
+        <div class="optimization-list">
+            <h3>Applied Optimizations:</h3>
+            <ul>
+                <li>✅ Added font-display: swap for better perceived performance</li>
+                <li>✅ Preloaded WOFF2 font file for faster loading</li>
+                <li>✅ Optimized font format order (WOFF2 first)</li>
+                <li>✅ Added font compression via mod_deflate</li>
+                <li>✅ Set proper caching headers (1 year expiry)</li>
+                <li>✅ Added correct MIME types for fonts</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="loading-indicator" id="loadingIndicator">
+        Loading icons...
+    </div>
+
+    <div class="icon-test-grid">
+        <!-- Common icons used in the application -->
+        <div class="icon-item">
+            <i class="mdi mdi-account"></i>
+            <span class="icon-name">mdi-account</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-home"></i>
+            <span class="icon-name">mdi-home</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-car"></i>
+            <span class="icon-name">mdi-car</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-credit-card"></i>
+            <span class="icon-name">mdi-credit-card</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-calendar"></i>
+            <span class="icon-name">mdi-calendar</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-bell"></i>
+            <span class="icon-name">mdi-bell</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-settings"></i>
+            <span class="icon-name">mdi-settings</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-menu"></i>
+            <span class="icon-name">mdi-menu</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-search"></i>
+            <span class="icon-name">mdi-search</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-close"></i>
+            <span class="icon-name">mdi-close</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-check"></i>
+            <span class="icon-name">mdi-check</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-plus"></i>
+            <span class="icon-name">mdi-plus</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-edit"></i>
+            <span class="icon-name">mdi-edit</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-delete"></i>
+            <span class="icon-name">mdi-delete</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-download"></i>
+            <span class="icon-name">mdi-download</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-upload"></i>
+            <span class="icon-name">mdi-upload</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-email"></i>
+            <span class="icon-name">mdi-email</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-phone"></i>
+            <span class="icon-name">mdi-phone</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-map-marker"></i>
+            <span class="icon-name">mdi-map-marker</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-star"></i>
+            <span class="icon-name">mdi-star</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-heart"></i>
+            <span class="icon-name">mdi-heart</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-eye"></i>
+            <span class="icon-name">mdi-eye</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-lock"></i>
+            <span class="icon-name">mdi-lock</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-key"></i>
+            <span class="icon-name">mdi-key</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-shield"></i>
+            <span class="icon-name">mdi-shield</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-information"></i>
+            <span class="icon-name">mdi-information</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-alert"></i>
+            <span class="icon-name">mdi-alert</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-help"></i>
+            <span class="icon-name">mdi-help</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-bookmark"></i>
+            <span class="icon-name">mdi-bookmark</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-briefcase"></i>
+            <span class="icon-name">mdi-briefcase</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-chart-line"></i>
+            <span class="icon-name">mdi-chart-line</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-clipboard"></i>
+            <span class="icon-name">mdi-clipboard</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-cash"></i>
+            <span class="icon-name">mdi-cash</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-bank"></i>
+            <span class="icon-name">mdi-bank</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-currency-usd"></i>
+            <span class="icon-name">mdi-currency-usd</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-gavel"></i>
+            <span class="icon-name">mdi-gavel</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-certificate"></i>
+            <span class="icon-name">mdi-certificate</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-file-document"></i>
+            <span class="icon-name">mdi-file-document</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-timer"></i>
+            <span class="icon-name">mdi-timer</span>
+        </div>
+        <div class="icon-item">
+            <i class="mdi mdi-clock"></i>
+            <span class="icon-name">mdi-clock</span>
+        </div>
+    </div>
+
+    <script>
+        // Performance monitoring
+        let startTime = performance.now();
+        let loadingIndicator = document.getElementById('loadingIndicator');
+        
+        // Show loading indicator
+        loadingIndicator.style.display = 'block';
+        
+        // Check if font is loaded
+        function checkFontLoad() {
+            // Use font loading API if available
+            if ('fonts' in document) {
+                document.fonts.load('24px Material Design Icons').then(function() {
+                    let fontLoadTime = performance.now() - startTime;
+                    document.getElementById('fontLoadTime').textContent = Math.round(fontLoadTime) + 'ms';
+                    loadingIndicator.style.display = 'none';
+                }).catch(function() {
+                    document.getElementById('fontLoadTime').textContent = 'Load Failed';
+                    loadingIndicator.style.display = 'none';
+                });
+            } else {
+                // Fallback for older browsers
+                setTimeout(function() {
+                    document.getElementById('fontLoadTime').textContent = 'Legacy Load';
+                    loadingIndicator.style.display = 'none';
+                }, 1000);
+            }
+        }
+        
+        // Page load time
+        window.addEventListener('load', function() {
+            let pageLoadTime = performance.now() - startTime;
+            document.getElementById('pageLoadTime').textContent = Math.round(pageLoadTime) + 'ms';
+            checkFontLoad();
+        });
+        
+        // Count icons
+        document.addEventListener('DOMContentLoaded', function() {
+            let iconCount = document.querySelectorAll('.mdi').length;
+            document.getElementById('iconCount').textContent = iconCount;
+        });
+    </script>
+</body>
+</html>

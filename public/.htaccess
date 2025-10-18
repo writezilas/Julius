@@ -1,3 +1,92 @@
+# Performance Optimization - Compression
+<IfModule mod_deflate.c>
+    # Compress CSS, JS, HTML, XML, and other text files
+    <FilesMatch "\.(css|js|html|htm|php|xml|txt|json)$">
+        SetOutputFilter DEFLATE
+    </FilesMatch>
+    
+    # Compress font files
+    <FilesMatch "\.(eot|woff|woff2|ttf|svg)$">
+        SetOutputFilter DEFLATE
+    </FilesMatch>
+    
+    # Enable compression for specific MIME types
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# Performance Optimization - Caching Headers
+<IfModule mod_expires.c>
+    ExpiresActive on
+    
+    # CSS and JS files - Cache for 1 month
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    
+    # Images - Cache for 6 months
+    ExpiresByType image/png "access plus 6 months"
+    ExpiresByType image/jpg "access plus 6 months"
+    ExpiresByType image/jpeg "access plus 6 months"
+    ExpiresByType image/gif "access plus 6 months"
+    ExpiresByType image/webp "access plus 6 months"
+    ExpiresByType image/svg+xml "access plus 6 months"
+    
+    # Fonts - Cache for 1 year
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/eot "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    
+    # HTML and other dynamic content
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType application/json "access plus 1 hour"
+</IfModule>
+
+# Add proper MIME types
+<IfModule mod_mime.c>
+    # Fonts
+    AddType font/woff2 .woff2
+    AddType font/woff .woff
+    AddType font/ttf .ttf
+    AddType font/eot .eot
+    
+    # CSS and JS
+    AddType text/css .css
+    AddType application/javascript .js
+    
+    # Images
+    AddType image/webp .webp
+</IfModule>
+
+# Performance Headers
+<IfModule mod_headers.c>
+    # Add Vary: Accept-Encoding header for compressed content
+    <FilesMatch "\.(js|css|xml|gz|html)$">
+        Header append Vary: Accept-Encoding
+    </FilesMatch>
+    
+    # Security headers
+    Header always set X-Content-Type-Options nosniff
+    Header always set X-Frame-Options DENY
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Cache-Control headers for better caching
+    <FilesMatch "\.(css|js|png|jpg|jpeg|gif|webp|svg|woff|woff2|ttf|eot)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

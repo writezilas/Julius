@@ -377,6 +377,38 @@
     </div>
     <!--end row-->
 @endsection
+
+@section('css')
+<style>
+/* Fix inactive tab text contrast on profile page */
+.nav-tabs-custom .nav-item .nav-link {
+    color: white !important; /* Make inactive tab text white for better contrast */
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs-custom .nav-item .nav-link.active {
+    color: white !important; /* Active tab text should be white on primary background */
+    background-color: var(--bs-primary) !important; /* Ensure primary background is applied */
+    font-weight: 600;
+}
+
+.nav-tabs-custom .nav-item .nav-link:hover {
+    color: rgba(255, 255, 255, 0.8) !important; /* Slightly transparent white on hover */
+}
+
+.nav-tabs-custom .nav-item .nav-link.active:hover {
+    color: white !important; /* Active tab hover keeps white text */
+    background-color: var(--bs-primary) !important;
+}
+
+/* Ensure icons in tabs also have proper contrast */
+.nav-tabs-custom .nav-item .nav-link i {
+    color: inherit;
+}
+</style>
+@endsection
+
 @section('script')
     <script src="{{ URL::asset('assets/js/pages/profile-setting.init.js') }}"></script>
     <script>

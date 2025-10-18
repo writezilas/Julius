@@ -1,0 +1,102 @@
+/* Microsoft Logo Blur Override for Authentication Pages */
+.auth-one-bg::after {
+    content: '';
+    position: absolute;
+    /* Adjust these coordinates to match Microsoft logo position in your background image */
+    top: 15%; /* Adjust based on actual logo position */
+    right: 10%; /* Adjust based on actual logo position */
+    width: 150px; /* Adjust based on actual logo size */
+    height: 150px; /* Adjust based on actual logo size */
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: blur(20px) brightness(1.1);
+    z-index: 2;
+    border-radius: 15px;
+    opacity: 0.95;
+}
+
+/* Auto Bidder Logo Styling */
+.autobidder-logo {
+    max-width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+/* Logo sizing for different contexts */
+.logo-sm .autobidder-logo {
+    max-height: 32px;
+    width: auto;
+}
+
+.logo-lg .autobidder-logo {
+    max-height: 40px;
+    width: auto;
+}
+
+/* Authentication page logo styling */
+.auth-logo-img {
+    filter: brightness(0) invert(1);
+    max-height: 45px;
+    width: auto;
+}
+
+/* Logo visibility for light and dark modes */
+.logo-dark .autobidder-logo,
+[data-layout-mode="light"] .logo-dark .autobidder-logo {
+    display: inline-block;
+}
+
+.logo-light .autobidder-logo,
+[data-layout-mode="dark"] .logo-light .autobidder-logo {
+    display: none;
+}
+
+/* Dark mode logo visibility */
+[data-layout-mode="dark"] .logo-dark .autobidder-logo {
+    display: none;
+}
+
+[data-layout-mode="dark"] .logo-light .autobidder-logo {
+    display: inline-block;
+    filter: brightness(0) invert(1);
+}
+
+/* Dark sidebar specific styling */
+[data-sidebar="dark"] .logo-dark .autobidder-logo {
+    display: none;
+}
+
+[data-sidebar="dark"] .logo-light .autobidder-logo {
+    display: inline-block;
+    filter: brightness(0) invert(1);
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+    .logo-sm .autobidder-logo {
+        max-height: 28px;
+    }
+    
+    .logo-lg .autobidder-logo {
+        max-height: 35px;
+    }
+    
+    .auth-logo-img {
+        max-height: 38px;
+    }
+}
+
+@media (max-width: 576px) {
+    .logo-sm .autobidder-logo {
+        max-height: 24px;
+    }
+    
+    .logo-lg .autobidder-logo {
+        max-height: 30px;
+    }
+    
+    .auth-logo-img {
+        max-height: 32px;
+    }
+}

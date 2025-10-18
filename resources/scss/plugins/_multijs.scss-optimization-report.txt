@@ -1,0 +1,22 @@
+CSS Optimization Report for _multijs.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .non-selected-wrapper
+- &::-webkit-scrollbar
+- &::-webkit-scrollbar:vertical
+- &::-webkit-scrollbar:horizontal
+- &::-webkit-scrollbar-track
+- .item-group .group-label
+- .selected-wrapper
+- flex: 0 0 auto;
+    padding: $input-padding-y $input-padding-x;
+    font-family: $input-font-family;
+    font-size: $input-font-size;
+    color: $input-color;
+    background-color: $input-bg;
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+    margin-bottom: 16px;
+    &::placeholder

@@ -1,0 +1,111 @@
+CSS Optimization Report for _theme-light.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- //vertical light
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+
+  // twocolumn menu
+  --#
+- ;
+  --#
+- ;
+  // two column dark
+  --#
+- vertical-menu-bg-dark);
+  --#
+- ;
+  --#
+- vertical-menu-item-color-dark);
+  --#
+- ;
+  --#
+- ;
+
+  // boxed 
+  --#
+- ;
+
+  // heading-color
+  --#
+- ;
+  
+  // component variable
+  // link
+  --#
+- ;
+  --#
+- ;
+
+  // Border variable
+  --#
+- ;
+
+  // card
+  --#
+- ;
+  --#
+- --#
+- --#
+- ;
+    --#
+- ;
+    --#
+- ;
+    --#
+- //list
+  --#
+- ;
+
+  // form
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+
+  // input-group-addon
+  --#
+- ;
+
+  //check
+  --#

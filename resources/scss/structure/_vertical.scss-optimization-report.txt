@@ -1,0 +1,46 @@
+CSS Optimization Report for _vertical.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- + #
+- ) calc(#
+- * 0.5) $footer-height calc(#
+- i
+- svg
+- &::after
+- .5
+- .2
+- i
+- &.lar
+- &.lab
+- svg
+- &.lar
+- &.lab
+- svg
+- i
+- .simplebar-content-wrapper
+- .simplebar-scrollbar
+- .simplebar-offset
+- i
+- i
+- svg
+- svg
+- .icon-dual
+- svg
+- + #
+- i
+- .icon-dual
+- svg
+- var(--#
+- primary)
+- var(--#
+- var(--#
+- info)
+- var(--#
+- var(--#
+- info)
+- var(--#
+- var(--#
+- dark)
+- var(--#

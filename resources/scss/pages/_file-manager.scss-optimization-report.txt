@@ -1,0 +1,13 @@
+CSS Optimization Report for _file-manager.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- - #
+- .simplebar-content
+- .simplebar-content
+- .file-manager-detail-content
+- #file-overview
+- .file-manager-detail-content
+- .file-manager-detail-content
+- .file-details-box

@@ -4,21 +4,19 @@
 @section('css')
 <!-- Enhanced Dashboard Styles -->
 <link href="{{ URL::asset('/assets/css/dashboard-enhanced.css') }}" rel="stylesheet">
+<!-- Stats Cards Without Icons -->
+<link href="{{ URL::asset('/assets/css/stats-card-no-icons.css') }}?v={{ time() }}" rel="stylesheet">
 <!-- Enhanced Bidding Cards Styles -->
 <link href="{{ URL::asset('/assets/css/enhanced-bidding-cards.css') }}?v={{ time() }}" rel="stylesheet">
 <!-- Enhanced Announcement Card Styles -->
 <link href="{{ URL::asset('/assets/css/announcement-card.css') }}?v={{ time() }}" rel="stylesheet">
 <!-- Enhanced Countdown Timer Styles -->
 <link href="{{ URL::asset('/assets/css/enhanced-countdown.css') }}?v={{ time() }}" rel="stylesheet">
+<!-- Market Timer Card Styles -->
+<link href="{{ URL::asset('/assets/css/market-timer-card.css') }}?v={{ time() }}" rel="stylesheet">
 @endsection
 
 @section('content')
-
-    @component('components.breadcrumb')
-        @slot('li_1') Home @endslot
-        @slot('title') Dashboard @endslot
-    @endcomponent
-    
     <div class="enhanced-dashboard">
 
     <!-- Stats Overview Section -->    
@@ -28,16 +26,14 @@
                             ->where('user_id', auth()->user()->id)->sum('amount');
             $profit = \App\Models\UserShare::where('status', 'completed')
                     ->where('user_id', auth()->user()->id)->sum('profit_share');
-            $referralAmount = auth()->user()->referrals ? auth()->user()->referrals->sum('ref_amount') : 0;
+            // Use paid referral earnings passed from controller instead of total referral amounts
+            $referralAmount = $paidReferralEarnings ?? 0;
         @endphp
         
         <!-- Investment Stats -->        
         <div class="col-xl-3 col-md-6">
             <div class="card card-animate stats-card">
                 <div class="card-body">
-                    <div class="stats-icon">
-                        <i data-feather="briefcase"></i>
-                    </div>
                     <div class="stats-value counter-value" data-target="{{ $investment }}">0</div>
                     <div class="stats-label">Total Investment</div>
                 </div>
@@ -48,9 +44,6 @@
         <div class="col-xl-3 col-md-6">
             <div class="card card-animate stats-card">
                 <div class="card-body">
-                    <div class="stats-icon warning">
-                        <i data-feather="award"></i>
-                    </div>
                     <div class="stats-value counter-value" data-target="{{ $profit }}">0</div>
                     <div class="stats-label">Total Earnings</div>
                 </div>
@@ -61,9 +54,6 @@
         <div class="col-xl-3 col-md-6">
             <div class="card card-animate stats-card">
                 <div class="card-body">
-                    <div class="stats-icon info">
-                        <i data-feather="credit-card"></i>
-                    </div>
                     <div class="stats-value counter-value" data-target="0">0</div>
                     <div class="stats-label">Total Expenses</div>
                 </div>
@@ -74,9 +64,6 @@
         <div class="col-xl-3 col-md-6">
             <div class="card card-animate stats-card">
                 <div class="card-body">
-                    <div class="stats-icon success">
-                        <i data-feather="users"></i>
-                    </div>
                     <div class="stats-value counter-value" data-target="{{ $referralAmount }}">0</div>
                     <div class="stats-label">Referral Earnings</div>
                 </div>
@@ -118,8 +105,19 @@
                                 @php
                                     $availableShares = checkAvailableSharePerTrade($trade->id);
                                     
-                                    // Use the centralized helper function for consistent progress calculation
-                                    $progressPercentage = calculateTradeProgressPercentage($trade->id);
+                                    // Check if user has any shares in this trade first
+                                    $userHasShares = \App\Models\UserShare::where('user_id', auth()->user()->id)
+                                        ->where('trade_id', $trade->id)
+                                        ->exists();
+                                    
+                                    if ($userHasShares) {
+                                        // Use user-specific progress calculation for their personal wallet
+                                        // This shows how much of THEIR shares are still available vs sold
+                                        $progressPercentage = calculateUserSharesProgressPercentage(auth()->user()->id, $trade->id);
+                                    } else {
+                                        // If user has no shares in this trade, fall back to trade progress
+                                        $progressPercentage = calculateTradeProgressPercentage($trade->id);
+                                    }
                                 @endphp
                                 <div class="col-xxl-3 col-xl-4 col-lg-6 col-md-6 col-sm-12 mb-3">
                                     <div class="bidding-card animate-slide-up h-100" data-trade-id="{{ $trade->id }}">
@@ -140,7 +138,7 @@
                                                     <div class="bidding-progress-bar" style="width: {{ $progressPercentage }}%" data-progress="{{ $progressPercentage }}"></div>
                                                 </div>
                                                 <div class="progress-label">
-                                                    <span class="progress-text">{{ number_format($progressPercentage, 1) }}% Complete</span>
+                                                    <span class="progress-text">{{ number_format($progressPercentage, 1) }}% Sold</span>
                                                 </div>
                                             </div>
                                             
@@ -156,7 +154,7 @@
                                                 </div>
                                                 <div class="bidding-info-item stats-hover-effect">
                                                     <span class="bidding-info-value">{{ number_format($progressPercentage, 1) }}%</span>
-                                                    <span class="bidding-info-label">Progress</span>
+                                                    <span class="bidding-info-label">Sold</span>
                                                 </div>
                                             </div>
                                             
@@ -418,10 +416,21 @@
     <script src="{{ URL::asset('/assets/js/progress-bar-handler.js') }}"></script>
     <!-- Enhanced Announcement Card -->
     <script src="{{ URL::asset('/assets/js/announcement-card.js') }}?v={{ time() }}"></script>
+    <!-- Market Timer Card -->
+    <script src="{{ URL::asset('/assets/js/market-timer-card.js') }}?v={{ time() }}"></script>
 
     <script>
+        // Market data for floating timer
+        window.marketData = @json($marketTimerData ?? ['isOpen' => false, 'closeTime' => null, 'timezone' => 'UTC']);
+        
         // Prevent unwanted scrolling on page load
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Feather Icons first
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+                console.log('📈 Dashboard: Feather icons initialized');
+            }
+            
             // Save current scroll position on load
             const scrollY = window.scrollY;
             
@@ -625,25 +634,25 @@
                             return; // Skip this update cycle
                         }
                         
-                        // If the count down is over, show completion message (no auto-refresh)
+                        // If the count down is over, automatically refresh the page
                         if (distance < 0) {
                             clearInterval(x);
+                            console.log('🔄 Market opening countdown finished - Auto-refreshing page...');
+                            
+                            // Show brief message before refresh
                             document.getElementById(id).innerHTML = `
                                 <div class="enhanced-countdown-container countdown-ended">
                                     <div class="countdown-header">
-                                        <h3 class="countdown-title">Market Should Be Open!</h3>
-                                        <p class="text-muted">Please refresh to check current market status</p>
-                                        <button class="btn btn-primary btn-sm mt-2" onclick="window.location.reload()">
-                                            <i data-feather="refresh-cw" style="width: 14px; height: 14px; margin-right: 5px;"></i>
-                                            Check Market Status
-                                        </button>
+                                        <h3 class="countdown-title">Market Opening...</h3>
+                                        <p class="text-muted">Refreshing page automatically...</p>
                                     </div>
                                 </div>
                             `;
-                            // Re-initialize feather icons for the button
-                            if (typeof feather !== 'undefined') {
-                                feather.replace();
-                            }
+                            
+                            // Auto-refresh after 2 seconds
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
                             return;
                         }
                         
@@ -662,6 +671,53 @@
                     getCounterTime(countdownTime, "count-down");
                 }
             }
+            
+            // Market Status Monitor - Auto-refresh on market close
+            function startMarketStatusMonitor() {
+                // Only monitor if market is currently open
+                if (window.marketData && window.marketData.isOpen && window.marketData.closeTime) {
+                    console.log('🔍 Starting market status monitor...');
+                    
+                    const checkMarketStatus = () => {
+                        const now = new Date().getTime();
+                        const closeTime = new Date(window.marketData.closeTime).getTime();
+                        
+                        // Check if market has closed (with 1-second buffer)
+                        if (now >= closeTime) {
+                            console.log('🔄 Market has closed - Auto-refreshing page...');
+                            
+                            // Clear the interval
+                            if (window.marketStatusInterval) {
+                                clearInterval(window.marketStatusInterval);
+                            }
+                            
+                            // Show notification if floating timer exists
+                            if (window.marketTimer && window.marketTimer.timerElement) {
+                                const messageEl = window.marketTimer.timerElement.querySelector('.market-close-message');
+                                if (messageEl) {
+                                    messageEl.textContent = 'Market closed - Refreshing...';
+                                }
+                            }
+                            
+                            // Auto-refresh after 2 seconds
+                            setTimeout(() => {
+                                window.location.reload();
+                            }, 2000);
+                        }
+                    };
+                    
+                    // Check every 5 seconds
+                    window.marketStatusInterval = setInterval(checkMarketStatus, 5000);
+                    
+                    // Also check immediately
+                    checkMarketStatus();
+                } else {
+                    console.log('ℹ️ Market status monitor not needed - Market is closed or no close time available');
+                }
+            }
+            
+            // Start the market status monitor
+            startMarketStatusMonitor();
             
             // Note: Live Statistics functionality is now handled by the component itself
             
@@ -793,6 +849,14 @@
                 }, duration);
             }
             
+            // Cleanup market status monitor on page unload
+            window.addEventListener('beforeunload', function() {
+                if (window.marketStatusInterval) {
+                    clearInterval(window.marketStatusInterval);
+                    console.log('🗑️ Market status monitor cleaned up');
+                }
+            });
+            
             // Add a spinning animation style
             const style = document.createElement('style');
             style.textContent = `
@@ -806,6 +870,14 @@
                 }
             `;
             document.head.appendChild(style);
+            
+            // Final Feather icons initialization after everything is loaded
+            setTimeout(function() {
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                    console.log('🎆 Dashboard: Final Feather icons initialization complete');
+                }
+            }, 2000);
         });
     </script>
 @endsection

@@ -1,0 +1,17 @@
+CSS Optimization Summary for custom.css
+==================================================
+Generated on: 2025-10-08 13:14:26
+
+File Size Comparison:
+- Original size: 2,283 bytes
+- Optimized size: 1,924 bytes
+- Savings: 359 bytes
+- Percentage saved: 15.72%
+
+Rules Analysis:
+- Rules removed: 0
+- Rules kept: 13
+
+Note: The optimized file preserves all media queries, keyframes, 
+and other critical CSS constructs. Only unused class and ID 
+selectors have been removed based on usage analysis.

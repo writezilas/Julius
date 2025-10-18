@@ -3,15 +3,19 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\AdminNotification;
 use App\Models\AllocateShareHistory;
 use App\Models\Log;
 use App\Models\Trade;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
 use App\Models\UserShare;
+use App\Mail\NewUserRegistrationMail;
+use App\Helpers\SettingHelper;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -174,6 +178,28 @@ class RegisterController extends Controller
                 \Log::error("Failed to set up referral for user {$user->username}: " . $e->getMessage());
                 // Continue with registration even if referral setup fails
             }
+        }
+
+        // Create admin notification for new user signup
+        try {
+            AdminNotification::newUserSignup($user);
+        } catch (\Exception $e) {
+            \Log::error("Failed to create admin notification for new user {$user->username}: " . $e->getMessage());
+            // Don't fail registration if notification creation fails
+        }
+        
+        // Send admin email notification for new user registration
+        try {
+            $adminEmail = SettingHelper::get('admin_email');
+            if ($adminEmail && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                Mail::to($adminEmail)->send(new NewUserRegistrationMail($user));
+                \Log::info("Admin email sent successfully for new user registration: {$user->username} to {$adminEmail}");
+            } else {
+                \Log::warning("Admin email not configured or invalid - skipping email notification for new user: {$user->username}");
+            }
+        } catch (\Exception $e) {
+            \Log::error("Failed to send admin email for new user registration {$user->username}: " . $e->getMessage());
+            // Don't fail registration if email sending fails
         }
 
         return $user;

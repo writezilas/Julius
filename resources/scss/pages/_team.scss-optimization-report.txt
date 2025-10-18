@@ -1,0 +1,20 @@
+CSS Optimization Report for _team.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- &::before
+- .team-cover
+- .btn-star
+- >a
+- .team-content
+- .view-btn
+- .team-content
+- .team-settings
+- .btn-star
+- .team-profile-img
+- .view-btn
+- .modal-team-cover
+- .team-cover
+- .btn-star
+- >a

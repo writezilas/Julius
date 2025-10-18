@@ -1,0 +1,8 @@
+CSS Optimization Report for _list-group.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .list-group-fill-#
+- .list-group-fill-light
+- .list-text

@@ -1,0 +1,17 @@
+CSS Optimization Report for _two-column.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- i
+- >div
+- + #
+- &::after
+- color: $twocolumn-menu-item-active-color-dark;
+
+                            &::before
+- &::after
+- color: $twocolumn-menu-item-active-color-dark;
+    
+                            &::before
+- &::after

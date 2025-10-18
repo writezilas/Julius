@@ -1,0 +1,37 @@
+CSS Optimization Report for _helper.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .fs-#
+- .border-#
+- .border-top-#
+- .border-bottom-#
+- .border-end-#
+- .border-start-#
+- &.border-#
+- // Font Family
+
+.ff-base
+- // Fixed minimum width
+.w-xs
+- .w-lg
+- .w-xl
+- // Icons Sizes
+.icon-xs
+- .icon-sm
+- .icon-md
+- .icon-lg
+- .icon-xl
+- .icon-xxl
+- // Dual Icons
+.icon-dual
+- .icon-dual-#
+- .search-icon
+- // 
+code
+- .layout-rightside
+- // text-truncate-two-lines
+.text-truncate-two-lines
+- 0%
+- 75%

@@ -1,0 +1,13 @@
+CSS Optimization Report for _gallery.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- rgba(0
+- 0) 10%
+- rgba(0
+- 0) 60%
+- rgba(0
+- .gallery-img
+- &::before
+- .gallery-overlay

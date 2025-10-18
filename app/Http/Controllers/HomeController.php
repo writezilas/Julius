@@ -47,7 +47,7 @@ class HomeController extends Controller
 
         $recentShares = UserShare::latest()->limit(5)->get();
         $topCategory = Trade::with('userShares')
-                    ->withcount('userShares')
+                    ->withCount('userShares')
                     ->whereStatus(1)->orderBy('user_shares_count', 'DESC')->get();
 
         $topTraders = User::where('role_id', 2)->orderBy('balance', 'DESC')->limit(5)->get();
@@ -58,15 +58,107 @@ class HomeController extends Controller
             ->whereHas('payment')
             ->orderBy('id')->get();
 
+        // New User Activity Data for Right Card
+        // New users - recently signed up (last 7 days) - TOP 5
+        $newUsers = User::where('role_id', 2)
+            ->where('created_at', '>=', now()->subDays(7))
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        // New traders - users who made their first investment (recently) - TOP 5
+        $newTraders = User::where('role_id', 2)
+            ->whereHas('shares', function($query) {
+                $query->where('status', '!=', 'failed');
+            })
+            ->withCount('shares')
+            ->having('shares_count', '>', 0)
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        // Top investors overall - users with highest balance - TOP 5
+        $topInvestors = User::where('role_id', 2)
+            ->where('balance', '>', 0)
+            ->orderBy('balance', 'DESC')
+            ->limit(5)
+            ->get();
+
+        // Top referral users - users who have referred the most users - TOP 5
+        $topReferralUsers = User::select('users.id', 'users.name', 'users.username', 'users.avatar', 'users.created_at', DB::raw('COUNT(referred_users.id) as referral_count'))
+            ->leftJoin('users as referred_users', 'users.username', '=', 'referred_users.refferal_code')
+            ->where('users.role_id', 2)
+            ->where('referred_users.id', '!=', DB::raw('users.id')) // Exclude self-referrals
+            ->groupBy('users.id', 'users.name', 'users.username', 'users.avatar', 'users.created_at')
+            ->having('referral_count', '>', 0)
+            ->orderBy('referral_count', 'DESC')
+            ->limit(5)
+            ->get();
+
         // return $pendingShares;
         
-        return view('index', compact('trades', 'recentShares', 'topCategory', 'topTraders', 'pendingShares'));
+        return view('index', compact('trades', 'recentShares', 'topCategory', 'topTraders', 'pendingShares', 'newUsers', 'newTraders', 'topInvestors', 'topReferralUsers'));
     }
 
     public function root()
     {          
         $isTradeOpen = true;
-        return view('user-panel.dashboard', compact('isTradeOpen'));
+        
+        // Calculate paid referral earnings only
+        $paidReferralEarnings = $this->calculatePaidReferralEarnings();
+        
+        return view('user-panel.dashboard', compact('isTradeOpen', 'paidReferralEarnings'));
+    }
+    
+    /**
+     * Calculate only the paid referral earnings for the current user
+     * 
+     * @return float
+     */
+    private function calculatePaidReferralEarnings()
+    {
+        // Get users who were referred by the current user, excluding self-referrals
+        $refferals = User::where('refferal_code', auth()->user()->username)
+            ->where('id', '!=', auth()->user()->id)
+            ->where('username', '!=', auth()->user()->username)
+            ->get();
+        
+        $paidEarnings = 0;
+        
+        // Check each referral to see if their bonus has been paid
+        foreach ($refferals as $referral) {
+            if ($referral->ref_amount > 0) {
+                // Check if the referrer (current user) has sold bonus shares for THIS SPECIFIC referral
+                $soldBonusShares = UserShare::where('user_id', auth()->user()->id)
+                    ->where('get_from', 'refferal-bonus')
+                    ->whereHas('invoice', function($invoiceQuery) use ($referral) {
+                        // Link to the specific referral through the invoice reff_user_id
+                        $invoiceQuery->where('reff_user_id', $referral->id);
+                    })
+                    ->where(function($shareQuery) {
+                        // Check if this bonus share has been sold, completed, or paired and paid
+                        $shareQuery->where('status', 'sold')
+                                  ->orWhere('status', 'completed')
+                                  ->orWhereExists(function($pairSubQuery) {
+                                      // Check if the share has been paired and payment confirmed via user_share_pairs
+                                      $pairSubQuery->select(DB::raw(1))
+                                                   ->from('user_share_pairs')
+                                                   ->where(function($whereClause) {
+                                                       $whereClause->whereColumn('user_share_pairs.user_share_id', 'user_shares.id')
+                                                                   ->orWhereColumn('user_share_pairs.paired_user_share_id', 'user_shares.id');
+                                                   })
+                                                   ->where('user_share_pairs.is_paid', 1);
+                                  });
+                    })
+                    ->exists();
+                    
+                if ($soldBonusShares) {
+                    $paidEarnings += $referral->ref_amount;
+                }
+            }
+        }
+        
+        return $paidEarnings;
     }
 
     /*Language Translation*/
@@ -413,14 +505,30 @@ class HomeController extends Controller
         ));
     }
 
-    public function soldShares()
+    public function soldShares(Request $request)
     {   
         $pageTitle = __('translation.soldshares');
 
+        // Apply share type filter (bought vs sold)
+        $baseQuery = UserShare::with('trade')
+            ->where('user_id', \auth()->user()->id);
+        
+        if ($request->filled('share_type') && $request->share_type !== 'all') {
+            if ($request->share_type === 'bought') {
+                // Show only purchased shares that are in selling/maturity phase
+                $baseQuery->where('get_from', 'purchase')
+                         ->where('status', 'completed')
+                         ->whereNotNull('start_date')
+                         ->where('start_date', '!=', '');
+            } elseif ($request->share_type === 'sold') {
+                // Show only shares being sold (excluding purchased shares)
+                $baseQuery->where('get_from', '!=', 'purchase');
+            }
+        }
+        
         // Show shares in their selling/maturity phase - FIXED QUERY STRUCTURE
-        $soldShares = UserShare::with('trade')
-            ->where('user_id', \auth()->user()->id)
-            ->where(function($query) {
+        $query = clone $baseQuery;
+        $soldShares = $query->where(function($query) {
                 // Group ALL conditions under a single WHERE to ensure proper user_id scoping
                 $query->where(function($subQuery) {
                     // Show shares that have buyers (traditional selling)
@@ -488,71 +596,71 @@ class HomeController extends Controller
             ->paginate(10);
 
         // Get statistics for all shares available for selling (not just current page)
-        $allSoldShares = UserShare::where('user_id', \auth()->user()->id)
-            ->where(function($query) {
-                // Apply the same logic for statistics
-                $query->where(function($subQuery) {
-                    // Show shares that have buyers (traditional selling)
-                    $subQuery->where('get_from', '!=', 'purchase')
-                           ->whereHas('pairedWithThis')
-                           ->whereIn('status', ['completed', 'sold', 'paired'])
-                           ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
-                })
-                ->orWhere(function($subQuery) {
-                    // OR show matured shares that are ready to sell (excluding buyer trades)
-                    $subQuery->where('get_from', '!=', 'purchase')
-                           ->where('is_ready_to_sell', 1)
-                           ->whereIn('status', ['completed', 'sold', 'paired'])
-                           ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
-                })
-                ->orWhere(function($subQuery) {
-                    // OR show admin-allocated shares (they start directly in selling/maturity phase)
-                    $subQuery->where('get_from', 'allocated-by-admin')
-                           ->whereIn('status', ['completed', 'sold'])
-                           ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '')
-                           ->whereNotNull('selling_started_at'); // Ensure timer can run
-                })
-                ->orWhere(function($subQuery) {
-                    // OR show purchased shares in countdown
-                    $subQuery->where('get_from', 'purchase')
-                           ->where('status', 'completed')
-                           ->where('is_ready_to_sell', 0)
-                           ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
-                })
-                ->orWhere(function($subQuery) {
-                    // OR show purchased shares that have matured and are ready to sell
-                    $subQuery->where('get_from', 'purchase')
-                           ->where('status', 'completed')
-                           ->where('is_ready_to_sell', 1) // Ready to sell
-                           ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
-                })
-                ->orWhere(function($subQuery) {
-                    // OR show shares with active buyer pairings
-                    $subQuery->whereHas('pairedWithThis', function($pairQuery) {
-                              $pairQuery->where('is_paid', 0)
-                                       ->whereHas('payment', function($paymentQuery) {
-                                           $paymentQuery->where('status', 'paid');
-                                       });
-                           })
-                           ->whereIn('status', ['completed', 'sold', 'paired'])
-                           ->whereNotNull('start_date')
-                           ->where('start_date', '!=', '');
-                })
-                ->orWhere(function($subQuery) {
-                    // OR show matured referral bonuses that have been paired with buyers
-                    $subQuery->where('get_from', 'refferal-bonus')
-                           ->where('status', 'completed')
-                           ->whereNotNull('matured_at') // Only matured bonuses
-                           ->where('is_ready_to_sell', 1) // Ready to sell
-                           ->whereHas('pairedWithThis'); // Only paired bonuses
-                });
+        $statsQuery = clone $baseQuery;
+        $allSoldShares = $statsQuery->where(function($query) {
+            // Apply the same logic for statistics as the main query
+            $query->where(function($subQuery) {
+                // Show shares that have buyers (traditional selling)
+                $subQuery->where('get_from', '!=', 'purchase')
+                       ->whereHas('pairedWithThis')
+                       ->whereIn('status', ['completed', 'sold', 'paired'])
+                       ->whereNotNull('start_date')
+                       ->where('start_date', '!=', '');
             })
-            ->get();
+            ->orWhere(function($subQuery) {
+                // OR show matured shares that are ready to sell (excluding buyer trades)
+                $subQuery->where('get_from', '!=', 'purchase')
+                       ->where('is_ready_to_sell', 1)
+                       ->whereIn('status', ['completed', 'sold', 'paired'])
+                       ->whereNotNull('start_date')
+                       ->where('start_date', '!=', '');
+            })
+            ->orWhere(function($subQuery) {
+                // OR show admin-allocated shares (they start directly in selling/maturity phase)
+                $subQuery->where('get_from', 'allocated-by-admin')
+                       ->whereIn('status', ['completed', 'sold'])
+                       ->whereNotNull('start_date')
+                       ->where('start_date', '!=', '')
+                       ->whereNotNull('selling_started_at'); // Ensure timer can run
+            })
+            ->orWhere(function($subQuery) {
+                // OR show purchased shares in countdown
+                $subQuery->where('get_from', 'purchase')
+                       ->where('status', 'completed')
+                       ->where('is_ready_to_sell', 0)
+                       ->whereNotNull('start_date')
+                       ->where('start_date', '!=', '');
+            })
+            ->orWhere(function($subQuery) {
+                // OR show purchased shares that have matured and are ready to sell
+                $subQuery->where('get_from', 'purchase')
+                       ->where('status', 'completed')
+                       ->where('is_ready_to_sell', 1) // Ready to sell
+                       ->whereNotNull('start_date')
+                       ->where('start_date', '!=', '');
+            })
+            ->orWhere(function($subQuery) {
+                // OR show shares with active buyer pairings
+                $subQuery->whereHas('pairedWithThis', function($pairQuery) {
+                          $pairQuery->where('is_paid', 0)
+                                   ->whereHas('payment', function($paymentQuery) {
+                                       $paymentQuery->where('status', 'paid');
+                                   });
+                       })
+                       ->whereIn('status', ['completed', 'sold', 'paired'])
+                       ->whereNotNull('start_date')
+                       ->where('start_date', '!=', '');
+            })
+            ->orWhere(function($subQuery) {
+                // OR show matured referral bonuses that have been paired with buyers
+                $subQuery->where('get_from', 'refferal-bonus')
+                       ->where('status', 'completed')
+                       ->whereNotNull('matured_at') // Only matured bonuses
+                       ->where('is_ready_to_sell', 1) // Ready to sell
+                       ->whereHas('pairedWithThis'); // Only paired bonuses
+            });
+        })
+        ->get();
             
         $totalSoldShares = $allSoldShares->count();
         // Count matured shares: those that are ready to sell OR fully sold
@@ -576,6 +684,10 @@ class HomeController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        // Calculate bought and sold share statistics for current filter
+        $boughtShares = $allSoldShares->where('get_from', 'purchase')->count();
+        $soldSharesCount = $allSoldShares->where('get_from', '!=', 'purchase')->count();
+        
         return view('user-panel.sold-shares', compact(
             'pageTitle', 
             'soldShares', 
@@ -585,7 +697,9 @@ class HomeController extends Controller
             'totalInvestment', 
             'totalEarnings', 
             'totalReturn',
-            'availableReferralBonuses'
+            'availableReferralBonuses',
+            'boughtShares',
+            'soldSharesCount'
         ));
     }
     public function support()

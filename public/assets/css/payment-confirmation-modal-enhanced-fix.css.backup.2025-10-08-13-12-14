@@ -1,0 +1,421 @@
+/**
+ * Payment Confirmation Modal Enhanced Fix
+ * 1. Forces light mode display regardless of app theme
+ * 2. Fixes mobile scrolling issues on iOS and Android
+ * 3. Improves touch interactions and responsive behavior
+ */
+
+/* CRITICAL: Force light mode for payment confirmation modals */
+.payment-confirmation-modal,
+.modal[class*="payment-confirmation"],
+.modal[id*="soldShareDetails"],
+[data-layout-mode="dark"] .payment-confirmation-modal,
+[data-layout-mode="dark"] .modal[class*="payment-confirmation"],
+[data-layout-mode="dark"] .modal[id*="soldShareDetails"] {
+    color-scheme: light !important;
+    --bs-body-bg: #ffffff !important;
+    --bs-body-color: #212529 !important;
+}
+
+/* Force light mode on all content inside payment confirmation modals */
+.payment-confirmation-modal *,
+.modal[class*="payment-confirmation"] *,
+.modal[id*="soldShareDetails"] *,
+[data-layout-mode="dark"] .payment-confirmation-modal *,
+[data-layout-mode="dark"] .modal[class*="payment-confirmation"] *,
+[data-layout-mode="dark"] .modal[id*="soldShareDetails"] * {
+    color-scheme: light !important;
+}
+
+/* Modal Content - Force White Background */
+.payment-confirmation-modal .modal-content,
+.payment-confirmation-modal .payment-modal-content,
+.modal[id*="soldShareDetails"] .modal-content,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-content,
+[data-layout-mode="dark"] .payment-confirmation-modal .payment-modal-content,
+[data-layout-mode="dark"] .modal[id*="soldShareDetails"] .modal-content {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Modal Body - White Background with Dark Text */
+.payment-confirmation-modal .modal-body,
+.payment-confirmation-modal .payment-modal-body,
+.modal[id*="soldShareDetails"] .modal-body,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-body,
+[data-layout-mode="dark"] .payment-confirmation-modal .payment-modal-body,
+[data-layout-mode="dark"] .modal[id*="soldShareDetails"] .modal-body {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+/* All Text Elements - Force Dark Text */
+.payment-confirmation-modal h1, .payment-confirmation-modal h2, .payment-confirmation-modal h3,
+.payment-confirmation-modal h4, .payment-confirmation-modal h5, .payment-confirmation-modal h6,
+.payment-confirmation-modal p, .payment-confirmation-modal span, .payment-confirmation-modal div,
+.payment-confirmation-modal label, .payment-confirmation-modal small,
+[data-layout-mode="dark"] .payment-confirmation-modal h1,
+[data-layout-mode="dark"] .payment-confirmation-modal h2,
+[data-layout-mode="dark"] .payment-confirmation-modal h3,
+[data-layout-mode="dark"] .payment-confirmation-modal h4,
+[data-layout-mode="dark"] .payment-confirmation-modal h5,
+[data-layout-mode="dark"] .payment-confirmation-modal h6,
+[data-layout-mode="dark"] .payment-confirmation-modal p,
+[data-layout-mode="dark"] .payment-confirmation-modal span,
+[data-layout-mode="dark"] .payment-confirmation-modal div:not(.modal-header),
+[data-layout-mode="dark"] .payment-confirmation-modal label,
+[data-layout-mode="dark"] .payment-confirmation-modal small {
+    color: #212529 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: #212529 !important;
+    background-clip: initial !important;
+}
+
+/* Form Controls - White Background with Dark Text */
+.payment-confirmation-modal input,
+.payment-confirmation-modal textarea,
+.payment-confirmation-modal select,
+[data-layout-mode="dark"] .payment-confirmation-modal input,
+[data-layout-mode="dark"] .payment-confirmation-modal textarea,
+[data-layout-mode="dark"] .payment-confirmation-modal select {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 2px solid #ced4da !important;
+}
+
+.payment-confirmation-modal input:focus,
+.payment-confirmation-modal textarea:focus,
+.payment-confirmation-modal select:focus,
+[data-layout-mode="dark"] .payment-confirmation-modal input:focus,
+[data-layout-mode="dark"] .payment-confirmation-modal textarea:focus,
+[data-layout-mode="dark"] .payment-confirmation-modal select:focus {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Input Placeholders */
+.payment-confirmation-modal input::placeholder,
+.payment-confirmation-modal textarea::placeholder,
+[data-layout-mode="dark"] .payment-confirmation-modal input::placeholder,
+[data-layout-mode="dark"] .payment-confirmation-modal textarea::placeholder {
+    color: #6c757d !important;
+    opacity: 0.7 !important;
+}
+
+/* Cards and Containers */
+.payment-confirmation-modal .payment-summary-section,
+.payment-confirmation-modal .payment-recipient-section,
+.payment-confirmation-modal .payment-instructions-section,
+.payment-confirmation-modal .summary-grid,
+.payment-confirmation-modal .recipient-card,
+.payment-confirmation-modal .instructions-card,
+.payment-confirmation-modal .summary-item,
+[data-layout-mode="dark"] .payment-confirmation-modal .payment-summary-section,
+[data-layout-mode="dark"] .payment-confirmation-modal .payment-recipient-section,
+[data-layout-mode="dark"] .payment-confirmation-modal .payment-instructions-section,
+[data-layout-mode="dark"] .payment-confirmation-modal .summary-grid,
+[data-layout-mode="dark"] .payment-confirmation-modal .recipient-card,
+[data-layout-mode="dark"] .payment-confirmation-modal .instructions-card,
+[data-layout-mode="dark"] .payment-confirmation-modal .summary-item {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.payment-confirmation-modal .summary-item {
+    background-color: #ffffff !important;
+}
+
+/* Modal Footer */
+.payment-confirmation-modal .modal-footer,
+.payment-confirmation-modal .payment-modal-footer,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-footer,
+[data-layout-mode="dark"] .payment-confirmation-modal .payment-modal-footer {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* Text Muted Elements */
+.payment-confirmation-modal .text-muted,
+.payment-confirmation-modal .form-help,
+.payment-confirmation-modal .form-text,
+[data-layout-mode="dark"] .payment-confirmation-modal .text-muted,
+[data-layout-mode="dark"] .payment-confirmation-modal .form-help,
+[data-layout-mode="dark"] .payment-confirmation-modal .form-text {
+    color: #6c757d !important;
+}
+
+/* Header Text - Keep White for Gradient Background */
+.payment-confirmation-modal .modal-header h1,
+.payment-confirmation-modal .modal-header h2,
+.payment-confirmation-modal .modal-header h3,
+.payment-confirmation-modal .modal-header h4,
+.payment-confirmation-modal .modal-header h5,
+.payment-confirmation-modal .modal-header h6,
+.payment-confirmation-modal .modal-header .modal-title,
+.payment-confirmation-modal .modal-header .modal-subtitle,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header h1,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header h2,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header h3,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header h4,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header h5,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header h6,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header .modal-title,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-header .modal-subtitle {
+    color: #ffffff !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* ===============================================
+   MOBILE SCROLLING FIXES - CRITICAL
+   =============================================== */
+
+/* Fix 1: Remove problematic max-height constraints that prevent scrolling */
+@media (max-width: 768px) {
+    .payment-confirmation-modal .modal-dialog {
+        margin: 0.5rem auto !important;
+        max-height: none !important; /* Remove height constraint */
+        height: auto !important;
+    }
+    
+    .payment-confirmation-modal .modal-content,
+    .payment-confirmation-modal .payment-modal-content {
+        max-height: none !important; /* Remove height constraint */
+        height: auto !important;
+        overflow: visible !important;
+    }
+    
+    .payment-confirmation-modal .modal-body,
+    .payment-confirmation-modal .payment-modal-body {
+        max-height: none !important; /* CRITICAL: Remove this constraint */
+        height: auto !important;
+        overflow: visible !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+    }
+}
+
+/* Fix 2: Ensure proper touch scrolling on iOS and Android */
+@supports (-webkit-touch-callout: none) {
+    /* iOS specific fixes */
+    .payment-confirmation-modal .modal-content {
+        -webkit-overflow-scrolling: touch !important;
+        overflow: visible !important;
+    }
+    
+    .payment-confirmation-modal .modal-body {
+        -webkit-overflow-scrolling: touch !important;
+        overflow: visible !important;
+        transform: translateZ(0) !important; /* Hardware acceleration */
+    }
+    
+    /* Prevent iOS from disabling scroll */
+    .payment-confirmation-modal .modal-dialog {
+        -webkit-overflow-scrolling: touch !important;
+        overflow-y: visible !important;
+    }
+}
+
+/* Fix 3: Android specific scrolling improvements */
+@media (max-width: 768px) and (-webkit-min-device-pixel-ratio: 1) {
+    .payment-confirmation-modal .modal-body {
+        overflow-y: visible !important;
+        scroll-behavior: smooth !important;
+        overscroll-behavior: contain !important;
+    }
+}
+
+/* Fix 4: Flexible modal height for mobile devices */
+@media (max-width: 768px) {
+    .payment-confirmation-modal .modal-dialog {
+        display: flex !important;
+        flex-direction: column !important;
+        max-width: 95vw !important;
+        margin: 0.5rem auto !important;
+        min-height: 0 !important;
+        max-height: calc(100vh - 1rem) !important; /* Allow full height but with margin */
+    }
+    
+    .payment-confirmation-modal .modal-content {
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 1 auto !important;
+        max-height: calc(100vh - 1rem) !important;
+        overflow: hidden !important; /* Container shouldn't scroll, body should */
+    }
+    
+    .payment-confirmation-modal .modal-header {
+        flex-shrink: 0 !important;
+    }
+    
+    .payment-confirmation-modal .modal-body {
+        flex: 1 1 auto !important;
+        overflow-y: auto !important; /* This is where scrolling happens */
+        padding: 1rem !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    .payment-confirmation-modal .modal-footer {
+        flex-shrink: 0 !important;
+    }
+}
+
+/* Fix 5: Viewport height adjustments for mobile keyboards */
+@media (max-width: 768px) {
+    .payment-confirmation-modal.keyboard-visible .modal-dialog {
+        max-height: 70vh !important;
+    }
+    
+    .payment-confirmation-modal.keyboard-visible .modal-content {
+        max-height: 70vh !important;
+    }
+}
+
+/* Fix 6: Enhanced touch interactions */
+@media (max-width: 768px) {
+    .payment-confirmation-modal input,
+    .payment-confirmation-modal textarea,
+    .payment-confirmation-modal button {
+        min-height: 44px !important; /* Apple's minimum touch target */
+        font-size: 16px !important; /* Prevents zoom on iOS */
+    }
+    
+    .payment-confirmation-modal .form-control {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Fix 7: Prevent body scroll lock issues */
+.payment-confirmation-modal-open {
+    overflow: hidden !important;
+    position: fixed !important;
+    width: 100% !important;
+}
+
+/* Fix 8: Safe area support for notched devices */
+@supports (padding: max(0px)) {
+    @media (max-width: 768px) {
+        .payment-confirmation-modal .modal-dialog {
+            padding-left: max(0.5rem, env(safe-area-inset-left)) !important;
+            padding-right: max(0.5rem, env(safe-area-inset-right)) !important;
+            padding-top: max(0.5rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
+        }
+    }
+}
+
+/* ===============================================
+   ENHANCED RESPONSIVE IMPROVEMENTS
+   =============================================== */
+
+/* Improved tablet experience */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .payment-confirmation-modal .modal-dialog {
+        max-width: 90vw !important;
+        margin: 1rem auto !important;
+    }
+    
+    .payment-confirmation-modal .modal-body {
+        max-height: calc(100vh - 200px) !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+/* Small phone adjustments */
+@media (max-width: 480px) {
+    .payment-confirmation-modal .modal-dialog {
+        margin: 0.25rem auto !important;
+        max-width: 98vw !important;
+    }
+    
+    .payment-confirmation-modal .payment-modal-header {
+        padding: 0.75rem 1rem !important;
+    }
+    
+    .payment-confirmation-modal .payment-modal-body {
+        padding: 0.75rem !important;
+    }
+    
+    .payment-confirmation-modal .summary-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.5rem !important;
+    }
+    
+    .payment-confirmation-modal .step-item {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.5rem !important;
+    }
+}
+
+/* ===============================================
+   ACCESSIBILITY IMPROVEMENTS
+   =============================================== */
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .payment-confirmation-modal .modal-content {
+        border: 3px solid #000000 !important;
+    }
+    
+    .payment-confirmation-modal input,
+    .payment-confirmation-modal textarea {
+        border: 2px solid #000000 !important;
+    }
+    
+    .payment-confirmation-modal input:focus,
+    .payment-confirmation-modal textarea:focus {
+        border: 3px solid #0066cc !important;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .payment-confirmation-modal * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ===============================================
+   DEBUG UTILITIES (Remove in production)
+   =============================================== */
+
+/* Uncomment for debugging mobile scroll issues */
+/*
+@media (max-width: 768px) {
+    .payment-confirmation-modal .modal-body::after {
+        content: "Scroll Debug: " attr(style);
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        background: red;
+        color: white;
+        padding: 5px;
+        font-size: 12px;
+        z-index: 9999;
+    }
+}
+*/
+
+/* ===============================================
+   PRINT SUPPORT
+   =============================================== */
+
+@media print {
+    .payment-confirmation-modal {
+        display: none !important;
+    }
+}

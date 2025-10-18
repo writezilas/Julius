@@ -1,0 +1,24 @@
+CSS Optimization Report for _waves.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .waves-notransition
+- .waves-button
+- .waves-circle
+- .waves-button
+- .waves-button-input
+- .waves-button
+- .waves-button-input
+- .waves-input-wrapper
+- .waves-input-wrapper.waves-button
+- .waves-input-wrapper .waves-button-input
+- .waves-circle
+- .waves-float
+- .waves-block
+- .waves-ripple
+- .waves-ripple
+- .waves-ripple
+- .waves-ripple
+- .waves-ripple
+- .waves-ripple

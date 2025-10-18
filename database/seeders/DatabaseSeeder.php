@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionSeeder::class);
         $this->call(AssignPendingPaymentPermissionsSeeder::class);
         $this->call(AssignPendingPaymentPermissionsToSuperAdminSeeder::class);
+        $this->call(EmailConfigurationSeeder::class);
     }
 }

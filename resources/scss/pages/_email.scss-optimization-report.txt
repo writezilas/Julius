@@ -1,0 +1,23 @@
+CSS Optimization Report for _email.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- - #
+- i
+- .unreadConversations-alert
+- .email-detail-content
+- .col-mail
+- .checkbox-wrapper-mail
+- .checkbox-wrapper-mail
+- .star-toggle
+- #unreadConversations
+- #email-topbar-actions
+- #elmLoader
+- .email-compose-input
+- .email-detail-content
+- .email-detail-content
+- .message-list li .col-mail-1
+- .ck-editor__editable_inline
+- - #
+- .message-list-content

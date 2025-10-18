@@ -1,0 +1,17 @@
+CSS Optimization Report for _sweetalert2.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .swal2-title
+- .swal2-html-container
+- &.swal2-question
+- .swal2-success-ring
+- &.swal2-warning
+- .swal2-loader
+- .swal2-timer-progress-bar
+- &~.swal2-progress-step-line
+- .swal2-progress-step-line
+- .swal2-styled.swal2-confirm
+- .swal2-input
+- .swal2-validation-message

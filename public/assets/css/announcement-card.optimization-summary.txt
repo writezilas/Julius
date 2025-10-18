@@ -1,0 +1,17 @@
+CSS Optimization Summary for announcement-card.css
+==================================================
+Generated on: 2025-10-08 13:15:01
+
+File Size Comparison:
+- Original size: 6,053 bytes
+- Optimized size: 6,164 bytes
+- Savings: -111 bytes
+- Percentage saved: -1.83%
+
+Rules Analysis:
+- Rules removed: 5
+- Rules kept: 39
+
+Note: The optimized file preserves all media queries, keyframes, 
+and other critical CSS constructs. Only unused class and ID 
+selectors have been removed based on usage analysis.

@@ -46,6 +46,18 @@
                         </div>
                         <div class="col-6">
                             <div class="form-group">
+                                <label>Admin Email *</label>
+                                <input type="email" name="settings[admin_email]" class="form-control" value="{{ @$gs['admin_email'] ?? '' }}" placeholder="admin@example.com">
+                                @error('settings.admin_email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                                <small class="form-text text-muted">This email will be used for admin notifications and system communications</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
                                 <label>Application Timezone *</label>
                                 <select name="settings[app_timezone]" class="form-control">
                                     @php

@@ -1,0 +1,16 @@
+CSS Optimization Report for _flag-input.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- max-height: 158px;
+            overflow-y: auto;
+
+            &::-webkit-scrollbar
+- &::-webkit-scrollbar:vertical
+- &::-webkit-scrollbar:horizontal
+- &::-webkit-scrollbar-track
+- .flag-input
+- &::before
+- .country-codeno
+- .searchlist-input

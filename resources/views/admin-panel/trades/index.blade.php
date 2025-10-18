@@ -344,6 +344,12 @@
                                 @canAny(['trade-edit', 'trade-delete'])
                                 <td>
                                     <div class="action-buttons">
+                                        <a href="{{ route('admin.trade.view', $trade->id) }}" 
+                                           class="btn btn-sm btn-info" 
+                                           data-bs-toggle="tooltip" 
+                                           title="View Trade Details">
+                                            <i class="ri-eye-fill"></i>
+                                        </a>
                                         @can('trade-edit')
                                         <a href="{{ route('admin.trade.edit', $trade->id) }}" 
                                            class="btn btn-sm btn-success" 

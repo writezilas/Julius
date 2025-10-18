@@ -1,0 +1,39 @@
+CSS Optimization Report for _sitemap.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- >a
+- position: absolute;
+        width: 100%;
+
+        &::after
+- &::after
+- &::after
+- &::after
+- border-left: 2px dashed $border-color;
+    float: left;
+    margin-left: 1.75%;
+    margin-bottom: 60px;
+    width: 18.25%;
+
+    &::before
+- >a
+- float: none;
+        width: 100%;
+        margin-left: 0;
+
+        &::before
+- &::before
+- &::before
+- &::after
+- position: relative;
+
+                    &::before
+- position: relative;
+                padding: 10px 16px 4px 36px;
+                &::before
+- .second-list
+- .third-list
+- &::before
+- &::before

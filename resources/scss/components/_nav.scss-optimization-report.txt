@@ -1,0 +1,47 @@
+CSS Optimization Report for _nav.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- border: none;
+            font-weight: $font-weight-medium;
+
+            &::after
+- >a
+- .nav-titl
+- .nav-tab-position
+- &.nav-titl
+- .nav-titl
+- .nav-icon
+- &::before
+- &::before
+- &::before
+- color: $white;
+                background-color: transparent !important;
+
+                &::before
+- .nav-border-top-#
+- dark-rgb)
+- .nav-custom-#
+- .nav-#
+- card-bg-custom);
+
+                    &::after
+- &::before
+- &::before
+- dark);
+
+            &::before
+- 0.05);
+                color: $primary;
+
+                &::before
+- 0.1);
+                color: $primary;
+                box-shadow: none;
+
+                &::before
+- light-rgb)
+- .nav-#
+- &::before
+- &::after

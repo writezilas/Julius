@@ -147,16 +147,159 @@ $pageTitle = __('translation.soldshares');
     border-color: rgba(255, 255, 255, 0.5) !important;
     color: white !important;
     box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
-}</style>
+}
+
+/* Responsive Table Styles for Sold Shares */
+.responsive-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.responsive-table {
+    min-width: 1200px; /* Wider minimum for sold shares table with more columns */
+    width: 100%;
+}
+
+/* Mobile-first responsive approach */
+@media (max-width: 768px) {
+    .responsive-table-wrapper {
+        margin: -15px;
+        margin-top: 0;
+        border-radius: 0;
+    }
+    
+    .responsive-table {
+        min-width: 1000px;
+        font-size: 0.875rem;
+    }
+    
+    .responsive-table th,
+    .responsive-table td {
+        padding: 8px 6px;
+        white-space: nowrap;
+    }
+    
+    .responsive-table th {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    /* Specific column width optimizations for sold shares */
+    .responsive-table th:nth-child(1), /* SR No */
+    .responsive-table td:nth-child(1) {
+        width: 50px;
+        text-align: center;
+    }
+    
+    .responsive-table th:nth-child(2), /* Ticket No */
+    .responsive-table td:nth-child(2) {
+        width: 120px;
+    }
+    
+    .responsive-table th:nth-child(3), /* Share Type */
+    .responsive-table td:nth-child(3) {
+        width: 130px;
+    }
+    
+    .responsive-table th:nth-child(4), /* Start Date */
+    .responsive-table td:nth-child(4) {
+        width: 90px;
+    }
+    
+    .responsive-table th:nth-child(5), /* Investment */
+    .responsive-table td:nth-child(5) {
+        width: 90px;
+    }
+    
+    .responsive-table th:nth-child(6), /* Earning */
+    .responsive-table td:nth-child(6) {
+        width: 80px;
+    }
+    
+    .responsive-table th:nth-child(7), /* Total */
+    .responsive-table td:nth-child(7) {
+        width: 90px;
+    }
+    
+    .responsive-table th:nth-child(8), /* Status */
+    .responsive-table td:nth-child(8) {
+        width: 80px;
+    }
+    
+    .responsive-table th:nth-child(9), /* Time Remaining */
+    .responsive-table td:nth-child(9) {
+        width: 120px;
+    }
+    
+    .responsive-table th:nth-child(10), /* Action */
+    .responsive-table td:nth-child(10) {
+        width: 70px;
+    }
+}
+
+@media (max-width: 480px) {
+    .responsive-table {
+        min-width: 900px;
+        font-size: 0.8rem;
+    }
+    
+    .responsive-table th,
+    .responsive-table td {
+        padding: 6px 4px;
+    }
+    
+    /* Adjust flip timer for mobile */
+    .flip-card-inner {
+        min-width: 18px !important;
+        min-height: 16px !important;
+        padding: 1px 3px !important;
+    }
+    
+    .flip-card-number {
+        font-size: 0.6rem !important;
+    }
+    
+    .flip-card-label {
+        font-size: 0.4rem !important;
+    }
+    
+    .btn-sm {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* Scroll indicator for mobile */
+@media (max-width: 768px) {
+    .table-scroll-indicator {
+        position: relative;
+        margin-bottom: 10px;
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .table-scroll-indicator::before {
+        content: '← Scroll horizontally to view all columns →';
+        background: linear-gradient(90deg, transparent, #f8f9fa 20%, #f8f9fa 80%, transparent);
+        padding: 5px 20px;
+        border-radius: 15px;
+        display: inline-block;
+    }
+}
+
+@media (min-width: 769px) {
+    .table-scroll-indicator {
+        display: none;
+    }
+}
 </style>
 @endsection
 
 @section('content')
-    @component('components.breadcrumb')
-        @slot('li_1') @lang('translation.dashboard') @endslot
-        @slot('title') {{$pageTitle}} @endslot
-    @endcomponent
-
     <!-- Statistics Cards -->
     <div class="row mb-4">
         <div class="col-xl-2 col-md-6 col-sm-6 mb-3">
@@ -353,8 +496,9 @@ $pageTitle = __('translation.soldshares');
                     <h5 class="card-title mb-0">{{$pageTitle}}</h5>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="alternative-pagination" class="table align-middle table-hover table-bordered" style="width:100%">
+                    <div class="table-scroll-indicator"></div>
+                    <div class="responsive-table-wrapper">
+                        <table id="alternative-pagination" class="table align-middle table-hover table-bordered responsive-table" style="width:100%">
                             <thead>
                             <tr>
                                 <th>SR No.</th>
@@ -447,6 +591,7 @@ $pageTitle = __('translation.soldshares');
                             @endif
                             </tbody>
                         </table>
+                    </div>
                     </div>
                 </div>
             </div>

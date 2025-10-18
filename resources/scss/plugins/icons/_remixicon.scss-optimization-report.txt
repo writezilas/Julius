@@ -1,0 +1,21 @@
+CSS Optimization Report for _remixicon.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .ri-lg
+- .ri-xl
+- .ri-xxs
+- .ri-xs
+- .ri-sm
+- .ri-1x
+- .ri-2x
+- .ri-3x
+- .ri-4x
+- .ri-5x
+- .ri-6x
+- .ri-7x
+- .ri-8x
+- .ri-9x
+- .ri-10x
+- .ri-fw

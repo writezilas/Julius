@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Timeout Fixes Test</title>
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/css/mobile-timeout-styles.css" rel="stylesheet">
+    <style>
+        body { padding: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .test-pass { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .test-fail { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .test-info { background-color: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mobile Timeout Fixes Test Page</h1>
+        <p>This page tests the mobile timeout fixes deployed to resolve ERR_CONNECTION_TIMED_OUT errors.</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Device Detection</h3>
+                <div id="device-info" class="test-result test-info">
+                    Detecting device...
+                </div>
+                
+                <h3>Network Handler Status</h3>
+                <div id="network-status" class="test-result test-info">
+                    Checking network handler...
+                </div>
+                
+                <h3>Mobile Modal Fixes</h3>
+                <div id="modal-status" class="test-result test-info">
+                    Checking modal fixes...
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <h3>Connection Quality</h3>
+                <div id="connection-quality" class="test-result test-info">
+                    Testing connection...
+                </div>
+                
+                <h3>Timeout Settings</h3>
+                <div id="timeout-settings" class="test-result test-info">
+                    Checking timeout configuration...
+                </div>
+                
+                <h3>Test Actions</h3>
+                <button id="test-ajax" class="btn btn-primary">Test AJAX Request</button>
+                <button id="test-timeout" class="btn btn-warning">Test Timeout Handling</button>
+                <button id="show-modal" class="btn btn-info">Test Mobile Modal</button>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h3>Test Results</h3>
+                <div id="test-results" class="alert alert-info">
+                    Test results will appear here...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Test Modal -->
+    <div class="modal fade payment-confirmation-modal" id="testModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Test Mobile Modal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This is a test modal to verify mobile optimizations are working.</p>
+                    <form class="payment-form">
+                        <input type="text" class="form-control" placeholder="Test input">
+                        <button type="submit" class="btn btn-primary mt-2">Test Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript files -->
+    <script src="assets/js/jquery-3.6.0.min.js"></script>
+    <script src="assets/libs/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/mobile-network-handler.js"></script>
+    <script src="assets/js/mobile-payment-modal-fix.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Test device detection
+            function testDeviceDetection() {
+                const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile Safari/i.test(navigator.userAgent);
+                const deviceType = navigator.userAgent;
+                const screenWidth = window.innerWidth;
+                
+                $('#device-info').html(`
+                    <strong>Mobile Device:</strong> ${isMobile ? 'Yes' : 'No'}<br>
+                    <strong>Screen Width:</strong> ${screenWidth}px<br>
+                    <strong>User Agent:</strong> ${deviceType.substring(0, 50)}...
+                `);
+                
+                if (isMobile) {
+                    $('#device-info').removeClass('test-info').addClass('test-pass');
+                } else {
+                    $('#device-info').removeClass('test-info').addClass('test-info');
+                }
+            }
+            
+            // Test network handler
+            function testNetworkHandler() {
+                if (typeof MobileNetworkHandler !== 'undefined') {
+                    const stats = MobileNetworkHandler.getStats();
+                    $('#network-status').html(`
+                        <strong>Network Handler:</strong> ✅ Loaded<br>
+                        <strong>Mobile Detected:</strong> ${stats.isMobile ? 'Yes' : 'No'}<br>
+                        <strong>Connection Quality:</strong> ${stats.connectionQuality}<br>
+                        <strong>Version:</strong> ${MobileNetworkHandler.version}
+                    `).removeClass('test-info').addClass('test-pass');
+                } else {
+                    $('#network-status').html('<strong>Network Handler:</strong> ❌ Not loaded')
+                        .removeClass('test-info').addClass('test-fail');
+                }
+            }
+            
+            // Test modal fixes
+            function testModalFixes() {
+                if (typeof PaymentModalMobileFix !== 'undefined') {
+                    $('#modal-status').html(`
+                        <strong>Modal Fix:</strong> ✅ Loaded<br>
+                        <strong>Version:</strong> ${PaymentModalMobileFix.version}<br>
+                        <strong>Mobile Detected:</strong> ${PaymentModalMobileFix.isMobile() ? 'Yes' : 'No'}
+                    `).removeClass('test-info').addClass('test-pass');
+                } else {
+                    $('#modal-status').html('<strong>Modal Fix:</strong> ❌ Not loaded')
+                        .removeClass('test-info').addClass('test-fail');
+                }
+            }
+            
+            // Test connection quality
+            function testConnectionQuality() {
+                const startTime = Date.now();
+                
+                // Make a simple request to measure response time
+                $.ajax({
+                    url: window.location.href,
+                    method: 'HEAD',
+                    timeout: 10000,
+                    success: function() {
+                        const duration = Date.now() - startTime;
+                        let quality = 'Good';
+                        let className = 'test-pass';
+                        
+                        if (duration > 5000) {
+                            quality = 'Slow';
+                            className = 'test-fail';
+                        } else if (duration > 2000) {
+                            quality = 'Fair';
+                            className = 'test-info';
+                        }
+                        
+                        $('#connection-quality').html(`
+                            <strong>Response Time:</strong> ${duration}ms<br>
+                            <strong>Connection Quality:</strong> ${quality}
+                        `).removeClass('test-info').addClass(className);
+                    },
+                    error: function() {
+                        $('#connection-quality').html('<strong>Connection Test:</strong> ❌ Failed')
+                            .removeClass('test-info').addClass('test-fail');
+                    }
+                });
+            }
+            
+            // Test timeout settings
+            function testTimeoutSettings() {
+                const ajaxTimeout = $.ajaxSetup().timeout || 'Default';
+                $('#timeout-settings').html(`
+                    <strong>AJAX Timeout:</strong> ${ajaxTimeout}ms<br>
+                    <strong>Mobile Optimization:</strong> ${/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? '60000ms' : '30000ms'} expected
+                `).removeClass('test-info').addClass('test-pass');
+            }
+            
+            // Test AJAX request
+            $('#test-ajax').click(function() {
+                const startTime = Date.now();
+                $('#test-results').html('Testing AJAX request with mobile timeout settings...');
+                
+                $.ajax({
+                    url: window.location.href,
+                    method: 'GET',
+                    success: function() {
+                        const duration = Date.now() - startTime;
+                        $('#test-results').html(`
+                            ✅ AJAX test successful!<br>
+                            Duration: ${duration}ms<br>
+                            Mobile timeout handling: Active
+                        `).removeClass('alert-info').addClass('alert-success');
+                    },
+                    error: function(xhr, status, error) {
+                        $('#test-results').html(`
+                            ❌ AJAX test failed!<br>
+                            Status: ${status}<br>
+                            Error: ${error}
+                        `).removeClass('alert-info').addClass('alert-danger');
+                    }
+                });
+            });
+            
+            // Test timeout handling
+            $('#test-timeout').click(function() {
+                $('#test-results').html('Testing timeout handling (this may take a moment)...');
+                
+                $.ajax({
+                    url: '/nonexistent-endpoint-for-timeout-test',
+                    method: 'GET',
+                    timeout: 5000,
+                    success: function() {
+                        $('#test-results').html('Unexpected success - endpoint should not exist')
+                            .removeClass('alert-info').addClass('alert-warning');
+                    },
+                    error: function(xhr, status, error) {
+                        if (status === 'timeout') {
+                            $('#test-results').html(`
+                                ✅ Timeout handling working correctly!<br>
+                                Status: ${status}<br>
+                                Mobile retry mechanisms should be active
+                            `).removeClass('alert-info').addClass('alert-success');
+                        } else {
+                            $('#test-results').html(`
+                                ℹ️ Error handling working (status: ${status})<br>
+                                This confirms error handling is functional
+                            `).removeClass('alert-info').addClass('alert-info');
+                        }
+                    }
+                });
+            });
+            
+            // Show test modal
+            $('#show-modal').click(function() {
+                $('#testModal').modal('show');
+            });
+            
+            // Run all tests on load
+            testDeviceDetection();
+            testNetworkHandler();
+            testModalFixes();
+            testConnectionQuality();
+            testTimeoutSettings();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+CSS Optimization Report for _reboot.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- h1
+- h2
+- h3
+- h4
+- h5
+- h6
+- label
+- b
+- strong

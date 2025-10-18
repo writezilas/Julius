@@ -1,0 +1,28 @@
+CSS Optimization Report for success-notification-fix.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .swal2-success .swal2-title
+- .swal2-success .swal2-html-container
+- .badge-success
+- .notification-success
+- .flash-success
+- .notification-success h1
+- .notification-success h2
+- .notification-success h3
+- .notification-success h4
+- .notification-success h5
+- .notification-success h6
+- .flash-success h1
+- .flash-success h2
+- .flash-success h3
+- .flash-success h4
+- .flash-success h5
+- .flash-success h6
+- .notification-success p
+- .notification-success span
+- .notification-success div
+- .flash-success p
+- .flash-success span
+- .flash-success div

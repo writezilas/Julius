@@ -1,0 +1,19 @@
+CSS Optimization Report for modern-payment-confirmation-form.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 0%
+- 100%
+- 50%
+- section
+- 0%
+- 100%
+- 0%
+- 100%
+- 50%
+- to
+- from
+- to
+- *::before
+- *::after

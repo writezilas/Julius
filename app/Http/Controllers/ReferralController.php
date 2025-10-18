@@ -34,16 +34,27 @@ class ReferralController extends Controller
         // Add status information to each referral
         foreach ($refferals as $referral) {
             if ($referral->ref_amount > 0) {
-                // Check if the referrer (current user) has sold bonus shares for this referral
-                // Look for referral bonus shares that have been paired with buyers and payments confirmed
+                // Check if the referrer (current user) has sold bonus shares for THIS SPECIFIC referral
+                // We need to find the referral bonus share that was created for this specific referral
+                // and check if it has been sold and payment confirmed
                 $soldBonusShares = UserShare::where('user_id', \auth()->user()->id)
                     ->where('get_from', 'refferal-bonus')
-                    ->whereHas('pairedWithThis', function($query) {
-                        // Check if the pairing has confirmed payment
-                        $query->where('is_paid', 1)
-                              ->whereHas('payment', function($paymentQuery) {
-                                  $paymentQuery->where('status', 'paid');
-                              });
+                    ->whereHas('invoice', function($invoiceQuery) use ($referral) {
+                        // Link to the specific referral through the invoice reff_user_id
+                        // The referral user is stored in reff_user_id (the person who was referred)
+                        $invoiceQuery->where('reff_user_id', $referral->id);
+                    })
+                    ->where(function($shareQuery) {
+                        // Check if this bonus share has been sold and payment confirmed
+                        $shareQuery->where('status', 'sold')
+                                  ->orWhere(function($pairQuery) {
+                                      $pairQuery->whereHas('pairedWithThis', function($pairSubQuery) {
+                                          $pairSubQuery->where('is_paid', 1)
+                                                      ->whereHas('payment', function($paymentQuery) {
+                                                          $paymentQuery->where('status', 'paid');
+                                                      });
+                                      });
+                                  });
                     })
                     ->exists();
                     

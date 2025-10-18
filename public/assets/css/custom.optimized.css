@@ -1,0 +1,128 @@
+/* Optimized CSS - Generated on 2025-10-08 13:14:26 */
+
+.auth-one-bg::after {
+    content: '';
+    
+    position: absolute;
+    
+    
+    top: 15%;
+     
+    right: 10%;
+     
+    width: 150px;
+     
+    height: 150px;
+     
+    background: inherit;
+    
+    background-size: cover;
+    
+    background-position: center;
+    
+    filter: blur(20px) brightness(1.1);
+    
+    z-index: 2;
+    
+    border-radius: 15px;
+    
+    opacity: 0.95;
+    
+}
+
+.autobidder-logo {
+    max-width: 100%;
+    
+    height: auto;
+    
+    transition: all 0.3s ease;
+    
+}
+
+.logo-sm .autobidder-logo {
+    max-height: 32px;
+    
+    width: auto;
+    
+}
+
+.logo-lg .autobidder-logo {
+    max-height: 40px;
+    
+    width: auto;
+    
+}
+
+.auth-logo-img {
+    filter: brightness(0) invert(1);
+    
+    max-height: 45px;
+    
+    width: auto;
+    
+}
+
+.logo-dark .autobidder-logo,
+[data-layout-mode="light"] .logo-dark .autobidder-logo {
+    display: inline-block;
+    
+}
+
+.logo-light .autobidder-logo,
+[data-layout-mode="dark"] .logo-light .autobidder-logo {
+    display: none;
+    
+}
+
+[data-layout-mode="dark"] .logo-dark .autobidder-logo {
+    display: none;
+    
+}
+
+[data-layout-mode="dark"] .logo-light .autobidder-logo {
+    display: inline-block;
+    
+    filter: brightness(0) invert(1);
+    
+}
+
+[data-sidebar="dark"] .logo-dark .autobidder-logo {
+    display: none;
+    
+}
+
+[data-sidebar="dark"] .logo-light .autobidder-logo {
+    display: inline-block;
+    
+    filter: brightness(0) invert(1);
+    
+}
+
+@media (max-width: 768px) {
+.logo-sm .autobidder-logo {
+        max-height: 28px;
+    }
+    
+    .logo-lg .autobidder-logo {
+        max-height: 35px;
+    }
+    
+    .auth-logo-img {
+        max-height: 38px;
+    }
+}
+
+@media (max-width: 576px) {
+.logo-sm .autobidder-logo {
+        max-height: 24px;
+    }
+    
+    .logo-lg .autobidder-logo {
+        max-height: 30px;
+    }
+    
+    .auth-logo-img {
+        max-height: 32px;
+    }
+}
+

@@ -3,11 +3,6 @@
 @section('title', $pageTitle)
 @section('content')
 
-	@component('components.breadcrumb')
-		@slot('li_1') Pages @endslot
-		@slot('title') {{$pageTitle}}  @endslot
-	@endcomponent
-
 	 <div class="row justify-content-center mt-4">
         <div class="col-lg-5">
             <div class="text-center mb-4">

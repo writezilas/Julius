@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Services\OnlineUserService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -74,7 +75,11 @@ class UserController extends Controller
         // Get user statistics
         $stats = $this->getUserStats();
         
-        return view('admin-panel.users.unified', compact('users', 'stats'));
+        // Get online users
+        $onlineUsers = OnlineUserService::getOnlineUsers();
+        $onlineUsersCount = OnlineUserService::getOnlineUsersCount();
+        
+        return view('admin-panel.users.unified', compact('users', 'stats', 'onlineUsers', 'onlineUsersCount'));
     }
     
     /**
@@ -88,6 +93,62 @@ class UserController extends Controller
             'suspended' => User::where('role_id', 2)->where('status', 'suspended')->count(),
             'blocked' => User::where('role_id', 2)->where('status', 'blocked')->count(),
         ];
+    }
+    
+    /**
+     * API endpoint to get current online users
+     */
+    public function getOnlineUsers()
+    {
+        OnlineUserService::cleanupExpiredUsers();
+        $onlineUsers = OnlineUserService::getOnlineUsers();
+        $count = OnlineUserService::getOnlineUsersCount();
+        
+        return response()->json([
+            'users' => $onlineUsers,
+            'count' => $count,
+            'last_updated' => now()->toISOString()
+        ]);
+    }
+    
+    /**
+     * Debug method to check online users status
+     */
+    public function debugOnlineUsers()
+    {
+        $keys = \Cache::get('online_users_keys', []);
+        $cacheData = [];
+        
+        foreach ($keys as $key) {
+            if (\Cache::has($key)) {
+                $userData = \Cache::get($key);
+                $user = User::find($userData['id'] ?? null);
+                $cacheData[$key] = [
+                    'cache_data' => $userData,
+                    'user_in_db' => $user ? [
+                        'id' => $user->id,
+                        'username' => $user->username,
+                        'role_id' => $user->role_id,
+                        'status' => $user->status
+                    ] : null
+                ];
+            }
+        }
+        
+        $onlineUsers = OnlineUserService::getOnlineUsers();
+        
+        return response()->json([
+            'cache_keys' => $keys,
+            'cache_data' => $cacheData,
+            'online_users_service_result' => $onlineUsers,
+            'current_user' => auth()->check() ? [
+                'id' => auth()->id(),
+                'username' => auth()->user()->username,
+                'role_id' => auth()->user()->role_id
+            ] : null,
+            'cache_driver' => config('cache.default'),
+            'timestamp' => now()->toISOString()
+        ]);
     }
 
     /**

@@ -1,0 +1,26 @@
+CSS Optimization Report for _landing.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- position: relative;
+
+    &::before
+- .card-logo-dark
+- .card-logo-light
+- .card-logo-dark
+- .card-logo-light
+- .bg-overlay-pattern
+- .demo-img-patten-top
+- .demo-img-patten-bottom
+- // client images
+.client-images img
+- // plan
+
+.plan-box
+- .custom-footer
+- &.landing-back-top
+- .demo-img-patten-top
+- .demo-img-patten-bottom
+- .card-logo-dark
+- .card-logo-light

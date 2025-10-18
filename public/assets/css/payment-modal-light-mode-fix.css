@@ -1,0 +1,512 @@
+/**
+ * Payment Modal Light Mode Fix
+ * Forces all payment-related modals to display in light mode regardless of app theme
+ * Targets all existing payment modal variations in the application
+ */
+
+/* CRITICAL: Force light mode for ALL payment modals regardless of theme */
+/* Target all possible payment modal variations EXCEPT new-payment-confirmation-modal */
+.clean-payment-modal:not(.new-payment-confirmation-modal),
+.payment-modal:not(.new-payment-confirmation-modal),
+.payment-confirmation-modal:not(.new-payment-confirmation-modal),
+.modal[id*="payment"]:not(.new-payment-confirmation-modal),
+.modal[id*="Payment"]:not(.new-payment-confirmation-modal),
+.modal.clean-payment-modal:not(.new-payment-confirmation-modal),
+.modal.afresh-payment-modal:not(.new-payment-confirmation-modal),
+.modal[class*="payment"]:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .clean-payment-modal:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .payment-modal:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .payment-confirmation-modal:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .modal[id*="payment"]:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .modal[id*="Payment"]:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .modal.clean-payment-modal:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .modal.afresh-payment-modal:not(.new-payment-confirmation-modal),
+[data-layout-mode="dark"] .modal[class*="payment"]:not(.new-payment-confirmation-modal)
+    color-scheme: light !important;
+    --bs-body-bg: #ffffff !important;
+    --bs-body-color: #212529 !important;
+}
+
+/* Force light mode on all content inside payment modals (except new payment confirmation modal) */
+.clean-payment-modal:not(.new-payment-confirmation-modal) *,
+.payment-modal:not(.new-payment-confirmation-modal) *,
+.payment-confirmation-modal:not(.new-payment-confirmation-modal) *,
+.modal[id*="payment"]:not(.new-payment-confirmation-modal) *,
+.modal[id*="Payment"]:not(.new-payment-confirmation-modal) *,
+.modal.clean-payment-modal:not(.new-payment-confirmation-modal) *,
+.modal.afresh-payment-modal:not(.new-payment-confirmation-modal) *,
+.modal[class*="payment"]:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .clean-payment-modal:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .payment-modal:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .payment-confirmation-modal:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .modal[id*="payment"]:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .modal[id*="Payment"]:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .modal.clean-payment-modal:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .modal.afresh-payment-modal:not(.new-payment-confirmation-modal) *,
+[data-layout-mode="dark"] .modal[class*="payment"]:not(.new-payment-confirmation-modal) *
+    color-scheme: light !important;
+    background-color: inherit !important;
+    color: inherit !important;
+}
+
+/* Modal Content - Force White Background */
+.clean-payment-modal .modal-content,
+.payment-modal .modal-content,
+.payment-confirmation-modal .modal-content,
+.modal[id*="payment"] .modal-content,
+.modal[id*="Payment"] .modal-content,
+.modal.clean-payment-modal .modal-content,
+.modal.afresh-payment-modal .modal-content,
+.modal[class*="payment"] .modal-content,
+[data-layout-mode="dark"] .clean-payment-modal .modal-content,
+[data-layout-mode="dark"] .payment-modal .modal-content,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-content,
+[data-layout-mode="dark"] .modal[id*="payment"] .modal-content,
+[data-layout-mode="dark"] .modal[id*="Payment"] .modal-content,
+[data-layout-mode="dark"] .modal.clean-payment-modal .modal-content,
+[data-layout-mode="dark"] .modal.afresh-payment-modal .modal-content,
+[data-layout-mode="dark"] .modal[class*="payment"] .modal-content {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #dee2e6 !important;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Modal Body - White Background with Dark Text */
+.clean-payment-modal .modal-body,
+.payment-modal .modal-body,
+.payment-confirmation-modal .modal-body,
+.modal[id*="payment"] .modal-body,
+.modal[id*="Payment"] .modal-body,
+.modal.clean-payment-modal .modal-body,
+.modal.afresh-payment-modal .modal-body,
+.modal[class*="payment"] .modal-body,
+[data-layout-mode="dark"] .clean-payment-modal .modal-body,
+[data-layout-mode="dark"] .payment-modal .modal-body,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-body,
+[data-layout-mode="dark"] .modal[id*="payment"] .modal-body,
+[data-layout-mode="dark"] .modal[id*="Payment"] .modal-body,
+[data-layout-mode="dark"] .modal.clean-payment-modal .modal-body,
+[data-layout-mode="dark"] .modal.afresh-payment-modal .modal-body,
+[data-layout-mode="dark"] .modal[class*="payment"] .modal-body {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+/* All Text Elements in Payment Modals */
+.clean-payment-modal h1, .clean-payment-modal h2, .clean-payment-modal h3, 
+.clean-payment-modal h4, .clean-payment-modal h5, .clean-payment-modal h6,
+.clean-payment-modal p, .clean-payment-modal span, .clean-payment-modal div,
+.clean-payment-modal label, .clean-payment-modal small,
+.payment-modal h1, .payment-modal h2, .payment-modal h3, 
+.payment-modal h4, .payment-modal h5, .payment-modal h6,
+.payment-modal p, .payment-modal span, .payment-modal div,
+.payment-modal label, .payment-modal small,
+.payment-confirmation-modal h1, .payment-confirmation-modal h2, .payment-confirmation-modal h3, 
+.payment-confirmation-modal h4, .payment-confirmation-modal h5, .payment-confirmation-modal h6,
+.payment-confirmation-modal p, .payment-confirmation-modal span, .payment-confirmation-modal div,
+.payment-confirmation-modal label, .payment-confirmation-modal small,
+.modal[id*="payment"] h1, .modal[id*="payment"] h2, .modal[id*="payment"] h3, 
+.modal[id*="payment"] h4, .modal[id*="payment"] h5, .modal[id*="payment"] h6,
+.modal[id*="payment"] p, .modal[id*="payment"] span, .modal[id*="payment"] div,
+.modal[id*="payment"] label, .modal[id*="payment"] small,
+[data-layout-mode="dark"] .clean-payment-modal h1, [data-layout-mode="dark"] .clean-payment-modal h2, 
+[data-layout-mode="dark"] .clean-payment-modal h3, [data-layout-mode="dark"] .clean-payment-modal h4, 
+[data-layout-mode="dark"] .clean-payment-modal h5, [data-layout-mode="dark"] .clean-payment-modal h6,
+[data-layout-mode="dark"] .clean-payment-modal p, [data-layout-mode="dark"] .clean-payment-modal span, 
+[data-layout-mode="dark"] .clean-payment-modal div, [data-layout-mode="dark"] .clean-payment-modal label, 
+[data-layout-mode="dark"] .clean-payment-modal small,
+[data-layout-mode="dark"] .payment-modal h1, [data-layout-mode="dark"] .payment-modal h2, 
+[data-layout-mode="dark"] .payment-modal h3, [data-layout-mode="dark"] .payment-modal h4, 
+[data-layout-mode="dark"] .payment-modal h5, [data-layout-mode="dark"] .payment-modal h6,
+[data-layout-mode="dark"] .payment-modal p, [data-layout-mode="dark"] .payment-modal span, 
+[data-layout-mode="dark"] .payment-modal div, [data-layout-mode="dark"] .payment-modal label, 
+[data-layout-mode="dark"] .payment-modal small,
+[data-layout-mode="dark"] .payment-confirmation-modal h1, [data-layout-mode="dark"] .payment-confirmation-modal h2, 
+[data-layout-mode="dark"] .payment-confirmation-modal h3, [data-layout-mode="dark"] .payment-confirmation-modal h4, 
+[data-layout-mode="dark"] .payment-confirmation-modal h5, [data-layout-mode="dark"] .payment-confirmation-modal h6,
+[data-layout-mode="dark"] .payment-confirmation-modal p, [data-layout-mode="dark"] .payment-confirmation-modal span, 
+[data-layout-mode="dark"] .payment-confirmation-modal div, [data-layout-mode="dark"] .payment-confirmation-modal label, 
+[data-layout-mode="dark"] .payment-confirmation-modal small {
+    color: #212529 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: #212529 !important;
+    background-clip: initial !important;
+}
+
+/* Form Controls */
+.clean-payment-modal input,
+.clean-payment-modal textarea,
+.clean-payment-modal select,
+.payment-modal input,
+.payment-modal textarea,
+.payment-modal select,
+.payment-confirmation-modal input,
+.payment-confirmation-modal textarea,
+.payment-confirmation-modal select,
+.modal[id*="payment"] input,
+.modal[id*="payment"] textarea,
+.modal[id*="payment"] select,
+[data-layout-mode="dark"] .clean-payment-modal input,
+[data-layout-mode="dark"] .clean-payment-modal textarea,
+[data-layout-mode="dark"] .clean-payment-modal select,
+[data-layout-mode="dark"] .payment-modal input,
+[data-layout-mode="dark"] .payment-modal textarea,
+[data-layout-mode="dark"] .payment-modal select,
+[data-layout-mode="dark"] .payment-confirmation-modal input,
+[data-layout-mode="dark"] .payment-confirmation-modal textarea,
+[data-layout-mode="dark"] .payment-confirmation-modal select {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #ced4da !important;
+}
+
+.clean-payment-modal input:focus,
+.clean-payment-modal textarea:focus,
+.clean-payment-modal select:focus,
+.payment-modal input:focus,
+.payment-modal textarea:focus,
+.payment-modal select:focus,
+.payment-confirmation-modal input:focus,
+.payment-confirmation-modal textarea:focus,
+.payment-confirmation-modal select:focus,
+[data-layout-mode="dark"] .clean-payment-modal input:focus,
+[data-layout-mode="dark"] .clean-payment-modal textarea:focus,
+[data-layout-mode="dark"] .clean-payment-modal select:focus,
+[data-layout-mode="dark"] .payment-modal input:focus,
+[data-layout-mode="dark"] .payment-modal textarea:focus,
+[data-layout-mode="dark"] .payment-modal select:focus {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Input Placeholder */
+.clean-payment-modal input::placeholder,
+.clean-payment-modal textarea::placeholder,
+.payment-modal input::placeholder,
+.payment-modal textarea::placeholder,
+.payment-confirmation-modal input::placeholder,
+.payment-confirmation-modal textarea::placeholder,
+[data-layout-mode="dark"] .clean-payment-modal input::placeholder,
+[data-layout-mode="dark"] .clean-payment-modal textarea::placeholder,
+[data-layout-mode="dark"] .payment-modal input::placeholder,
+[data-layout-mode="dark"] .payment-modal textarea::placeholder {
+    color: #6c757d !important;
+    opacity: 0.7 !important;
+}
+
+/* Cards and Backgrounds */
+.clean-payment-modal .card,
+.clean-payment-modal .payment-summary-card,
+.clean-payment-modal .seller-card,
+.clean-payment-modal .instructions-card,
+.payment-modal .card,
+.payment-confirmation-modal .card,
+[data-layout-mode="dark"] .clean-payment-modal .card,
+[data-layout-mode="dark"] .clean-payment-modal .payment-summary-card,
+[data-layout-mode="dark"] .clean-payment-modal .seller-card,
+[data-layout-mode="dark"] .clean-payment-modal .instructions-card,
+[data-layout-mode="dark"] .payment-modal .card,
+[data-layout-mode="dark"] .payment-confirmation-modal .card {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+/* Summary Items */
+.clean-payment-modal .summary-item,
+.payment-modal .summary-item,
+.payment-confirmation-modal .summary-item,
+[data-layout-mode="dark"] .clean-payment-modal .summary-item,
+[data-layout-mode="dark"] .payment-modal .summary-item,
+[data-layout-mode="dark"] .payment-confirmation-modal .summary-item {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #e9ecef !important;
+}
+
+/* Alerts */
+.clean-payment-modal .alert,
+.payment-modal .alert,
+.payment-confirmation-modal .alert,
+[data-layout-mode="dark"] .clean-payment-modal .alert,
+[data-layout-mode="dark"] .payment-modal .alert,
+[data-layout-mode="dark"] .payment-confirmation-modal .alert {
+    background-color: #cce5ff !important;
+    color: #084298 !important;
+    border: 1px solid #b8daff !important;
+}
+
+/* Buttons - Keep Original Colors but Ensure Visibility */
+.clean-payment-modal .btn,
+.payment-modal .btn,
+.payment-confirmation-modal .btn,
+[data-layout-mode="dark"] .clean-payment-modal .btn,
+[data-layout-mode="dark"] .payment-modal .btn,
+[data-layout-mode="dark"] .payment-confirmation-modal .btn {
+    border: 1px solid transparent !important;
+}
+
+.clean-payment-modal .btn-secondary,
+.payment-modal .btn-secondary,
+.payment-confirmation-modal .btn-secondary,
+[data-layout-mode="dark"] .clean-payment-modal .btn-secondary,
+[data-layout-mode="dark"] .payment-modal .btn-secondary,
+[data-layout-mode="dark"] .payment-confirmation-modal .btn-secondary {
+    background-color: #6c757d !important;
+    color: #ffffff !important;
+    border-color: #6c757d !important;
+}
+
+/* Modal Footer */
+.clean-payment-modal .modal-footer,
+.payment-modal .modal-footer,
+.payment-confirmation-modal .modal-footer,
+[data-layout-mode="dark"] .clean-payment-modal .modal-footer,
+[data-layout-mode="dark"] .payment-modal .modal-footer,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-footer {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* Text Muted Elements */
+.clean-payment-modal .text-muted,
+.payment-modal .text-muted,
+.payment-confirmation-modal .text-muted,
+[data-layout-mode="dark"] .clean-payment-modal .text-muted,
+[data-layout-mode="dark"] .payment-modal .text-muted,
+[data-layout-mode="dark"] .payment-confirmation-modal .text-muted {
+    color: #6c757d !important;
+}
+
+/* Form Text */
+.clean-payment-modal .form-text,
+.payment-modal .form-text,
+.payment-confirmation-modal .form-text,
+[data-layout-mode="dark"] .clean-payment-modal .form-text,
+[data-layout-mode="dark"] .payment-modal .form-text,
+[data-layout-mode="dark"] .payment-confirmation-modal .form-text {
+    color: #6c757d !important;
+}
+
+/* List Groups */
+.clean-payment-modal .list-group-item,
+.payment-modal .list-group-item,
+.payment-confirmation-modal .list-group-item,
+[data-layout-mode="dark"] .clean-payment-modal .list-group-item,
+[data-layout-mode="dark"] .payment-modal .list-group-item,
+[data-layout-mode="dark"] .payment-confirmation-modal .list-group-item {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid rgba(0, 0, 0, 0.125) !important;
+}
+
+/* Tables */
+.clean-payment-modal table,
+.payment-modal table,
+.payment-confirmation-modal table,
+[data-layout-mode="dark"] .clean-payment-modal table,
+[data-layout-mode="dark"] .payment-modal table,
+[data-layout-mode="dark"] .payment-confirmation-modal table {
+    color: #212529 !important;
+}
+
+.clean-payment-modal .table th,
+.clean-payment-modal .table td,
+.payment-modal .table th,
+.payment-modal .table td,
+.payment-confirmation-modal .table th,
+.payment-confirmation-modal .table td,
+[data-layout-mode="dark"] .clean-payment-modal .table th,
+[data-layout-mode="dark"] .clean-payment-modal .table td,
+[data-layout-mode="dark"] .payment-modal .table th,
+[data-layout-mode="dark"] .payment-modal .table td,
+[data-layout-mode="dark"] .payment-confirmation-modal .table th,
+[data-layout-mode="dark"] .payment-confirmation-modal .table td {
+    color: #212529 !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Icons - Ensure they're visible */
+.clean-payment-modal i,
+.payment-modal i,
+.payment-confirmation-modal i,
+[data-layout-mode="dark"] .clean-payment-modal i,
+[data-layout-mode="dark"] .payment-modal i,
+[data-layout-mode="dark"] .payment-confirmation-modal i {
+    color: inherit !important;
+}
+
+/* Close buttons - Keep white for dark header */
+.clean-payment-modal .btn-close-white,
+.payment-modal .btn-close-white,
+.payment-confirmation-modal .btn-close-white,
+[data-layout-mode="dark"] .clean-payment-modal .btn-close-white,
+[data-layout-mode="dark"] .payment-modal .btn-close-white,
+[data-layout-mode="dark"] .payment-confirmation-modal .btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+/* Modal Header can keep its gradient - only body needs to be light */
+.clean-payment-modal .modal-header,
+.payment-modal .modal-header,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header,
+[data-layout-mode="dark"] .payment-modal .modal-header {
+    /* Header can keep its original styling for branding */
+}
+
+/* Header Text - White for gradient backgrounds */
+.clean-payment-modal .modal-header h1,
+.clean-payment-modal .modal-header h2,
+.clean-payment-modal .modal-header h3,
+.clean-payment-modal .modal-header h4,
+.clean-payment-modal .modal-header h5,
+.clean-payment-modal .modal-header h6,
+.clean-payment-modal .modal-header .modal-title,
+.payment-modal .modal-header h1,
+.payment-modal .modal-header h2,
+.payment-modal .modal-header h3,
+.payment-modal .modal-header h4,
+.payment-modal .modal-header h5,
+.payment-modal .modal-header h6,
+.payment-modal .modal-header .modal-title,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header h1,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header h2,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header h3,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header h4,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header h5,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header h6,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header .modal-title,
+[data-layout-mode="dark"] .payment-modal .modal-header h1,
+[data-layout-mode="dark"] .payment-modal .modal-header h2,
+[data-layout-mode="dark"] .payment-modal .modal-header h3,
+[data-layout-mode="dark"] .payment-modal .modal-header h4,
+[data-layout-mode="dark"] .payment-modal .modal-header h5,
+[data-layout-mode="dark"] .payment-modal .modal-header h6,
+[data-layout-mode="dark"] .payment-modal .modal-header .modal-title {
+    color: #ffffff !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+
+/* Dropdown menus inside payment modals */
+.clean-payment-modal .dropdown-menu,
+.payment-modal .dropdown-menu,
+.payment-confirmation-modal .dropdown-menu,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-menu,
+[data-layout-mode="dark"] .payment-modal .dropdown-menu,
+[data-layout-mode="dark"] .payment-confirmation-modal .dropdown-menu {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+.clean-payment-modal .dropdown-item,
+.payment-modal .dropdown-item,
+.payment-confirmation-modal .dropdown-item,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-item,
+[data-layout-mode="dark"] .payment-modal .dropdown-item,
+[data-layout-mode="dark"] .payment-confirmation-modal .dropdown-item {
+    color: #212529 !important;
+}
+
+.clean-payment-modal .dropdown-item:hover,
+.clean-payment-modal .dropdown-item:focus,
+.payment-modal .dropdown-item:hover,
+.payment-modal .dropdown-item:focus,
+.payment-confirmation-modal .dropdown-item:hover,
+.payment-confirmation-modal .dropdown-item:focus,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-item:hover,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-item:focus,
+[data-layout-mode="dark"] .payment-modal .dropdown-item:hover,
+[data-layout-mode="dark"] .payment-modal .dropdown-item:focus,
+[data-layout-mode="dark"] .payment-confirmation-modal .dropdown-item:hover,
+[data-layout-mode="dark"] .payment-confirmation-modal .dropdown-item:focus {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* Validation feedback */
+.clean-payment-modal .invalid-feedback,
+.payment-modal .invalid-feedback,
+.payment-confirmation-modal .invalid-feedback,
+[data-layout-mode="dark"] .clean-payment-modal .invalid-feedback,
+[data-layout-mode="dark"] .payment-modal .invalid-feedback,
+[data-layout-mode="dark"] .payment-confirmation-modal .invalid-feedback {
+    color: #dc3545 !important;
+}
+
+.clean-payment-modal .valid-feedback,
+.payment-modal .valid-feedback,
+.payment-confirmation-modal .valid-feedback,
+[data-layout-mode="dark"] .clean-payment-modal .valid-feedback,
+[data-layout-mode="dark"] .payment-modal .valid-feedback,
+[data-layout-mode="dark"] .payment-confirmation-modal .valid-feedback {
+    color: #198754 !important;
+}
+
+/* Additional safety overrides for any remaining dark elements */
+.clean-payment-modal *,
+.payment-modal *,
+.payment-confirmation-modal *,
+.modal[id*="payment"] *,
+[data-layout-mode="dark"] .clean-payment-modal *,
+[data-layout-mode="dark"] .payment-modal *,
+[data-layout-mode="dark"] .payment-confirmation-modal *,
+[data-layout-mode="dark"] .modal[id*="payment"] * {
+    /* Remove any dark mode filters or transforms */
+    filter: none !important;
+    -webkit-filter: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+/* Final catch-all for any missed dark backgrounds */
+[data-layout-mode="dark"] .clean-payment-modal,
+[data-layout-mode="dark"] .payment-modal,
+[data-layout-mode="dark"] .payment-confirmation-modal,
+[data-layout-mode="dark"] .modal[id*="payment"] {
+    background-color: rgba(0, 0, 0, 0.5) !important; /* Modal backdrop */
+}
+
+[data-layout-mode="dark"] .clean-payment-modal .modal-dialog,
+[data-layout-mode="dark"] .payment-modal .modal-dialog,
+[data-layout-mode="dark"] .payment-confirmation-modal .modal-dialog,
+[data-layout-mode="dark"] .modal[id*="payment"] .modal-dialog {
+    background-color: transparent !important;
+}
+
+/* Print support */
+@media print {
+    .clean-payment-modal,
+    .payment-modal,
+    .payment-confirmation-modal,
+    .modal[id*="payment"] {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .clean-payment-modal .modal-content,
+    .payment-modal .modal-content,
+    .payment-confirmation-modal .modal-content {
+        border: 2px solid #000000 !important;
+    }
+    
+    .clean-payment-modal input,
+    .clean-payment-modal textarea,
+    .payment-modal input,
+    .payment-modal textarea,
+    .payment-confirmation-modal input,
+    .payment-confirmation-modal textarea {
+        border: 2px solid #000000 !important;
+    }
+}

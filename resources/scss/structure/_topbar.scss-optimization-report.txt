@@ -1,0 +1,15 @@
+CSS Optimization Report for _topbar.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- / 2) 0 calc(#
+- .topbar-badge-sm
+- dropdown-link-color);
+
+    img
+- #search-dropdown-reponsive
+- &.topbar-shadow
+- ) calc(#
+- / 2) $footer-height calc(#
+- + #

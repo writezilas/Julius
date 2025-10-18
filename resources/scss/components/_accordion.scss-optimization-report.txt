@@ -1,0 +1,22 @@
+CSS Optimization Report for _accordion.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .accordion-button
+- .accordion-body
+- &::after
+- &::after
+- &::after
+- &::after
+- &::after
+- &::after
+- padding-left: 2.75rem;
+
+        &::after
+- &::after
+- .accordion-item
+- .accordion-#
+- &::after
+- .accordion-fill-#
+- .accordion-button::after

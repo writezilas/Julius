@@ -1,0 +1,25 @@
+CSS Optimization Report for _apexcharts.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .apexcharts-canvas
+- .apexcharts-tooltip-title
+- .apexcharts-tooltip-text
+- .apexcharts-legend-series
+- .apexcharts-legend-text
+- .apexcharts-pie-label
+- .apexcharts-title-text
+- .apexcharts-subtitle-text
+- text
+- .apexcharts-yaxis-title
+- // column dynamic loaded chart
+
+#dynamicloadedchart-wrap
+- .chart-box
+- #chart-year
+- #chart-quarter
+- polygon
+- line
+- circle
+- line

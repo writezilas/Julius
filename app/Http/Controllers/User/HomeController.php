@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -41,9 +42,89 @@ class HomeController extends Controller
 
     public function root()
     {
-        // Chart data removed as earning graph was hidden per user request
-        // Simple dashboard view without chart data
-        return view('user-panel.dashboard');
+        $isTradeOpen = is_market_open();
+        
+        // Calculate paid referral earnings only
+        $paidReferralEarnings = $this->calculatePaidReferralEarnings();
+        
+        // Get market timer data for the floating timer
+        $marketTimerData = $this->getMarketTimerData();
+        
+        return view('user-panel.dashboard', compact('isTradeOpen', 'paidReferralEarnings', 'marketTimerData'));
+    }
+    
+    /**
+     * Calculate only the paid referral earnings for the current user
+     * 
+     * @return float
+     */
+    private function calculatePaidReferralEarnings()
+    {
+        // Get users who were referred by the current user, excluding self-referrals
+        $refferals = User::where('refferal_code', auth()->user()->username)
+            ->where('id', '!=', auth()->user()->id)
+            ->where('username', '!=', auth()->user()->username)
+            ->get();
+        
+        $paidEarnings = 0;
+        
+        // Check each referral to see if their bonus has been paid
+        foreach ($refferals as $referral) {
+            if ($referral->ref_amount > 0) {
+                // Check if the referrer (current user) has sold bonus shares for THIS SPECIFIC referral
+                $soldBonusShares = UserShare::where('user_id', auth()->user()->id)
+                    ->where('get_from', 'refferal-bonus')
+                    ->whereHas('invoice', function($invoiceQuery) use ($referral) {
+                        // Link to the specific referral through the invoice reff_user_id
+                        $invoiceQuery->where('reff_user_id', $referral->id);
+                    })
+                    ->where(function($shareQuery) {
+                        // Check if this bonus share has been sold, completed, or paired and paid
+                        $shareQuery->where('status', 'sold')
+                                  ->orWhere('status', 'completed')
+                                  ->orWhereExists(function($pairSubQuery) {
+                                      // Check if the share has been paired and payment confirmed via user_share_pairs
+                                      $pairSubQuery->select(DB::raw(1))
+                                                   ->from('user_share_pairs')
+                                                   ->where(function($whereClause) {
+                                                       $whereClause->whereColumn('user_share_pairs.user_share_id', 'user_shares.id')
+                                                                   ->orWhereColumn('user_share_pairs.paired_user_share_id', 'user_shares.id');
+                                                   })
+                                                   ->where('user_share_pairs.is_paid', 1);
+                                  });
+                    })
+                    ->exists();
+                    
+                if ($soldBonusShares) {
+                    $paidEarnings += $referral->ref_amount;
+                }
+            }
+        }
+        
+        return $paidEarnings;
+    }
+    
+    /**
+     * Get market timer data for the floating timer card
+     * 
+     * @return array
+     */
+    private function getMarketTimerData()
+    {
+        $isMarketOpen = is_market_open();
+        $closeTime = null;
+        $appTimezone = get_app_timezone();
+        
+        // Only get close time if market is open
+        if ($isMarketOpen) {
+            $closeTime = get_current_market_close_time();
+        }
+        
+        return [
+            'isOpen' => $isMarketOpen,
+            'closeTime' => $closeTime ? $closeTime->toISOString() : null,
+            'timezone' => $appTimezone
+        ];
     }
 
     /*Language Translation*/

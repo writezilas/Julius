@@ -1,0 +1,236 @@
+CSS Optimization Report for _theme-dark.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- --#
+- gray-#
+- // body
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+
+  //vertical light
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+
+  //vertical dark
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+
+  // Topbar - (Default Light)
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  
+  // Horizontal nav
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  
+  // twocolumn menu
+  --#
+- ;
+  --#
+- ;
+  
+  // two column dark
+  --#
+- vertical-menu-bg-dark);
+  --#
+- vertical-menu-item-color-dark);
+  --#
+- ;
+  --#
+- ;
+  
+  // boxed 
+  --#
+- ;
+  
+  // heading-color
+  --#
+- ;
+  
+  // component variable
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  
+  // link
+  --#
+- ;
+  --#
+- ;
+  
+  // Border variable
+  --#
+- --#
+- ;
+    --#
+- ;
+    --#
+- ;
+    --#
+- ;
+    --#
+- ;
+    --#
+- --#
+- ;
+    --#
+- ;
+    --#
+- ;
+    --#
+- --#
+- dark);
+    --#
+- light);
+    --#
+- --#
+- dark);
+    --#
+- --#
+- dark);
+    --#
+- light-rgb)
+- 0.75);
+    --#
+- --#
+- light);
+    --#
+- dark);
+    --#
+- --#
+- dark);
+    --#
+- --#
+- light);
+    --#
+- dark-rgb)
+- 0.75);
+    --#
+- --#
+- ;
+    --#
+- --#
+- ;
+  --#
+- --#
+- --#
+- ;
+    --#
+- --#
+- ;
+    --#
+- ;
+    --#
+- --#
+- --#
+- --#
+- ;
+    --#
+- ;
+    --#
+- ;
+    --#
+- //list
+  --#
+- --#
+- --#
+- ;
+    --#
+- //form
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+  --#
+- ;
+
+  // input-group-addon
+  --#
+- ;
+
+  //check
+  --#
+- --#
+- var(--#
+- primary)
+- var(--#
+- success));
+  --#
+- success);
+  --#
+- --#
+- var(--#
+- info)
+- var(--#
+- secondary));
+  --#
+- secondary);
+  --#
+- --#
+- var(--#
+- info)
+- var(--#
+- success));
+  --#
+- success);
+  --#
+- --#
+- #1a1d21
+- var(--#
+- primary));
+  --#
+- primary);
+  --#

@@ -1,0 +1,25 @@
+CSS Optimization Report for _progress.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- // Progress height large
+.progress-lg
+- // Progress height Extra large
+.progress-xl
+- 0%
+- position: relative;
+        border-radius: 30px;
+
+        &::before
+- position: relative;
+        overflow: initial;
+        font-size: .875rem;
+        color: $white;
+        &::after
+- background-color: $bg;
+        &::after
+- 0.1) !important;
+            color: $bg !important;
+            &::after
+- .progress-#

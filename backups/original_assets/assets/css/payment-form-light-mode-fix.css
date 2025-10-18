@@ -1,0 +1,453 @@
+/**
+ * Payment Form Light Mode Override
+ * Fixes dark mode inheritance issue for all payment submission forms
+ * 
+ * This file ensures that payment forms always display in light mode
+ * regardless of the user's global theme preference.
+ */
+
+/* =============================================================================
+   GLOBAL PAYMENT FORM LIGHT MODE ENFORCEMENT
+   ============================================================================= */
+
+/* Force light mode for all payment form modals */
+[data-layout-mode="dark"] .payment-modal,
+[data-layout-mode="dark"] .afresh-payment-modal,
+[data-layout-mode="dark"] .compact-payment-modal,
+[data-layout-mode="dark"] .clean-payment-modal {
+    /* Override CSS custom properties for light mode */
+    --vz-body-bg: #ffffff !important;
+    --vz-body-color: #212529 !important;
+    --vz-modal-bg: #ffffff !important;
+    --vz-card-bg: #ffffff !important;
+    --vz-card-cap-bg: #ffffff !important;
+    --vz-heading-color: #495057 !important;
+    --vz-border-color: #dee2e6 !important;
+    --vz-input-bg: #ffffff !important;
+    --vz-input-border: #ced4da !important;
+    --vz-input-color: #495057 !important;
+    --vz-dropdown-bg: #ffffff !important;
+    --vz-dropdown-link-color: #212529 !important;
+    
+    /* Force light mode appearance */
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    color-scheme: light !important;
+}
+
+/* Modal content containers */
+[data-layout-mode="dark"] .payment-modal .modal-content,
+[data-layout-mode="dark"] .afresh-payment-modal .modal-content,
+[data-layout-mode="dark"] .compact-payment-modal .modal-content,
+[data-layout-mode="dark"] .clean-payment-modal .modal-content {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+/* Modal headers */
+[data-layout-mode="dark"] .payment-modal .modal-header,
+[data-layout-mode="dark"] .afresh-payment-modal .modal-header,
+[data-layout-mode="dark"] .compact-payment-modal .modal-header,
+[data-layout-mode="dark"] .clean-payment-modal .modal-header {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Modal body */
+[data-layout-mode="dark"] .payment-modal .modal-body,
+[data-layout-mode="dark"] .afresh-payment-modal .modal-body,
+[data-layout-mode="dark"] .compact-payment-modal .modal-body,
+[data-layout-mode="dark"] .clean-payment-modal .modal-body {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+}
+
+/* Modal footer */
+[data-layout-mode="dark"] .payment-modal .modal-footer,
+[data-layout-mode="dark"] .afresh-payment-modal .modal-footer,
+[data-layout-mode="dark"] .compact-payment-modal .modal-footer,
+[data-layout-mode="dark"] .clean-payment-modal .modal-footer {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+/* =============================================================================
+   FORM ELEMENTS LIGHT MODE OVERRIDES
+   ============================================================================= */
+
+/* Form controls */
+[data-layout-mode="dark"] .payment-modal .form-control,
+[data-layout-mode="dark"] .afresh-payment-modal .form-control,
+[data-layout-mode="dark"] .compact-payment-modal .form-control,
+[data-layout-mode="dark"] .clean-payment-modal .form-control,
+[data-layout-mode="dark"] .payment-modal .form-select,
+[data-layout-mode="dark"] .afresh-payment-modal .form-select,
+[data-layout-mode="dark"] .compact-payment-modal .form-select,
+[data-layout-mode="dark"] .clean-payment-modal .form-select {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    color: #495057 !important;
+}
+
+/* Form control focus states */
+[data-layout-mode="dark"] .payment-modal .form-control:focus,
+[data-layout-mode="dark"] .afresh-payment-modal .form-control:focus,
+[data-layout-mode="dark"] .compact-payment-modal .form-control:focus,
+[data-layout-mode="dark"] .clean-payment-modal .form-control:focus {
+    background-color: #ffffff !important;
+    border-color: #86b7fe !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    color: #495057 !important;
+}
+
+/* Form labels */
+[data-layout-mode="dark"] .payment-modal .form-label,
+[data-layout-mode="dark"] .afresh-payment-modal .form-label,
+[data-layout-mode="dark"] .compact-payment-modal .form-label,
+[data-layout-mode="dark"] .clean-payment-modal .form-label,
+[data-layout-mode="dark"] .payment-modal .input-label,
+[data-layout-mode="dark"] .afresh-payment-modal .input-label,
+[data-layout-mode="dark"] .compact-payment-modal .input-label,
+[data-layout-mode="dark"] .clean-payment-modal .input-label {
+    color: #495057 !important;
+}
+
+/* Form floating labels */
+[data-layout-mode="dark"] .payment-modal .form-floating > label,
+[data-layout-mode="dark"] .afresh-payment-modal .form-floating > label,
+[data-layout-mode="dark"] .compact-payment-modal .form-floating > label,
+[data-layout-mode="dark"] .clean-payment-modal .form-floating > label {
+    color: #6c757d !important;
+}
+
+/* Form help text */
+[data-layout-mode="dark"] .payment-modal .form-text,
+[data-layout-mode="dark"] .afresh-payment-modal .form-text,
+[data-layout-mode="dark"] .compact-payment-modal .form-text,
+[data-layout-mode="dark"] .clean-payment-modal .form-text,
+[data-layout-mode="dark"] .payment-modal .input-help,
+[data-layout-mode="dark"] .afresh-payment-modal .input-help,
+[data-layout-mode="dark"] .compact-payment-modal .input-help,
+[data-layout-mode="dark"] .clean-payment-modal .input-help {
+    color: #6c757d !important;
+}
+
+/* =============================================================================
+   CARDS AND CONTAINERS
+   ============================================================================= */
+
+/* Cards within payment modals */
+[data-layout-mode="dark"] .payment-modal .card,
+[data-layout-mode="dark"] .afresh-payment-modal .card,
+[data-layout-mode="dark"] .compact-payment-modal .card,
+[data-layout-mode="dark"] .clean-payment-modal .card {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+    color: #212529 !important;
+}
+
+/* Card headers and footers */
+[data-layout-mode="dark"] .payment-modal .card-header,
+[data-layout-mode="dark"] .afresh-payment-modal .card-header,
+[data-layout-mode="dark"] .compact-payment-modal .card-header,
+[data-layout-mode="dark"] .clean-payment-modal .card-header,
+[data-layout-mode="dark"] .payment-modal .card-footer,
+[data-layout-mode="dark"] .afresh-payment-modal .card-footer,
+[data-layout-mode="dark"] .compact-payment-modal .card-footer,
+[data-layout-mode="dark"] .clean-payment-modal .card-footer {
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+    color: #212529 !important;
+}
+
+/* Alert components */
+[data-layout-mode="dark"] .payment-modal .alert,
+[data-layout-mode="dark"] .afresh-payment-modal .alert,
+[data-layout-mode="dark"] .compact-payment-modal .alert,
+[data-layout-mode="dark"] .clean-payment-modal .alert {
+    color: inherit !important;
+}
+
+/* Specific alert types */
+[data-layout-mode="dark"] .payment-modal .alert-info,
+[data-layout-mode="dark"] .afresh-payment-modal .alert-info,
+[data-layout-mode="dark"] .compact-payment-modal .alert-info,
+[data-layout-mode="dark"] .clean-payment-modal .alert-info {
+    background-color: #d1ecf1 !important;
+    border-color: #bee5eb !important;
+    color: #0c5460 !important;
+}
+
+[data-layout-mode="dark"] .payment-modal .alert-warning,
+[data-layout-mode="dark"] .afresh-payment-modal .alert-warning,
+[data-layout-mode="dark"] .compact-payment-modal .alert-warning,
+[data-layout-mode="dark"] .clean-payment-modal .alert-warning {
+    background-color: #fff3cd !important;
+    border-color: #ffecb5 !important;
+    color: #664d03 !important;
+}
+
+/* =============================================================================
+   BUTTONS AND INTERACTIVE ELEMENTS
+   ============================================================================= */
+
+/* Button overrides (keep existing button colors but ensure text is readable) */
+[data-layout-mode="dark"] .payment-modal .btn-secondary,
+[data-layout-mode="dark"] .afresh-payment-modal .btn-secondary,
+[data-layout-mode="dark"] .compact-payment-modal .btn-secondary,
+[data-layout-mode="dark"] .clean-payment-modal .btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    color: #ffffff !important;
+}
+
+[data-layout-mode="dark"] .payment-modal .btn-light,
+[data-layout-mode="dark"] .afresh-payment-modal .btn-light,
+[data-layout-mode="dark"] .compact-payment-modal .btn-light,
+[data-layout-mode="dark"] .clean-payment-modal .btn-light {
+    background-color: #f8f9fa !important;
+    border-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* Close button */
+[data-layout-mode="dark"] .payment-modal .btn-close,
+[data-layout-mode="dark"] .afresh-payment-modal .btn-close,
+[data-layout-mode="dark"] .compact-payment-modal .btn-close,
+[data-layout-mode="dark"] .clean-payment-modal .btn-close,
+[data-layout-mode="dark"] .payment-modal .afresh-close-btn,
+[data-layout-mode="dark"] .afresh-payment-modal .afresh-close-btn,
+[data-layout-mode="dark"] .compact-payment-modal .afresh-close-btn,
+[data-layout-mode="dark"] .clean-payment-modal .afresh-close-btn {
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+}
+
+/* =============================================================================
+   TEXT AND TYPOGRAPHY
+   ============================================================================= */
+
+/* Headings */
+[data-layout-mode="dark"] .payment-modal h1,
+[data-layout-mode="dark"] .payment-modal h2,
+[data-layout-mode="dark"] .payment-modal h3,
+[data-layout-mode="dark"] .payment-modal h4,
+[data-layout-mode="dark"] .payment-modal h5,
+[data-layout-mode="dark"] .payment-modal h6,
+[data-layout-mode="dark"] .afresh-payment-modal h1,
+[data-layout-mode="dark"] .afresh-payment-modal h2,
+[data-layout-mode="dark"] .afresh-payment-modal h3,
+[data-layout-mode="dark"] .afresh-payment-modal h4,
+[data-layout-mode="dark"] .afresh-payment-modal h5,
+[data-layout-mode="dark"] .afresh-payment-modal h6,
+[data-layout-mode="dark"] .compact-payment-modal h1,
+[data-layout-mode="dark"] .compact-payment-modal h2,
+[data-layout-mode="dark"] .compact-payment-modal h3,
+[data-layout-mode="dark"] .compact-payment-modal h4,
+[data-layout-mode="dark"] .compact-payment-modal h5,
+[data-layout-mode="dark"] .compact-payment-modal h6,
+[data-layout-mode="dark"] .clean-payment-modal h1,
+[data-layout-mode="dark"] .clean-payment-modal h2,
+[data-layout-mode="dark"] .clean-payment-modal h3,
+[data-layout-mode="dark"] .clean-payment-modal h4,
+[data-layout-mode="dark"] .clean-payment-modal h5,
+[data-layout-mode="dark"] .clean-payment-modal h6 {
+    color: #212529 !important;
+}
+
+/* Modal titles */
+[data-layout-mode="dark"] .payment-modal .modal-title,
+[data-layout-mode="dark"] .afresh-payment-modal .modal-title,
+[data-layout-mode="dark"] .compact-payment-modal .modal-title,
+[data-layout-mode="dark"] .clean-payment-modal .modal-title {
+    color: #212529 !important;
+}
+
+/* Text muted */
+[data-layout-mode="dark"] .payment-modal .text-muted,
+[data-layout-mode="dark"] .afresh-payment-modal .text-muted,
+[data-layout-mode="dark"] .compact-payment-modal .text-muted,
+[data-layout-mode="dark"] .clean-payment-modal .text-muted {
+    color: #6c757d !important;
+}
+
+/* =============================================================================
+   SPECIFIC COMPONENT OVERRIDES
+   ============================================================================= */
+
+/* Afresh modal specific overrides */
+[data-layout-mode="dark"] .afresh-payment-modal .header-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #212529 !important;
+}
+
+[data-layout-mode="dark"] .afresh-payment-modal .modal-title {
+    color: #212529 !important;
+    text-shadow: none !important;
+    background: none !important;
+    -webkit-background-clip: initial !important;
+    -webkit-text-fill-color: #212529 !important;
+    background-clip: initial !important;
+    filter: none !important;
+    opacity: 1 !important;
+}
+
+[data-layout-mode="dark"] .afresh-payment-modal .modal-subtitle {
+    color: #6c757d !important;
+}
+
+/* Compact modal specific overrides */
+[data-layout-mode="dark"] .compact-payment-modal .compact-modal-header {
+    background: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+[data-layout-mode="dark"] .compact-payment-modal .compact-modal-footer {
+    background: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* Input containers for custom form designs */
+[data-layout-mode="dark"] .payment-modal .input-container,
+[data-layout-mode="dark"] .afresh-payment-modal .input-container,
+[data-layout-mode="dark"] .compact-payment-modal .input-container,
+[data-layout-mode="dark"] .clean-payment-modal .input-container {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(222, 226, 230, 0.8) !important;
+}
+
+/* Form inputs within custom containers */
+[data-layout-mode="dark"] .payment-modal .form-input,
+[data-layout-mode="dark"] .afresh-payment-modal .form-input,
+[data-layout-mode="dark"] .compact-payment-modal .form-input,
+[data-layout-mode="dark"] .clean-payment-modal .form-input {
+    background: transparent !important;
+    color: #212529 !important;
+}
+
+/* =============================================================================
+   DROPDOWN AND SELECT ELEMENTS
+   ============================================================================= */
+
+/* Dropdown menus */
+[data-layout-mode="dark"] .payment-modal .dropdown-menu,
+[data-layout-mode="dark"] .afresh-payment-modal .dropdown-menu,
+[data-layout-mode="dark"] .compact-payment-modal .dropdown-menu,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-menu {
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6 !important;
+}
+
+[data-layout-mode="dark"] .payment-modal .dropdown-item,
+[data-layout-mode="dark"] .afresh-payment-modal .dropdown-item,
+[data-layout-mode="dark"] .compact-payment-modal .dropdown-item,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-item {
+    color: #212529 !important;
+}
+
+[data-layout-mode="dark"] .payment-modal .dropdown-item:hover,
+[data-layout-mode="dark"] .afresh-payment-modal .dropdown-item:hover,
+[data-layout-mode="dark"] .compact-payment-modal .dropdown-item:hover,
+[data-layout-mode="dark"] .clean-payment-modal .dropdown-item:hover {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+}
+
+/* =============================================================================
+   VALIDATION STATES
+   ============================================================================= */
+
+/* Valid state */
+[data-layout-mode="dark"] .payment-modal .is-valid,
+[data-layout-mode="dark"] .afresh-payment-modal .is-valid,
+[data-layout-mode="dark"] .compact-payment-modal .is-valid,
+[data-layout-mode="dark"] .clean-payment-modal .is-valid {
+    border-color: #198754 !important;
+}
+
+/* Invalid state */
+[data-layout-mode="dark"] .payment-modal .is-invalid,
+[data-layout-mode="dark"] .afresh-payment-modal .is-invalid,
+[data-layout-mode="dark"] .compact-payment-modal .is-invalid,
+[data-layout-mode="dark"] .clean-payment-modal .is-invalid {
+    border-color: #dc3545 !important;
+}
+
+/* Validation feedback */
+[data-layout-mode="dark"] .payment-modal .valid-feedback,
+[data-layout-mode="dark"] .afresh-payment-modal .valid-feedback,
+[data-layout-mode="dark"] .compact-payment-modal .valid-feedback,
+[data-layout-mode="dark"] .clean-payment-modal .valid-feedback {
+    color: #198754 !important;
+}
+
+[data-layout-mode="dark"] .payment-modal .invalid-feedback,
+[data-layout-mode="dark"] .afresh-payment-modal .invalid-feedback,
+[data-layout-mode="dark"] .compact-payment-modal .invalid-feedback,
+[data-layout-mode="dark"] .clean-payment-modal .invalid-feedback {
+    color: #dc3545 !important;
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ============================================================================= */
+
+/* Background utilities */
+[data-layout-mode="dark"] .payment-modal .bg-light,
+[data-layout-mode="dark"] .afresh-payment-modal .bg-light,
+[data-layout-mode="dark"] .compact-payment-modal .bg-light,
+[data-layout-mode="dark"] .clean-payment-modal .bg-light {
+    background-color: #f8f9fa !important;
+}
+
+[data-layout-mode="dark"] .payment-modal .bg-white,
+[data-layout-mode="dark"] .afresh-payment-modal .bg-white,
+[data-layout-mode="dark"] .compact-payment-modal .bg-white,
+[data-layout-mode="dark"] .clean-payment-modal .bg-white {
+    background-color: #ffffff !important;
+}
+
+/* Border utilities */
+[data-layout-mode="dark"] .payment-modal .border,
+[data-layout-mode="dark"] .afresh-payment-modal .border,
+[data-layout-mode="dark"] .compact-payment-modal .border,
+[data-layout-mode="dark"] .clean-payment-modal .border {
+    border-color: #dee2e6 !important;
+}
+
+/* =============================================================================
+   RESPONSIVE CONSIDERATIONS
+   ============================================================================= */
+
+/* Ensure the fix works across all screen sizes */
+@media (max-width: 768px) {
+    [data-layout-mode="dark"] .payment-modal,
+    [data-layout-mode="dark"] .afresh-payment-modal,
+    [data-layout-mode="dark"] .compact-payment-modal,
+    [data-layout-mode="dark"] .clean-payment-modal {
+        background-color: #ffffff !important;
+        color: #212529 !important;
+    }
+}
+
+/* =============================================================================
+   IMPORTANT NOTES
+   ============================================================================= */
+
+/*
+ * This CSS file uses !important declarations extensively to override
+ * the global dark mode theme. This is necessary because:
+ * 
+ * 1. The dark mode styles are applied at the HTML level with high specificity
+ * 2. Payment forms must remain in light mode for security and usability
+ * 3. The global theme system is working as designed, but payments need exception
+ * 
+ * If you need to add new payment form components, ensure they include
+ * one of these class patterns in their modal container:
+ * - .payment-modal
+ * - .afresh-payment-modal  
+ * - .compact-payment-modal
+ * - .clean-payment-modal
+ */

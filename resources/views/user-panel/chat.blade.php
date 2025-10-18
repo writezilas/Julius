@@ -163,11 +163,6 @@
 @endsection
 
 @section('content')
-@component('components.breadcrumb')
-@slot('li_1') @lang('translation.dashboard') @endslot
-@slot('title') {{ $pageTitle }} @endslot
-@endcomponent
-
 <div class="row">
     <div class="col-12">
         <div class="card">

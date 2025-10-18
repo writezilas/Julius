@@ -1,0 +1,22 @@
+CSS Optimization Report for _custom-scrollbar.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .simplebar-wrapper
+- .simplebar-mask
+- .simplebar-offset
+- .simplebar-content-wrapper
+- .simplebar-content-wrapper::-webkit-scrollbar
+- .simplebar-hide-scrollbar::-webkit-scrollbar
+- .simplebar-placeholder
+- .simplebar-height-auto-observer-wrapper
+- .simplebar-height-auto-observer
+- .simplebar-track
+- .simplebar-scrollbar
+- .simplebar-track.simplebar-vertical
+- .simplebar-track.simplebar-horizontal
+- .simplebar-track.simplebar-horizontal .simplebar-scrollbar
+- .hs-dummy-scrollbar-size
+- .simplebar-hide-scrollbar
+- .custom-scroll

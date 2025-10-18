@@ -30,8 +30,8 @@
 
 <!-- Clean Payment Modal -->
 <div class="modal fade clean-payment-modal" id="{{ $modalId }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="cleanPaymentLabel{{ $user->id }}" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content clean-modal-content">
+    <div class="modal-dialog modal-dialog-centered modal-lg modern-payment-modal">
+        <div class="modal-content clean-modal-content modern-payment-content">
             
             <!-- Simple Header -->
             <div class="modal-header clean-header">
@@ -41,7 +41,7 @@
                     </div>
                     <div>
                         <h5 class="modal-title text-white mb-0" id="cleanPaymentLabel{{ $user->id }}">
-                            Submit Payment Confirmation
+                            Submit Payment Form
                         </h5>
                         <small class="text-white-50">Complete your purchase of {{ number_format($totalShare) }} shares</small>
                     </div>
@@ -164,7 +164,7 @@
                                    required>
                             <div class="form-text">
                                 <i class="ri-information-line me-1"></i>
-                                Copy the transaction ID from your M-Pesa confirmation SMS
+                                Copy paste the Transaction Id or the Transaction Message
                             </div>
                             @error('txs_id')
                             <div class="text-danger small mt-1">
@@ -213,12 +213,27 @@
 
 <!-- Clean Modal Styles -->
 <style>
+/* CRITICAL: Force light mode for this payment modal regardless of theme */
+.clean-payment-modal,
+[data-layout-mode="dark"] .clean-payment-modal {
+    color-scheme: light !important;
+    --bs-body-bg: #ffffff !important;
+    --bs-body-color: #212529 !important;
+}
+
+.clean-payment-modal *,
+[data-layout-mode="dark"] .clean-payment-modal * {
+    color-scheme: light !important;
+}
+
 /* Clean Payment Modal - Minimal and User-Friendly */
 .clean-payment-modal .clean-modal-content {
     border: none;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     overflow: hidden;
+    background-color: #ffffff !important;
+    color: #212529 !important;
 }
 
 .clean-payment-modal .clean-header {

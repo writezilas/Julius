@@ -1,0 +1,1256 @@
+CSS Optimization Report for app.min.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .megamenu-list li
+- .megamenu-list li a
+- .topbar-badge-sm
+- #search-dropdown-reponsive
+- .app-content
+- .waves-notransition
+- .waves-button
+- .waves-circle
+- .waves-button
+- .waves-button-input
+- .waves-button
+- .waves-button-input
+- .waves-input-wrapper
+- .waves-input-wrapper.waves-button
+- .waves-input-wrapper .waves-button-input
+- .waves-circle
+- .waves-float
+- .waves-block
+- .avatar-group
+- .avatar-group .avatar-group-item
+- .accordion .accordion-button
+- .accordion .accordion-body
+- .lefticon-accordion .accordion-button
+- .accordion-border-box .accordion-item
+- .accordion-border-box .accordion-item .accordion-button
+- .custom-accordion-border .accordion-item
+- .accordion-primary .accordion-item
+- .accordion-primary .accordion-item .accordion-button
+- .accordion-fill-primary .accordion-item .accordion-button
+- .accordion-secondary .accordion-item
+- .accordion-secondary .accordion-item .accordion-button
+- .accordion-fill-secondary .accordion-item .accordion-button
+- .accordion-success .accordion-item
+- .accordion-success .accordion-item .accordion-button
+- .accordion-fill-success .accordion-item .accordion-button
+- .accordion-info .accordion-item
+- .accordion-info .accordion-item .accordion-button
+- .accordion-fill-info .accordion-item .accordion-button
+- .accordion-warning .accordion-item
+- .accordion-warning .accordion-item .accordion-button
+- .accordion-fill-warning .accordion-item .accordion-button
+- .accordion-danger .accordion-item
+- .accordion-danger .accordion-item .accordion-button
+- .accordion-fill-danger .accordion-item .accordion-button
+- .accordion-light .accordion-item
+- .accordion-light .accordion-item .accordion-button
+- .accordion-fill-light .accordion-item .accordion-button
+- .accordion-dark .accordion-item
+- .accordion-dark .accordion-item .accordion-button
+- .accordion-fill-dark .accordion-item .accordion-button
+- .fs-17
+- .fs-19
+- .fs-21
+- .fs-23
+- .fs-48
+- .border-dark
+- .border-double
+- .border-top-double
+- .border-bottom-double
+- .border-end-double
+- .border-start-double
+- .list-group-flush.border-double
+- .list-group-flush.border-double .list-group-item
+- .border-bottom-dashed
+- .border-end-dashed
+- .border-start-dashed
+- .border-groove
+- .border-top-groove
+- .border-bottom-groove
+- .border-end-groove
+- .border-start-groove
+- .list-group-flush.border-groove
+- .list-group-flush.border-groove .list-group-item
+- .border-outset
+- .border-top-outset
+- .border-bottom-outset
+- .border-end-outset
+- .border-start-outset
+- .list-group-flush.border-outset
+- .list-group-flush.border-outset .list-group-item
+- .border-ridge
+- .border-top-ridge
+- .border-bottom-ridge
+- .border-end-ridge
+- .border-start-ridge
+- .list-group-flush.border-ridge
+- .list-group-flush.border-ridge .list-group-item
+- .border-dotted
+- .border-top-dotted
+- .border-bottom-dotted
+- .border-end-dotted
+- .border-start-dotted
+- .list-group-flush.border-dotted
+- .list-group-flush.border-dotted .list-group-item
+- .border-inset
+- .border-top-inset
+- .border-bottom-inset
+- .border-end-inset
+- .border-start-inset
+- .list-group-flush.border-inset
+- .list-group-flush.border-inset .list-group-item
+- .ff-base
+- .social-list-item
+- .w-xs
+- .w-lg
+- .w-xl
+- .icon-xs
+- .icon-sm
+- .icon-md
+- .icon-lg
+- .icon-xl
+- .icon-xxl
+- .icon-dual
+- .icon-dual-primary
+- .icon-dual-secondary
+- .icon-dual-success
+- .icon-dual-info
+- .icon-dual-warning
+- .icon-dual-danger
+- .icon-dual-light
+- .icon-dual-dark
+- .search-box
+- .search-box .search-icon
+- code
+- .layout-rightside
+- .layout-rightside-col
+- .layout-rightside-col .overlay
+- .layout-rightside-col .layout-rightside
+- .text-truncate-two-lines
+- .favourite-btn
+- .favourite-btn .ri-star-fill
+- .card-logo-light
+- .card-logo-dark
+- 0%
+- 75%
+- 0%
+- 75%
+- .main-chart .chart-border-left
+- .activity-feed
+- .activity-feed .feed-item
+- .mini-stats-wid
+- .mini-stats-wid .mini-stat-icon
+- .button-items
+- .bs-example-modal
+- .icon-demo-content
+- .icon-demo-content i
+- .icon-demo-content svg
+- .grid-structure .grid-container
+- .right-bar
+- .vertical-menu
+- .right-bar
+- .ribbon-box
+- .ribbon-box .ribbon
+- .ribbon-box .ribbon.round-shape
+- .ribbon-box .ribbon.ribbon-shape
+- .ribbon-box.ribbon-circle .ribbon
+- .ribbon-box.ribbon-fill
+- .ribbon-box.ribbon-fill .ribbon
+- .ribbon-box.ribbon-fill.ribbon-sm .ribbon
+- .ribbon-box .ribbon-content
+- .ribbon-box .ribbon-primary
+- .ribbon-box .ribbon-secondary
+- .ribbon-box .ribbon-success
+- .ribbon-box .ribbon-info
+- .ribbon-box .ribbon-warning
+- .ribbon-box .ribbon-danger
+- .ribbon-box .ribbon-light
+- .ribbon-box .ribbon-dark
+- .ribbon-box .icon-ribbon
+- .ribbon-box .ribbon-two
+- .ribbon-box .ribbon-two span
+- .ribbon-box .ribbon-two-primary span
+- .ribbon-box .ribbon-two-secondary span
+- .ribbon-box .ribbon-two-success span
+- .ribbon-box .ribbon-two-info span
+- .ribbon-box .ribbon-two-warning span
+- .ribbon-box .ribbon-two-danger span
+- .ribbon-box .ribbon-two-light span
+- .ribbon-box .ribbon-two-dark span
+- .ribbon-three
+- .ribbon-three span
+- .ribbon-three-primary span
+- .ribbon-three-secondary span
+- .ribbon-three-success span
+- .ribbon-three-info span
+- .ribbon-three-warning span
+- .ribbon-three-danger span
+- .ribbon-three-light span
+- .ribbon-three-dark span
+- .ribbon-box .trending-ribbon
+- .ribbon-box .trending-ribbon .trending-ribbon-text
+- .scrollspy-example
+- .scrollspy-example-2
+- h1
+- h2
+- h3
+- h4
+- h5
+- h6
+- label
+- b
+- strong
+- .blockquote-reverse
+- .container-lg
+- .container-md
+- .container-sm
+- .container-xl
+- .container-xxl
+- .alert-solid .alert-link
+- .alert-outline
+- .alert-borderless
+- .alert-label-icon
+- .alert-label-icon.label-arrow
+- .alert-border-left
+- .alert-top-border
+- .alert-additional
+- .alert-additional .alert-body
+- .alert-solid.alert-secondary
+- .alert-outline.alert-secondary
+- .alert-border-left.alert-secondary
+- .alert-top-border.alert-secondary
+- .alert-solid.alert-dark
+- .alert-outline.alert-dark
+- .alert-border-left.alert-dark
+- .alert-top-border.alert-dark
+- .alert-outline.alert-dark
+- .bg-soft-secondary
+- .bg-soft-dark
+- .badge-outline-primary
+- .badge-outline-secondary
+- .badge-outline-success
+- .badge-outline-info
+- .badge-outline-warning
+- .badge-outline-danger
+- .badge-outline-light
+- .badge-outline-dark
+- .badge-outline
+- .badge-outline.badge-secondary
+- .badge-outline.badge-success
+- .badge-outline.badge-info
+- .badge-outline.badge-warning
+- .badge-outline.badge-danger
+- .badge-outline.badge-light
+- .badge-soft-dark
+- .badge-outline.badge-dark
+- .badge-border
+- .badge-label
+- .badge-gradient-primary
+- .badge-gradient-secondary
+- .badge-gradient-success
+- .badge-gradient-danger
+- .badge-gradient-info
+- .badge-gradient-dark
+- .btn-soft-light
+- .btn-soft-dark
+- .btn-ghost-primary
+- .btn-ghost-success
+- .btn-ghost-info
+- .btn-ghost-warning
+- .btn-ghost-danger
+- .btn-ghost-light
+- .btn-ghost-dark
+- .btn-label
+- .btn-animation
+- .btn-animation>span
+- .btn-animation>span
+- .btn-dark.btn-animation
+- .btn-group-vertical label
+- .btn-load .spinner-grow
+- .btn-soft-light.btn-border
+- .btn-dark.btn-border
+- .btn-outline-dark.btn-border
+- .btn-soft-dark.btn-border
+- .custom-toggle .icon-off
+- .card-drop
+- .card-title-desc
+- .card-primary
+- .card-secondary
+- .card-success
+- .card-info
+- .card-warning
+- .card-danger
+- .card-light
+- .card-dark
+- .card-border-primary
+- .card-border-secondary
+- .card-border-success
+- .card-border-info
+- .card-border-warning
+- .card-border-danger
+- .card-border-light
+- .card-border-dark
+- .card-light
+- .card-light .card-text
+- .card-preloader
+- .card-status
+- .custom-loader
+- to
+- to
+- .card-overlay
+- .card-toolbar-menu
+- .card-toolbar-menu a
+- .card-toolbar-menu .minimize-card .plus
+- to
+- 0%
+- to
+- 0%
+- to
+- 0%
+- to
+- 0%
+- .dropdown-menu-md
+- .dropdown-toggle-split
+- .dropdown-mega
+- .dropdown-mega-menu-xl
+- .dropdown-mega-menu-lg
+- .nav-pills>a
+- .nav-pills>li>a
+- .navtab-bg li>a
+- .animation-nav li
+- .animation-nav li a
+- .animation-nav li a span
+- .nav-custom
+- .nav-custom-primary
+- .nav-custom-secondary
+- .nav-custom-success
+- .nav-custom-info
+- .nav-custom-warning
+- .nav-custom-danger
+- .nav-custom-light
+- .nav-custom-dark
+- .nav-custom-light
+- .progress-nav
+- .modal-dialog-right
+- .modal-dialog-bottom
+- .modal-dialog-bottom
+- .modal-dialog-bottom-right
+- .modal-dialog-bottom-right
+- 0%
+- to
+- 0%
+- to
+- 0%
+- to
+- 0%
+- to
+- 0%
+- 50%
+- 0%
+- 50%
+- .login-modal
+- .progress-sm
+- .progress-lg
+- .progress-xl
+- .custom-progess
+- .custom-progess .progress-icon
+- .animated-progress
+- .animated-progress .progress-bar
+- 0%
+- 0%
+- .custom-progress
+- .custom-progress .progress-bar
+- .progress-step-arrow
+- .progress-step-arrow .progress-bar
+- .progress-primary .progress-bar
+- .progress-secondary .progress-bar
+- .progress-success .progress-bar
+- .progress-info .progress-bar
+- .progress-warning .progress-bar
+- .progress-danger .progress-bar
+- .progress-light .progress-bar
+- .progress-dark .progress-bar
+- .form-check-right
+- .form-switch-md
+- .form-switch-lg
+- .form-switch-right
+- .form-switch-right label
+- .form-icon
+- .form-icon .form-control-icon
+- .form-icon i
+- .list-group-fill-light
+- .list-group-item
+- .list-group-item .list-text
+- .simplebar-wrapper
+- .simplebar-mask
+- .simplebar-mask
+- .simplebar-offset
+- .simplebar-offset
+- .simplebar-content-wrapper
+- .simplebar-content-wrapper::-webkit-scrollbar
+- .simplebar-hide-scrollbar::-webkit-scrollbar
+- .simplebar-placeholder
+- .simplebar-height-auto-observer-wrapper
+- .simplebar-height-auto-observer
+- .simplebar-height-auto-observer
+- .simplebar-track
+- .simplebar-track
+- .simplebar-scrollbar
+- .simplebar-track.simplebar-vertical
+- .simplebar-track.simplebar-horizontal
+- .simplebar-track.simplebar-horizontal .simplebar-scrollbar
+- .hs-dummy-scrollbar-size
+- .simplebar-hide-scrollbar
+- .custom-scroll
+- .language-markup::-webkit-scrollbar
+- .language-markup::-webkit-scrollbar:vertical
+- .language-markup::-webkit-scrollbar:horizontal
+- .language-markup::-webkit-scrollbar-thumb
+- .language-markup::-webkit-scrollbar-track
+- #scroll-top
+- .btn-clipboard
+- .swal2-container .swal2-title
+- .swal2-popup
+- .swal2-popup .swal2-title
+- .swal2-footer
+- .swal2-popup .swal2-html-container
+- .swal2-footer
+- .swal2-html-container
+- .swal2-icon.swal2-question
+- .swal2-icon.swal2-success .swal2-success-ring
+- .swal2-icon.swal2-warning
+- .swal2-loader
+- .swal2-timer-progress-bar
+- .swal2-progress-steps .swal2-progress-step
+- .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step
+- .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step
+- .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line
+- .swal2-progress-steps .swal2-progress-step-line
+- .swal2-actions.swal2-loading .swal2-styled.swal2-confirm
+- .swal2-file
+- .swal2-input
+- .swal2-textarea
+- .swal2-input
+- .swal2-close
+- .swal2-validation-message
+- .noUi-connect
+- .noUi-handle
+- .noUi-handle
+- .noUi-horizontal
+- .noUi-horizontal .noUi-handle
+- .noUi-pips-horizontal
+- .noUi-tooltip
+- .noUi-vertical
+- .noUi-vertical .noUi-handle
+- .noUi-vertical .noUi-origin
+- .noUi-value
+- .noUi-marker-horizontal.noUi-marker-large
+- .noUi-value-horizontal
+- .noUi-target
+- #blue
+- #green
+- #red
+- #colorpicker
+- #colorpicker
+- #result
+- #result
+- #red .noUi-connect
+- #green .noUi-connect
+- #blue .noUi-connect
+- .example-val
+- .noUi-tooltip
+- .noUi-active .noUi-tooltip
+- .c-1-color
+- .c-2-color
+- .c-3-color
+- .c-4-color
+- .c-5-color
+- #slider-toggle
+- .nested-list .list-group-item
+- .nested-1
+- .nested-2
+- .nested-3
+- .nested-list
+- .nested-sortable-handle .list-group-item
+- .shepherd-element
+- .shepherd-has-title .shepherd-content .shepherd-header
+- .shepherd-has-title .shepherd-content .shepherd-cancel-icon
+- .shepherd-title
+- .shepherd-text
+- .shepherd-footer
+- .shepherd-arrow
+- .shepherd-button
+- .swiper-button-next
+- .swiper-button-prev
+- .swiper-pagination-bullet
+- .swiper-pagination-bullet .swiper-pagination-bullet-active
+- .dynamic-pagination .swiper-pagination-bullet
+- .dynamic-pagination .swiper-pagination-bullet.swiper-pagination-bullet-active
+- .swiper-pagination-fraction
+- .pagination-custom .swiper-pagination-bullet
+- .pagination-custom .swiper-pagination-bullet.swiper-pagination-bullet-active
+- .swiper-pagination-progressbar
+- .swiper-pagination-progressbar .swiper-pagination-progressbar-fill
+- .swiper-scrollbar
+- .swiper-scrollbar .swiper-scrollbar-drag
+- .swiper-pagination-dark .dynamic-pagination .swiper-pagination-bullet
+- .swiper-pagination-dark .swiper-pagination-bullet
+- .swiper-pagination-dark.pagination-custom .swiper-pagination-bullet
+- .swiper-pagination-dark.pagination-custom .swiper-pagination-bullet.swiper-pagination-bullet-active
+- .swiper-pagination-dark.swiper-scrollbar
+- .multi-wrapper
+- .multi-wrapper .non-selected-wrapper
+- .multi-wrapper .non-selected-wrapper::-webkit-scrollbar
+- .multi-wrapper .selected-wrapper::-webkit-scrollbar
+- .multi-wrapper .non-selected-wrapper::-webkit-scrollbar:vertical
+- .multi-wrapper .selected-wrapper::-webkit-scrollbar:vertical
+- .multi-wrapper .non-selected-wrapper::-webkit-scrollbar:horizontal
+- .multi-wrapper .selected-wrapper::-webkit-scrollbar:horizontal
+- .multi-wrapper .non-selected-wrapper::-webkit-scrollbar-thumb
+- .multi-wrapper .selected-wrapper::-webkit-scrollbar-thumb
+- .multi-wrapper .non-selected-wrapper::-webkit-scrollbar-track
+- .multi-wrapper .selected-wrapper::-webkit-scrollbar-track
+- .multi-wrapper .item-group .group-label
+- .multi-wrapper .selected-wrapper
+- .multi-wrapper .search-input
+- .multi-wrapper .search-input::-moz-placeholder
+- .multi-wrapper .search-input::placeholder
+- .pcr-app
+- .pickr .pcr-button
+- .pcr-app .pcr-interaction .pcr-result
+- .pcr-app .pcr-interaction input
+- .pcr-app .pcr-interaction .pcr-save
+- .pcr-app .pcr-interaction .pcr-cancel
+- .pcr-app .pcr-interaction .pcr-clear
+- .filepond--root
+- .filepond--panel-root
+- .filepond--drop-label
+- .filepond--drop-label label
+- .filepond--credits
+- .filepond--item-panel
+- .input-step
+- .input-step input
+- .input-step button
+- .input-step button
+- .input-step.light-input
+- .input-step.light-input input
+- .input-step.step-primary button
+- .input-step.step-secondary button
+- .input-step.step-success button
+- .input-step.step-info button
+- .input-step.step-warning button
+- .input-step.step-danger button
+- .input-step.step-light button
+- .input-step.step-dark button
+- .ck-editor__editable
+- .ck-editor-reverse .ck-editor
+- .ql-editor
+- .ql-editor ol
+- .ql-editor ul
+- .ql-container
+- .ql-container.ql-snow
+- .ql-bubble
+- .ql-toolbar
+- .ql-toolbar span
+- .ql-toolbar.ql-snow
+- .ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-label
+- .ql-toolbar.ql-snow .ql-picker-options
+- .ql-snow .ql-script
+- .ql-snow .ql-strike svg
+- .ql-snow .ql-stroke
+- .ql-snow .ql-fill
+- .ql-snow .ql-picker.ql-expanded .ql-picker-label
+- .ql-snow .ql-picker-options
+- .gridjs-container
+- .gridjs-wrapper
+- .gridjs-wrapper::-webkit-scrollbar
+- .gridjs-wrapper::-webkit-scrollbar:vertical
+- .gridjs-wrapper::-webkit-scrollbar:horizontal
+- .gridjs-wrapper::-webkit-scrollbar-thumb
+- .gridjs-wrapper::-webkit-scrollbar-track
+- .gridjs-footer
+- .gridjs-table
+- .gridjs-tbody
+- .gridjs-head
+- .gridjs-footer
+- .gridjs-summary
+- .gridjs-pagination .gridjs-pages button
+- .gridjs-pagination .gridjs-pages button.gridjs-currentPage
+- .gridjs-search
+- .gridjs-tr-selected td
+- .gridjs-td .gridjs-checkbox
+- .gridjs-border-none td.gridjs-td
+- .gridjs-border-none th.gridjs-th
+- .gridjs-loading-bar
+- .listjs-pagination
+- .pagination-wrap
+- .pagination-wrap a
+- .pagination-next
+- .pagination-prev
+- .apexcharts-tooltip-text
+- .apexcharts-tooltip-title
+- .apexcharts-tooltip
+- .apexcharts-tooltip *
+- .apexcharts-tooltip .apexcharts-tooltip-title
+- .apexcharts-tooltip.apexcharts-theme-dark *
+- .apexcharts-legend-series
+- .apexcharts-gridline
+- .apexcharts-legend-text
+- .apexcharts-pie-label
+- .apexcharts-subtitle-text
+- .apexcharts-title-text
+- .apexcharts-xaxis text
+- .apexcharts-yaxis text
+- .apexcharts-yaxis-title
+- #dynamicloadedchart-wrap
+- .chart-box
+- #chart-quarter
+- #chart-year
+- #chart-year
+- #chart-year.chart-quarter-activated
+- #chart-quarter
+- #chart-year
+- #chart-quarter
+- .apexcharts-pie circle
+- .apexcharts-pie line
+- .apexcharts-radar-series line
+- .apexcharts-radar-series polygon
+- .apexcharts-pie text
+- .chartjs-chart
+- .e-charts
+- .e-charts-height
+- .gmaps
+- .gmaps-panaroma
+- .gmaps-overlay
+- .gmaps-overlay_arrow
+- .gmaps-overlay_arrow.above
+- .gmaps-overlay_arrow.above
+- .gmaps-overlay_arrow.below
+- .gmaps-overlay_arrow.below
+- .autoComplete_wrapper
+- .autoComplete_wrapper>input
+- .autoComplete_wrapper>input::-moz-placeholder
+- .autoComplete_wrapper>input::placeholder
+- .autoComplete_wrapper>ul
+- .autoComplete_wrapper>ul>li
+- .autoComplete_wrapper>ul>li mark
+- .autoComplete_wrapper>ul .no_result
+- .jvm-tooltip
+- .jvm-container text
+- .jvm-tooltip
+- .jvm-container text
+- .jvm-zoom-btn
+- .leaflet-map
+- .leaflet-map.leaflet-container
+- .fc td
+- .fc th
+- .fc .fc-toolbar h2
+- .fc .fc-toolbar .fc-center
+- .fc .fc-toolbar .fc-left
+- .fc .fc-toolbar .fc-right
+- .fc .fc-toolbar>*>*
+- .fc .fc-toolbar .fc-today-button
+- .fc .fc-col-header-cell
+- .fc .fc-col-header-cell-cushion
+- .fc .fc-daygrid-day-number
+- .fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number
+- .fc .fc-daygrid-day.fc-day-today
+- .fc .fc-timegrid-col.fc-day-today
+- .fc .fc-list-event-title a
+- .fc .fc-col-header
+- .fc .fc-daygrid-body
+- .fc .fc-scrollgrid-sync-table
+- .fc .fc-scrollgrid-section>*
+- .fc .fc-scrollgrid-section-liquid>td
+- .fc-event
+- .fc th.fc-widget-header
+- .fc-unthemed .fc-content
+- .fc-unthemed .fc-divider
+- .fc-unthemed .fc-list-heading td
+- .fc-unthemed .fc-list-view
+- .fc-unthemed .fc-popover
+- .fc-unthemed .fc-row
+- .fc-unthemed tbody
+- .fc-unthemed td
+- .fc-unthemed th
+- .fc-unthemed thead
+- .fc-unthemed td.fc-today
+- .fc-button
+- .fc-state-active
+- .fc-state-disabled
+- .fc-state-down
+- .fc-event
+- .fc-daygrid-dot-event.fc-event-mirror
+- .fc-event
+- .fc-event-dot
+- .fc-event-title
+- .fc-sticky
+- .fc-daygrid-event-dot
+- .fc-event-time
+- .fc-event .fc-content
+- #external-events .external-event
+- .fc-next-button
+- .fc-prev-button
+- .fc-toolbar-chunk .fc-today-button
+- .fc-toolbar
+- #event-modal .event-details
+- #event-modal .view-event #event-category-tag
+- #event-modal .view-event .event-form
+- #event-modal .view-event .event-details
+- .fc-daygrid-event-harness .fc-daygrid-event
+- .fc-timegrid-event-harness .fc-timegrid-event
+- .fc-timegrid-slots table tr
+- .fc-list-table
+- .fc-daygrid-event-harness .fc-daygrid-event.bg-soft-secondary .fc-event-main
+- .fc-daygrid-event-harness .fc-daygrid-event.bg-soft-secondary .fc-event-title
+- .fc-list-table .fc-list-event.bg-soft-secondary
+- .fc-list-table .fc-list-event.bg-soft-secondary .fc-list-event-title>a
+- .fc-timegrid-event-harness .fc-timegrid-event.bg-soft-secondary .fc-event-title
+- .fc-list-table .fc-list-event.bg-soft-secondary .fc-list-event-dot
+- .fc-daygrid-event-harness .fc-daygrid-event.bg-soft-dark .fc-event-main
+- .fc-daygrid-event-harness .fc-daygrid-event.bg-soft-dark .fc-event-title
+- .fc-list-table .fc-list-event.bg-soft-dark
+- .fc-list-table .fc-list-event.bg-soft-dark .fc-list-event-title>a
+- .fc-timegrid-event-harness .fc-timegrid-event.bg-soft-dark .fc-event-title
+- .fc-list-table .fc-list-event.bg-soft-dark .fc-list-event-dot
+- .fc-daygrid-event-harness .fc-daygrid-event.bg-soft-dark .fc-event-main
+- .fc-daygrid-event-harness .fc-daygrid-event.bg-soft-dark .fc-event-title
+- .fc-direction-ltr
+- .fg-emoji-picker
+- .fg-emoji-picker *
+- .fg-emoji-picker
+- .fg-emoji-picker .fg-emoji-picker-container-title
+- .fg-emoji-picker .fg-emoji-picker-search
+- .fg-emoji-picker .fg-emoji-picker-search input
+- .fg-emoji-picker .fg-emoji-picker-search input::-moz-placeholder
+- .fg-emoji-picker .fg-emoji-picker-search input::placeholder
+- .fg-emoji-picker .fg-emoji-picker-search svg
+- .fg-emoji-picker .fg-emoji-picker-categories
+- .dt-buttons a.dt-button
+- .dt-buttons button.dt-button
+- .dt-buttons div.dt-button
+- .dt-buttons input.dt-button
+- .select2-container .select2-selection--single
+- .select2-container .select2-selection--single .select2-selection__rendered
+- .select2-container .select2-selection--single .select2-selection__arrow
+- .select2-container .select2-selection--single .select2-selection__arrow b
+- .select2-container--open .select2-selection--single .select2-selection__arrow b
+- .select2-results__option
+- .select2-dropdown
+- .select2-container--default .select2-results__option--selected
+- .select2-container--default .select2-search--dropdown
+- .select2-container--default .select2-search--dropdown .select2-search__field
+- .select2-container--default .select2-selection--multiple .select2-selection__choice__display
+- .select2-container--default .select2-selection--single .select2-selection__arrow
+- .select2-container .select2-selection--multiple
+- .select2-container .select2-selection--multiple .select2-selection__rendered
+- .select2-container .select2-selection--multiple .select2-search__field
+- .select2-container .select2-selection--multiple .select2-selection__choice
+- .select2-container .select2-selection--multiple .select2-selection__choice__remove
+- .select2-container .select2-search--inline .select2-search__field
+- .select2-container .select2-search textarea::-moz-placeholder
+- .select2-container .select2-search textarea::placeholder
+- .select2-container--default.select2-container--disabled .select2-selection--multiple
+- .select2-container--default.select2-container--disabled .select2-selection--single
+- .toastify
+- .toast-close
+- .toastify-right
+- .toastify-left
+- .toastify-left .toast-close
+- .toastify-top
+- .toastify-bottom
+- .toastify-rounded
+- .toastify-avatar
+- .toastify-center
+- .toastify-left
+- .toastify-right
+- .input-light .choices__inner
+- .choices__inner
+- .is-focused .choices__inner
+- .is-open .choices__inner
+- .choices__list
+- .choices__list--single
+- .choices__list--single .choices__item
+- .choices__list--multiple
+- .choices__list--multiple .choices__item
+- .choices__list--multiple .choices__item.is-highlighted
+- .is-disabled .choices__list--multiple .choices__item
+- .choices__list--dropdown
+- .choices__list--dropdown.is-active
+- .choices__list--dropdown .choices__item--selectable.is-highlighted
+- .choices__list--dropdown .choices__list
+- .choices__list--dropdown .has-no-results
+- .is-open .choices__list--dropdown
+- .is-flipped .choices__list--dropdown
+- .is-flipped .choices__list--dropdown.is-active
+- .choices__list--dropdown .choices__list
+- .choices__list--dropdown .choices__item
+- .choices__item
+- .choices__item--selectable
+- .choices__item--disabled
+- .choices__heading
+- .choices__button
+- .choices__input
+- .choices__input::-moz-placeholder
+- .choices__input::placeholder
+- .choices__placeholder
+- .flatpickr-calendar
+- .flatpickr-calendar .hasTime .dayContainer
+- .flatpickr-calendar .hasWeeks .dayContainer
+- .flatpickr-calendar .hasWeeks .dayContainer
+- .flatpickr-calendar.hasTime .flatpickr-time
+- .flatpickr-calendar.noCalendar.hasTime .flatpickr-time
+- .flatpickr-wrapper
+- .flatpickr-months
+- .flatpickr-months .flatpickr-month
+- .flatpickr-months .flatpickr-next-month
+- .flatpickr-months .flatpickr-prev-month
+- .flatpickr-months .flatpickr-next-month.flatpickr-disabled
+- .flatpickr-months .flatpickr-prev-month.flatpickr-disabled
+- .flatpickr-months .flatpickr-next-month i
+- .flatpickr-months .flatpickr-prev-month i
+- .flatpickr-months .flatpickr-next-month.flatpickr-prev-month
+- .flatpickr-months .flatpickr-prev-month.flatpickr-prev-month
+- .flatpickr-months .flatpickr-next-month.flatpickr-next-month
+- .flatpickr-months .flatpickr-prev-month.flatpickr-next-month
+- .flatpickr-months .flatpickr-next-month svg
+- .flatpickr-months .flatpickr-prev-month svg
+- .flatpickr-months .flatpickr-next-month svg path
+- .flatpickr-months .flatpickr-prev-month svg path
+- .numInputWrapper
+- .numInputWrapper input
+- .numInputWrapper span
+- .numInputWrapper input
+- .numInputWrapper input::-ms-clear
+- .numInputWrapper input::-webkit-inner-spin-button
+- .numInputWrapper input::-webkit-outer-spin-button
+- .numInputWrapper span
+- .numInputWrapper span.arrowUp
+- .numInputWrapper span.arrowDown
+- .numInputWrapper span svg
+- .numInputWrapper span svg path
+- .flatpickr-current-month
+- .flatpickr-current-month span.cur-month
+- .flatpickr-current-month .numInputWrapper
+- .flatpickr-current-month input.cur-year
+- .flatpickr-current-month .flatpickr-monthDropdown-months
+- .flatpickr-current-month .flatpickr-monthDropdown-months .flatpickr-monthDropdown-month
+- .flatpickr-weekdays
+- .flatpickr-weekdays .flatpickr-weekdaycontainer
+- .dayContainer
+- .flatpickr-weeks
+- .flatpickr-days
+- .dayContainer
+- .dayContainer+.dayContainer
+- .flatpickr-day
+- .flatpickr-day.inRange
+- .flatpickr-day.nextMonthDay.inRange
+- .flatpickr-day.prevMonthDay.inRange
+- .flatpickr-day.endRange
+- .flatpickr-day.endRange.inRange
+- .flatpickr-day.endRange.nextMonthDay
+- .flatpickr-day.endRange.prevMonthDay
+- .flatpickr-day.startRange
+- .flatpickr-day.startRange.inRange
+- .flatpickr-day.startRange.nextMonthDay
+- .flatpickr-day.startRange.prevMonthDay
+- .flatpickr-day.endRange.startRange
+- .flatpickr-day.startRange.startRange
+- .flatpickr-day.endRange.startRange .endRange
+- .flatpickr-day.startRange.startRange .endRange
+- .flatpickr-day.endRange.endRange
+- .flatpickr-day.startRange.endRange
+- .flatpickr-day.inRange
+- .flatpickr-day.flatpickr-disabled
+- .flatpickr-day.nextMonthDay
+- .flatpickr-day.notAllowed
+- .flatpickr-day.notAllowed.nextMonthDay
+- .flatpickr-day.notAllowed.prevMonthDay
+- .flatpickr-day.prevMonthDay
+- .flatpickr-day.flatpickr-disabled
+- .rangeMode .flatpickr-day
+- .flatpickr-weekwrapper
+- .flatpickr-weekwrapper .flatpickr-weeks
+- .flatpickr-weekwrapper .flatpickr-weekday
+- .flatpickr-weekwrapper span.flatpickr-day
+- .flatpickr-innerContainer
+- .flatpickr-rContainer
+- .flatpickr-time
+- .flatpickr-time .numInputWrapper
+- .flatpickr-time.hasSeconds .numInputWrapper
+- .flatpickr-time.time24hr .numInputWrapper
+- .flatpickr-time input
+- .flatpickr-time input.flatpickr-hour
+- .flatpickr-time input.flatpickr-minute
+- .flatpickr-time input.flatpickr-second
+- .flatpickr-time .flatpickr-am-pm
+- .flatpickr-time .flatpickr-time-separator
+- .flatpickr-time .flatpickr-am-pm
+- 0%
+- to
+- 0%
+- to
+- .particles-js-canvas-el
+- .signin-other-title
+- .auth-bg-cover
+- #password-contain
+- #password-contain p
+- .upcoming-scheduled
+- .upcoming-scheduled .flatpickr-months
+- .upcoming-scheduled .flatpickr-months .flatpickr-month
+- .upcoming-scheduled .flatpickr-months .flatpickr-next-month
+- .upcoming-scheduled .flatpickr-months .flatpickr-prev-month
+- .upcoming-scheduled .flatpickr-calendar
+- .upcoming-scheduled .flatpickr-calendar .flatpickr-current-month
+- .upcoming-scheduled .flatpickr-calendar .flatpickr-monthDropdown-months
+- .upcoming-scheduled .flatpickr-calendar .flatpickr-weekdays
+- .upcoming-scheduled .flatpickr-calendar .flatpickr-weekdays span.flatpickr-weekday
+- .upcoming-scheduled .flatpickr-calendar .numInputWrapper
+- .upcoming-scheduled .flatpickr-days
+- .crypto-widget
+- .bg-marketplace
+- .dash-countdown .countdownlist .count-num
+- .dash-countdown .countdownlist .count-num
+- .dash-countdown .countdownlist .count-title
+- .marketplace-icon
+- .marketplace-swiper .swiper-button-next
+- .marketplace-swiper .swiper-button-prev
+- .marketplace-swiper .swiper-button-prev
+- .jvectormap-legend-cnt-h .jvectormap-legend-tick-sample
+- .timeline-item
+- .timeline-item
+- .timeline-2
+- .timeline-2 .timeline-year
+- .timeline-2 .timeline-year p
+- .timeline-2 .timeline-year p span
+- .timeline-2 .timeline-date
+- .timeline-2 .timeline-box
+- .timeline-2 .timeline-box .timeline-text
+- .timeline-2 .timeline-launch
+- .timeline-2 .timeline-launch .timeline-box
+- .horizontal-timeline
+- .horizontal-timeline .swiper-slide .item-box
+- .horizontal-timeline .swiper-slide .timeline-content
+- .horizontal-timeline .swiper-button-next
+- .horizontal-timeline .swiper-button-prev
+- .horizontal-timeline .swiper-button-next.swiper-button-disabled
+- .horizontal-timeline .swiper-button-prev.swiper-button-disabled
+- .horizontal-timeline .swiper-button-next
+- .horizontal-timeline .swiper-button-prev
+- .acitivity-timeline
+- .acitivity-timeline .acitivity-item
+- .acitivity-timeline .acitivity-item .acitivity-avatar
+- .categories-filter .list-inline-item
+- .categories-filter .list-inline-item a
+- .gallery-box
+- .gallery-box .gallery-container
+- .gallery-box .gallery-container a
+- .gallery-box .gallery-container .gallery-overlay
+- .gallery-box .gallery-container .gallery-overlay .overlay-caption
+- .gallery-box .gallery-img
+- .gallery-box .box-content
+- 0%
+- 15%
+- 30%
+- 45%
+- 60%
+- 75%
+- to
+- 0%
+- 15%
+- 30%
+- 45%
+- 60%
+- 75%
+- to
+- .error-text
+- .error-text
+- .profile-project-card
+- .profile-project-card.profile-project-primary
+- .profile-project-card.profile-project-secondary
+- .profile-project-card.profile-project-success
+- .profile-project-card.profile-project-info
+- .profile-project-card.profile-project-warning
+- .profile-project-card.profile-project-danger
+- .profile-project-card.profile-project-light
+- .profile-project-card.profile-project-dark
+- .user-profile-img
+- .user-profile-img .profile-img
+- .user-profile-img .profile-img
+- .user-profile-img .profile-foreground-img-file-input
+- .profile-timeline .accordion-item
+- .profile-timeline .accordion-item .accordion-button
+- .sitemap-content
+- .sitemap-content *
+- .sitemap-horizontal
+- .sitemap-horizontal ul
+- .sitemap-horizontal ul a
+- .sitemap-horizontal ul a span
+- .administration .director>li>a
+- .administration .subdirector
+- .departments
+- .department
+- .department
+- .department>a
+- .department ul
+- .department ul li
+- .department ul li a
+- .department
+- .hori-sitemap ul
+- .hori-sitemap ul li
+- .hori-sitemap ul
+- .hori-sitemap ul .parent-title a
+- .hori-sitemap>ul
+- .hori-sitemap>ul li
+- .hori-sitemap>ul li .second-list
+- .hori-sitemap>ul li .sub-list
+- .hori-sitemap>ul li a
+- .hori-sitemap>ul li ul
+- .hori-sitemap ul
+- .hori-sitemap ul li
+- .hori-sitemap ul li .sub-title
+- .hori-sitemap a
+- .hori-sitemap a
+- .verti-sitemap a
+- .verti-sitemap .parent-title a
+- .verti-sitemap .first-list
+- .verti-sitemap .first-list .list-wrap a
+- .verti-sitemap .first-list li a
+- .verti-sitemap .first-list .second-list
+- .verti-sitemap .first-list .third-list
+- .verti-sitemap .first-list .second-list li
+- .verti-sitemap .first-list .third-list li
+- .modal-team-cover
+- .profile-offcanvas .team-cover
+- .team-box .team-cover
+- .modal-team-cover img
+- .profile-offcanvas .team-cover img
+- .team-box .team-cover img
+- .team-list.grid-view-filter
+- .team-list.grid-view-filter .team-box
+- .team-list.grid-view-filter .team-box .team-row
+- .team-list.grid-view-filter .team-box .team-cover
+- .team-list.grid-view-filter .team-box .team-settings .btn-star
+- .team-list.grid-view-filter .team-box .team-profile-img
+- .team-list.grid-view-filter .team-box .team-profile-img .team-content
+- .team-list.grid-view-filter .team-box .view-btn
+- .team-list.list-view-filter
+- .team-list.list-view-filter .team-box
+- .team-list.list-view-filter .team-box .team-row
+- .team-list.list-view-filter .team-box .team-profile-img
+- .team-list.list-view-filter .team-box .team-profile-img .team-content
+- .team-list.list-view-filter .team-box .team-settings
+- .team-list.list-view-filter .team-box .btn-star
+- .team-list.list-view-filter
+- .team-list.list-view-filter .team-box .team-settings
+- .team-list.list-view-filter .team-box .team-profile-img
+- .team-list.list-view-filter .team-box .view-btn
+- .modal-team-cover
+- .profile-offcanvas .team-cover
+- .profile-offcanvas .btn-star
+- .countdownlist
+- .countdownlist .countdownlist-item
+- .countdownlist .count-title
+- .countdownlist .count-num
+- .countdownlist .count-num
+- 0%
+- to
+- 0%
+- to
+- .coming-soon-text
+- .countdown-input-group
+- .search-more-results
+- .search-more-results .nav-icon
+- .search-more-results .nav-icon i
+- .search-more-results .nav-icon
+- .search-more-results .nav-icon i
+- .video-list .list-element
+- .search-voice
+- .search-voice i
+- .search-voice .voice-wave
+- 0%
+- to
+- 0%
+- to
+- .images-menu .swiper-slide
+- #selection-element
+- .filter-choices-input .choices__inner
+- .filter-choices-input .choices__inner
+- .filter-choices-input .choices__input
+- .sticky-side-div
+- .product-img-slider .product-nav-slider .nav-slide-item
+- .product-img-slider .product-nav-slider .swiper-slide-thumb-active .nav-slide-item
+- .currency-select .choices__inner
+- .currency-select .choices__list--single
+- .chat-wrapper
+- .chat-leftsidebar
+- .chat-leftsidebar
+- .chat-list
+- .chat-list>li a
+- .chat-list>li .chat-user-message
+- .chat-list>li .unread-msg-user
+- .chat-list>li .unread-message
+- .chat-user-img
+- .chat-user-img .user-status
+- .chat-user-img.away .user-status
+- .chat-room-list
+- .chat-room-list
+- .contact-list li
+- .contact-list-title
+- .user-chat
+- .user-chat
+- .user-chat.user-chat-show
+- .user-chat .chat-content
+- .user-chat.user-chat-show .chat-welcome-section
+- .user-chat.user-chat-show .chat-content
+- .user-chat-topbar
+- .user-chat-topbar
+- .user-chat-nav .nav-btn
+- .user-chat-nav
+- .chat-conversation
+- .chat-conversation
+- .chat-conversation .simplebar-content-wrapper
+- .chat-conversation .simplebar-content-wrapper .simplebar-content
+- .chat-conversation .chat-conversation-list
+- .chat-conversation .chat-conversation-list>li
+- .chat-conversation .chat-list .message-box-drop
+- .chat-conversation .chat-avatar
+- .chat-conversation .chat-avatar img
+- .chat-conversation .chat-day-title
+- .chat-conversation .conversation-list
+- .chat-conversation .conversation-list
+- .chat-conversation .conversation-list .ctext-wrap
+- .chat-conversation .conversation-list .ctext-content
+- .chat-conversation .conversation-list .ctext-wrap-content
+- .chat-conversation .conversation-list .ctext-wrap-content .attached-file .attached-file-avatar
+- .chat-conversation .conversation-list .conversation-name
+- .chat-conversation .conversation-list .chat-time
+- .chat-conversation .conversation-list .message-img
+- .chat-conversation .conversation-list .message-img .message-img-list
+- .chat-conversation .conversation-list .message-img img
+- .chat-conversation .conversation-list .message-img .message-img-link
+- .chat-conversation .conversation-list .message-img .message-img-link li>a
+- .chat-input-section
+- .chat-input-section .chat-input-feedback
+- .chat-input-links
+- .copyclipboard-alert
+- .replyCard
+- .replyCard
+- .replymessage-block
+- .replymessage-block .conversation-name
+- .chat-sm .ctext-wrap-content
+- .chat-sm .message-img img
+- .chat-sm .message-img-link
+- .email-wrapper
+- .email-menu-sidebar
+- .email-menu-sidebar
+- .email-menu-sidebar
+- .email-menu-sidebar.menubar-show
+- .email-menu-sidebar .email-menu-sidebar-scroll
+- .email-menu-sidebar .email-menu-sidebar-scroll
+- .mail-list a
+- .mail-list a i
+- .email-content
+- .unreadConversations-alert
+- .email-detail-content
+- .email-detail-show .email-detail-content
+- .email-detail-show .email-content
+- .email-detail-show .email-content
+- .email-detail-content-scroll
+- .email-detail-content-scroll
+- .message-list-content
+- .message-list-content
+- .message-list
+- .message-list li
+- .message-list li a
+- .message-list li .col-mail
+- .message-list li .col-mail-1
+- .message-list li .col-mail-1 .checkbox-wrapper-mail
+- .message-list li .col-mail-1 .star-toggle
+- .message-list li .col-mail-1 .checkbox-wrapper-mail
+- .message-list li .col-mail-1 .star-toggle
+- .message-list li .col-mail-2
+- #email-topbar-actions
+- #unreadConversations
+- #elmLoader
+- .email-compose-input
+- .email-detail-content
+- .email-detail-show .email-detail-content
+- .message-list li .col-mail-1
+- .email-editor .ck-editor__editable_inline
+- .email-chat-detail
+- .email-chat-detail
+- .tasks-board
+- .tasks-board .tasks-list
+- .tasks-board::-webkit-scrollbar
+- .tasks-board::-webkit-scrollbar:vertical
+- .tasks-board::-webkit-scrollbar:horizontal
+- .tasks-board::-webkit-scrollbar-thumb
+- .tasks-board::-webkit-scrollbar-track
+- .tasks-box .tasks-img
+- .tasks-wrapper
+- #tasksList tr .tasks-list-menu
+- .icon-effect
+- .navbar-landing
+- .navbar-landing
+- .navbar-landing.is-sticky
+- .navbar-light .navbar-brand .card-logo-dark
+- .navbar-light .navbar-brand .card-logo-light
+- .navbar-light.is-sticky .navbar-brand .card-logo-dark
+- .navbar-light.is-sticky .navbar-brand .card-logo-light
+- .hero-section
+- .hero-section .hero-shape-svg svg path
+- .bg-overlay-pattern
+- .demo-carousel
+- .demo-carousel .demo-img-patten-top
+- .demo-carousel .demo-img-patten-bottom
+- .client-images img
+- .plan-box
+- .process-card
+- .process-card .process-arrow-img
+- .custom-footer
+- .footer-list li a
+- .explore-box
+- .explore-box .explore-img
+- .explore-box .explore-place-bid-img
+- .explore-box .explore-place-bid-img .place-bid-btn
+- .explore-box .discount-time
+- .nft-hero
+- #explorecard-list .list-element
+- .file-manager-menu
+- .file-manager-menu
+- .file-manager-menu li
+- .file-manager-menu li a
+- .file-manager-menu li .sub-menu li
+- .file-manager-sidebar
+- .file-manager-sidebar
+- .file-manager-sidebar
+- .file-manager-sidebar.menubar-show
+- .file-menu-sidebar-scroll
+- .file-menu-sidebar-scroll
+- .file-manager-content
+- .file-manager-content-scroll
+- .file-manager-content-scroll
+- .file-manager-content-scroll .simplebar-content
+- .file-detail-content-scroll
+- .file-detail-content-scroll
+- .file-detail-content-scroll .simplebar-content
+- .file-manager-detail-content
+- .file-detail-show .file-manager-detail-content
+- #file-overview
+- .file-manager-detail-content
+- .file-detail-show .file-manager-detail-content
+- .file-details-box
+- .todo-content
+- .todo-content::-webkit-scrollbar
+- .todo-content::-webkit-scrollbar:vertical
+- .todo-content::-webkit-scrollbar:horizontal
+- .todo-content::-webkit-scrollbar-thumb
+- .todo-content::-webkit-scrollbar-track
+- .task-handle
+- #task-error-msg

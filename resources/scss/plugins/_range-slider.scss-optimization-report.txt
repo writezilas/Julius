@@ -1,0 +1,56 @@
+CSS Optimization Report for _range-slider.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    right: -10px !important;
+    top: -7px;
+
+    &::before
+- &::after
+- .noUi-pips-horizontal
+- height: 16px;
+    width: 16px;
+    right: -8px;
+    top: -12px;
+    left: auto;
+    border-radius: 50%;
+    &::before
+- &::after
+- .noUi-origin
+- .noUi-value
+- &.noUi-marker-large
+- .noUi-value-horizontal
+- // Colorpicker
+
+#red
+- #green
+- #blue
+- #colorpicker
+- #result
+- .noUi-connect
+- .noUi-connect
+- .noUi-connect
+- &.keyboard
+- // showing tooltips
+
+.noUi-tooltip
+- .noUi-active .noUi-tooltip
+- // Colored Connect Elements
+
+.c-1-color
+- .c-2-color
+- .c-3-color
+- .c-4-color
+- .c-5-color
+- .noUi-handle
+- .noUi-connect
+- .noUi-handle
+- .noUi-handle
+- &.noUi-horizontal .noUi-handle
+- &.noUi-vertical .noUi-handle
+- .noUi-handle
+- .noUi-handle

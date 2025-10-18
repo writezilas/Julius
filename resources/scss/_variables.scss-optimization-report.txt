@@ -1,0 +1,96 @@
+CSS Optimization Report for _variables.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 34
+- 58
+- 34
+- 58
+- 34
+- 58
+- 34
+- 58
+- 34
+- 58
+- 65
+- 74
+- success-rgb)
+- $primary 50%
+- to-rgb
+- "$value");
+// scss-docs-end theme-colors-rgb
+
+// The contrast ratio to reach against white
+- to determine if color changes from "light" to "dark". Acceptable values for WCAG 2.0 are 3
+- "%3c")
+- (">"
+- "%3e")
+- ("#"
+- "%23")
+- ("("
+- "%28")
+- (")"
+- "%29")
+- rgba($white
+- .15)
+- rgba($white
+- 0));
+// scss-docs-end variable-gradient
+
+// Spacing
+//
+// Control the default styling of most Bootstrap elements by modifying these
+// variables. Mostly focused on spacing.
+// You can add more entries to the $spacers map
+- negativify-map($spacers)
+- // adapting to different screen sizes
+- "$grid-breakpoints");
+@include _assert-starts-at-zero($grid-breakpoints
+- 65
+- 74
+- 32
+- 37
+- line-height
+- and color for body text
+- headings
+- Menlo
+- Monaco
+- Consolas
+- "Liberation Mono"
+- "Courier New"
+- font-monospace);
+
+// $font-size-root affects the value of `rem`
+- which is used for as well font sizes
+- paddings
+- dark-rgb)
+- light-rgb)
+- light-rgb)
+- $table-bg-scale)
+- $table-bg-scale)
+- $table-bg-scale)
+- $table-bg-scale)
+- $table-bg-scale)
+- $table-bg-scale)
+- define text
+- background
+- .15)
+- 0 1px 1px rgba($black
+- background-color .15s ease-in-out
+- border-color .15s ease-in-out
+- add($input-padding-y * 2
+- $input-height-border
+- add($input-padding-y-sm * 2
+- $input-height-border
+- add($input-padding-y-lg * 2
+- $input-height-border
+- border-color .15s ease-in-out
+- '><circle cx='6' cy='6' r='4.5'/><path stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/><circle cx='6' cy='8.2' r='.6' fill='#
+- background-color .15s ease-in-out
+- gray-300) var(--#
+- gray-300) var(--#
+- background-color .15s ease-in-out
+- border-color .15s ease-in-out
+- border radius
+- `transform 2s ease

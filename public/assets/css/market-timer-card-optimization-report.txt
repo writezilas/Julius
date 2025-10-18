@@ -1,0 +1,64 @@
+CSS Optimization Report for market-timer-card.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .floating-market-timer
+- .timer-card-body
+- .market-close-message
+- .timer-display
+- .timer-unit
+- .timer-value
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 0%
+- 50%
+- 51%
+- 100%
+- .timer-label
+- .timer-separator
+- 0%
+- 50%
+- 51%
+- 100%
+- .timer-progress-container
+- .timer-progress-bar
+- .timer-progress-fill
+- .timer-progress-fill::after
+- 0%
+- 100%
+- .timer-card-footer
+- .timer-timezone
+- .timer-refresh
+- .floating-market-timer
+- .timer-card-body
+- .market-close-message
+- .timer-display
+- .timer-unit
+- .timer-value
+- .timer-label
+- .timer-separator
+- .floating-market-timer
+- .timer-card-body
+- .market-close-message
+- .timer-display
+- .timer-unit
+- .timer-value
+- .timer-label
+- .timer-separator
+- .floating-market-timer
+- .floating-market-timer
+- .timer-unit
+- .timer-progress-fill
+- .timer-refresh
+- .timer-status-indicator
+- .timer-separator
+- .timer-progress-fill::after
+- .floating-market-timer
+- .timer-unit
+- 0%
+- 100%
+- 50%

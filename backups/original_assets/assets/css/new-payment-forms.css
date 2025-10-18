@@ -1,0 +1,2074 @@
+/*
+ * New Payment Forms - Clean, Modern, Light/Dark Mode Compatible
+ * Responsive design with smooth animations and excellent UX
+ */
+
+/* CSS Custom Properties for Light/Dark Mode */
+:root {
+    /* Light mode colors */
+    --payment-bg: #ffffff;
+    --payment-bg-secondary: #f8fafc;
+    --payment-surface: #ffffff;
+    --payment-border: #e2e8f0;
+    --payment-border-hover: #cbd5e1;
+    --payment-text: #1e293b;
+    --payment-text-secondary: #64748b;
+    --payment-text-muted: #94a3b8;
+    
+    /* Primary colors */
+    --payment-primary: #3b82f6;
+    --payment-primary-hover: #2563eb;
+    --payment-primary-light: #eff6ff;
+    
+    /* Success colors */
+    --payment-success: #10b981;
+    --payment-success-hover: #059669;
+    --payment-success-light: #ecfdf5;
+    
+    /* Error colors */
+    --payment-error: #ef4444;
+    --payment-error-hover: #dc2626;
+    --payment-error-light: #fef2f2;
+    
+    /* Warning colors */
+    --payment-warning: #f59e0b;
+    --payment-warning-light: #fffbeb;
+    
+    /* Shadows */
+    --payment-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --payment-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --payment-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --payment-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --payment-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    
+    /* Border radius */
+    --payment-radius: 0.5rem;
+    --payment-radius-lg: 0.75rem;
+    --payment-radius-xl: 1rem;
+    
+    /* Transitions */
+    --payment-transition: all 0.2s ease;
+    --payment-transition-slow: all 0.3s ease;
+}
+
+/* Dark mode colors - Override CSS custom properties when dark mode is active */
+[data-layout-mode="dark"] {
+    --payment-bg: #0f172a;
+    --payment-bg-secondary: #1e293b;
+    --payment-surface: #1e293b;
+    --payment-border: #334155;
+    --payment-border-hover: #475569;
+    --payment-text: #f1f5f9;
+    --payment-text-secondary: #cbd5e1;
+    --payment-text-muted: #94a3b8;
+    --payment-primary-light: #1e293b;
+    --payment-success-light: #1e293b;
+    --payment-error-light: #1e293b;
+    --payment-warning-light: #1e293b;
+}
+
+/* CRITICAL FIX: Ensure payment modals always adopt the current application theme */
+/* Override any existing light-mode-only fixes to allow proper theme switching */
+.new-payment-confirmation-modal.modal-content,
+.new-payment-confirmation-modal .modal-content {
+    background-color: var(--payment-bg) !important;
+    color: var(--payment-text) !important;
+    border: 1px solid var(--payment-border) !important;
+}
+
+.new-payment-confirmation-modal .modal-body,
+.new-confirmation-body {
+    background-color: var(--payment-bg) !important;
+    color: var(--payment-text) !important;
+}
+
+/* Override all text elements to use theme-appropriate colors */
+.new-payment-confirmation-modal h1, 
+.new-payment-confirmation-modal h2, 
+.new-payment-confirmation-modal h3,
+.new-payment-confirmation-modal h4, 
+.new-payment-confirmation-modal h5, 
+.new-payment-confirmation-modal h6,
+.new-payment-confirmation-modal p, 
+.new-payment-confirmation-modal span, 
+.new-payment-confirmation-modal div:not(.header-content),
+.new-payment-confirmation-modal label, 
+.new-payment-confirmation-modal small {
+    color: var(--payment-text) !important;
+}
+
+/* Muted text elements */
+.new-payment-confirmation-modal .text-muted,
+.new-payment-confirmation-modal .form-help {
+    color: var(--payment-text-muted) !important;
+}
+
+/* Form controls */
+.new-payment-confirmation-modal input,
+.new-payment-confirmation-modal textarea,
+.new-payment-confirmation-modal select {
+    background-color: var(--payment-surface) !important;
+    color: var(--payment-text) !important;
+    border: 1px solid var(--payment-border) !important;
+}
+
+.new-payment-confirmation-modal input:focus,
+.new-payment-confirmation-modal textarea:focus,
+.new-payment-confirmation-modal select:focus {
+    background-color: var(--payment-surface) !important;
+    color: var(--payment-text) !important;
+    border-color: var(--payment-primary) !important;
+}
+
+.new-payment-confirmation-modal input::placeholder,
+.new-payment-confirmation-modal textarea::placeholder {
+    color: var(--payment-text-muted) !important;
+}
+
+/* Cards and sections */
+.new-payment-confirmation-modal .summary-section,
+.new-payment-confirmation-modal .recipient-section,
+.new-payment-confirmation-modal .instructions-section,
+.new-payment-confirmation-modal .form-section,
+.new-payment-confirmation-modal .notes-section {
+    background-color: var(--payment-bg) !important;
+    color: var(--payment-text) !important;
+}
+
+.new-payment-confirmation-modal .summary-grid,
+.new-payment-confirmation-modal .summary-item {
+    background-color: var(--payment-surface) !important;
+    border: 1px solid var(--payment-border) !important;
+    color: var(--payment-text) !important;
+}
+
+.new-payment-confirmation-modal .recipient-card,
+.new-payment-confirmation-modal .instructions-card {
+    background-color: var(--payment-bg-secondary) !important;
+    border: 1px solid var(--payment-border) !important;
+    color: var(--payment-text) !important;
+}
+
+/* Footer */
+.new-payment-confirmation-modal .modal-footer,
+.new-confirmation-footer {
+    background-color: var(--payment-bg-secondary) !important;
+    border-top: 1px solid var(--payment-border) !important;
+}
+
+/* Override any existing light-mode-only payment modal fixes */
+/* This ensures the form adopts the active theme instead of being forced to light mode */
+.new-payment-confirmation-modal,
+.modal.new-payment-confirmation-modal,
+[data-layout-mode="dark"] .new-payment-confirmation-modal,
+[data-layout-mode="light"] .new-payment-confirmation-modal {
+    /* Allow theme variables to work naturally without forced overrides */
+    background-color: transparent !important; /* Modal backdrop */
+}
+
+/* Ensure buttons maintain their intended styling while respecting theme */
+.new-payment-confirmation-modal .btn-cancel {
+    background-color: var(--payment-text-secondary) !important;
+    color: var(--payment-bg) !important;
+    border: 1px solid var(--payment-text-secondary) !important;
+}
+
+.new-payment-confirmation-modal .btn-confirm {
+    background-color: var(--payment-success) !important;
+    color: white !important;
+    border: 1px solid var(--payment-success) !important;
+}
+
+.new-payment-confirmation-modal .btn-cancel:hover {
+    background-color: var(--payment-text) !important;
+    color: var(--payment-bg) !important;
+}
+
+.new-payment-confirmation-modal .btn-confirm:hover {
+    background-color: var(--payment-success-hover) !important;
+}
+
+/* Character count and help text */
+.new-payment-confirmation-modal .character-count,
+.new-payment-confirmation-modal .form-help {
+    color: var(--payment-text-secondary) !important;
+}
+
+/* Copy button styling */
+.new-payment-confirmation-modal .copy-btn {
+    background-color: var(--payment-bg-secondary) !important;
+    color: var(--payment-text-secondary) !important;
+    border: 1px solid var(--payment-border) !important;
+}
+
+.new-payment-confirmation-modal .copy-btn:hover {
+    background-color: var(--payment-primary-light) !important;
+    color: var(--payment-primary) !important;
+    border-color: var(--payment-primary) !important;
+}
+
+/* CRITICAL FIX: Explicit light mode styles to ensure white background and dark text */
+/* These rules specifically target light mode to fix the dark background issue */
+[data-layout-mode="light"] .new-payment-confirmation-modal,
+[data-layout-mode="light"] .modal.new-payment-confirmation-modal,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal,
+html:not([data-layout-mode="dark"]) .modal.new-payment-confirmation-modal {
+    --payment-bg: #ffffff !important;
+    --payment-bg-secondary: #f8fafc !important;
+    --payment-surface: #ffffff !important;
+    --payment-border: #e2e8f0 !important;
+    --payment-text: #1e293b !important;
+    --payment-text-secondary: #64748b !important;
+    --payment-text-muted: #94a3b8 !important;
+}
+
+/* Force white background on modal content for light mode */
+[data-layout-mode="light"] .new-payment-confirmation-modal .modal-content,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .modal-content {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Force white background on modal body for light mode */
+[data-layout-mode="light"] .new-payment-confirmation-modal .modal-body,
+[data-layout-mode="light"] .new-confirmation-body,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .modal-body,
+html:not([data-layout-mode="dark"]) .new-confirmation-body {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+}
+
+/* Force dark text on all text elements for light mode */
+[data-layout-mode="light"] .new-payment-confirmation-modal h1,
+[data-layout-mode="light"] .new-payment-confirmation-modal h2,
+[data-layout-mode="light"] .new-payment-confirmation-modal h3,
+[data-layout-mode="light"] .new-payment-confirmation-modal h4,
+[data-layout-mode="light"] .new-payment-confirmation-modal h5,
+[data-layout-mode="light"] .new-payment-confirmation-modal h6,
+[data-layout-mode="light"] .new-payment-confirmation-modal p,
+[data-layout-mode="light"] .new-payment-confirmation-modal span,
+[data-layout-mode="light"] .new-payment-confirmation-modal div:not(.header-content),
+[data-layout-mode="light"] .new-payment-confirmation-modal label,
+[data-layout-mode="light"] .new-payment-confirmation-modal small,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal h1,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal h2,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal h3,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal h4,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal h5,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal h6,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal p,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal span,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal div:not(.header-content),
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal label,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal small {
+    color: #1e293b !important;
+    text-shadow: none !important;
+}
+
+/* Force appropriate colors on form controls for light mode */
+[data-layout-mode="light"] .new-payment-confirmation-modal input,
+[data-layout-mode="light"] .new-payment-confirmation-modal textarea,
+[data-layout-mode="light"] .new-payment-confirmation-modal select,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal input,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal textarea,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal select {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-layout-mode="light"] .new-payment-confirmation-modal input::placeholder,
+[data-layout-mode="light"] .new-payment-confirmation-modal textarea::placeholder,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal input::placeholder,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Force light backgrounds on cards and sections for light mode */
+[data-layout-mode="light"] .new-payment-confirmation-modal .summary-section,
+[data-layout-mode="light"] .new-payment-confirmation-modal .recipient-section,
+[data-layout-mode="light"] .new-payment-confirmation-modal .instructions-section,
+[data-layout-mode="light"] .new-payment-confirmation-modal .form-section,
+[data-layout-mode="light"] .new-payment-confirmation-modal .notes-section,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .summary-section,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .recipient-section,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .instructions-section,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .form-section,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .notes-section {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+}
+
+[data-layout-mode="light"] .new-payment-confirmation-modal .summary-grid,
+[data-layout-mode="light"] .new-payment-confirmation-modal .summary-item,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .summary-grid,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .summary-item {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-layout-mode="light"] .new-payment-confirmation-modal .recipient-card,
+[data-layout-mode="light"] .new-payment-confirmation-modal .instructions-card,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .recipient-card,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .instructions-card {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Force light footer for light mode */
+[data-layout-mode="light"] .new-payment-confirmation-modal .modal-footer,
+[data-layout-mode="light"] .new-confirmation-footer,
+html:not([data-layout-mode="dark"]) .new-payment-confirmation-modal .modal-footer,
+html:not([data-layout-mode="dark"]) .new-confirmation-footer {
+    background-color: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+    color: #1e293b !important;
+}
+
+/* ADDITIONAL FIX: Handle standard payment modals in sold shares page and similar contexts */
+/* These target modals that contain payment-related content but don't use the new-payment-confirmation-modal class */
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] .modal-content,
+[data-layout-mode="light"] .modal[id*="paymentModal"] .modal-content,
+[data-layout-mode="light"] .modal[id*="Payment"] .modal-content,
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] .modal-content,
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] .modal-content,
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] .modal-content {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] .modal-body,
+[data-layout-mode="light"] .modal[id*="paymentModal"] .modal-body,
+[data-layout-mode="light"] .modal[id*="Payment"] .modal-body,
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] .modal-body,
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] .modal-body,
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] .modal-body {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+}
+
+/* Force light text colors for standard payment modals */
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] .modal-body *:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info):not(.text-white),
+[data-layout-mode="light"] .modal[id*="paymentModal"] .modal-body *:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info):not(.text-white),
+[data-layout-mode="light"] .modal[id*="Payment"] .modal-body *:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info):not(.text-white),
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] .modal-body *:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info):not(.text-white),
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] .modal-body *:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info):not(.text-white),
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] .modal-body *:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info):not(.text-white) {
+    color: #1e293b !important;
+}
+
+/* Force light backgrounds for cards in standard payment modals */
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] .card:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info),
+[data-layout-mode="light"] .modal[id*="paymentModal"] .card:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info),
+[data-layout-mode="light"] .modal[id*="Payment"] .card:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info),
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] .card:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info),
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] .card:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info),
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] .card:not(.bg-primary):not(.bg-success):not(.bg-warning):not(.bg-danger):not(.bg-info) {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Force light form controls in standard payment modals */
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] input,
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] textarea,
+[data-layout-mode="light"] .modal[id*="soldShareDetails"] select,
+[data-layout-mode="light"] .modal[id*="paymentModal"] input,
+[data-layout-mode="light"] .modal[id*="paymentModal"] textarea,
+[data-layout-mode="light"] .modal[id*="paymentModal"] select,
+[data-layout-mode="light"] .modal[id*="Payment"] input,
+[data-layout-mode="light"] .modal[id*="Payment"] textarea,
+[data-layout-mode="light"] .modal[id*="Payment"] select,
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] input,
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] textarea,
+html:not([data-layout-mode="dark"]) .modal[id*="soldShareDetails"] select,
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] input,
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] textarea,
+html:not([data-layout-mode="dark"]) .modal[id*="paymentModal"] select,
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] input,
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] textarea,
+html:not([data-layout-mode="dark"]) .modal[id*="Payment"] select {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* MODERN PAYMENT FORM STYLES */
+/* Reduce width by 15% on laptop/PC screens and add modern card designs */
+
+/* Reduced modal width for laptop/PC screens */
+@media (min-width: 992px) {
+    .modern-payment-modal {
+        max-width: calc(900px * 0.85); /* Reduce by 15% from default large modal */
+    }
+}
+
+/* Modern card styling for payment sections */
+.new-payment-submit-modal .summary-section,
+.new-payment-submit-modal .recipient-section,
+.new-payment-submit-modal .instructions-section,
+.new-payment-submit-modal .form-section {
+    margin-bottom: 2rem;
+}
+
+/* Enhanced Payment Summary Cards */
+.new-payment-submit-modal .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.new-payment-submit-modal .summary-item {
+    background: linear-gradient(135deg, var(--payment-surface) 0%, var(--payment-bg-secondary) 100%);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    transition: var(--payment-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.new-payment-submit-modal .summary-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+}
+
+.new-payment-submit-modal .summary-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--payment-shadow-md);
+    border-color: var(--payment-primary);
+}
+
+.new-payment-submit-modal .summary-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--payment-text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.new-payment-submit-modal .summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--payment-text);
+    line-height: 1.2;
+}
+
+.new-payment-submit-modal .total-item {
+    background: linear-gradient(135deg, var(--payment-primary-light) 0%, var(--payment-success-light) 100%);
+    border-color: var(--payment-primary);
+}
+
+.new-payment-submit-modal .total-item .summary-value {
+    color: var(--payment-primary);
+    font-size: 1.75rem;
+}
+
+/* Enhanced Recipient Card */
+.new-payment-submit-modal .recipient-card {
+    background: var(--payment-surface);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1rem;
+    transition: var(--payment-transition);
+    box-shadow: var(--payment-shadow-sm);
+}
+
+.new-payment-submit-modal .recipient-card:hover {
+    box-shadow: var(--payment-shadow-md);
+    border-color: var(--payment-primary);
+}
+
+.new-payment-submit-modal .recipient-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.new-payment-submit-modal .recipient-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.new-payment-submit-modal .recipient-details {
+    flex: 1;
+}
+
+.new-payment-submit-modal .recipient-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin-bottom: 0.25rem;
+}
+
+.new-payment-submit-modal .recipient-username {
+    font-size: 0.875rem;
+    color: var(--payment-text-secondary);
+}
+
+.new-payment-submit-modal .mpesa-details {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.new-payment-submit-modal .mpesa-badge {
+    background: linear-gradient(135deg, var(--payment-success) 0%, var(--payment-primary) 100%);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.new-payment-submit-modal .mpesa-number-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
+}
+
+.new-payment-submit-modal .mpesa-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: var(--payment-text);
+    background: var(--payment-bg-secondary);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--payment-radius);
+    border: 1px solid var(--payment-border);
+}
+
+.new-payment-submit-modal .copy-btn {
+    background: var(--payment-primary);
+    color: white;
+    border: none;
+    border-radius: var(--payment-radius);
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: var(--payment-transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.new-payment-submit-modal .copy-btn:hover {
+    background: var(--payment-primary-hover);
+    transform: scale(1.05);
+}
+
+.new-payment-submit-modal .mpesa-name {
+    font-size: 0.875rem;
+    color: var(--payment-text-secondary);
+    font-weight: 500;
+}
+
+/* Enhanced Instructions Card */
+.new-payment-submit-modal .instructions-card {
+    background: linear-gradient(135deg, var(--payment-primary-light) 0%, var(--payment-success-light) 100%);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+.new-payment-submit-modal .instructions-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    color: var(--payment-primary);
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.new-payment-submit-modal .instructions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.new-payment-submit-modal .instruction-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.new-payment-submit-modal .step-number {
+    background: var(--payment-primary);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.new-payment-submit-modal .step-text {
+    color: var(--payment-text);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    padding-top: 0.25rem;
+}
+
+/* Enhanced Form Styling */
+.new-payment-submit-modal .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.new-payment-submit-modal .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+}
+
+.new-payment-submit-modal .form-label.required::after {
+    content: '*';
+    color: var(--payment-error);
+    margin-left: 0.25rem;
+}
+
+.new-payment-submit-modal .input-container {
+    position: relative;
+}
+
+.new-payment-submit-modal .form-control {
+    background: var(--payment-surface);
+    border: 2px solid var(--payment-border);
+    border-radius: var(--payment-radius);
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    color: var(--payment-text);
+    transition: var(--payment-transition);
+    width: 100%;
+}
+
+.new-payment-submit-modal .form-control:focus {
+    outline: none;
+    border-color: var(--payment-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: var(--payment-bg);
+}
+
+.new-payment-submit-modal .form-control::placeholder {
+    color: var(--payment-text-muted);
+}
+
+.new-payment-submit-modal .character-count {
+    position: absolute;
+    bottom: -1.5rem;
+    right: 0;
+    font-size: 0.75rem;
+    color: var(--payment-text-secondary);
+}
+
+.new-payment-submit-modal .form-help {
+    font-size: 0.8125rem;
+    color: var(--payment-text-secondary);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Enhanced Footer Buttons */
+.new-payment-submit-modal .new-payment-footer {
+    background: var(--payment-bg-secondary);
+    border-top: 1px solid var(--payment-border);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.new-payment-submit-modal .btn {
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--payment-radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: var(--payment-transition);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.new-payment-submit-modal .btn-cancel {
+    background: transparent;
+    color: var(--payment-text-secondary);
+    border-color: var(--payment-border);
+}
+
+.new-payment-submit-modal .btn-cancel:hover {
+    background: var(--payment-bg-secondary);
+    color: var(--payment-text);
+    border-color: var(--payment-text-secondary);
+}
+
+.new-payment-submit-modal .btn-submit {
+    background: linear-gradient(135deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+    color: white;
+    border-color: var(--payment-primary);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.new-payment-submit-modal .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .new-payment-submit-modal .recipient-card {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .new-payment-submit-modal .mpesa-details {
+        text-align: center;
+    }
+    
+    .new-payment-submit-modal .mpesa-number-container {
+        justify-content: center;
+    }
+    
+    .new-payment-submit-modal .summary-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .new-payment-submit-modal .new-payment-footer {
+        flex-direction: column;
+    }
+    
+    .new-payment-submit-modal .btn {
+        justify-content: center;
+    }
+}
+
+/* Modern Toast Notifications */
+.payment-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--payment-surface);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1rem;
+    box-shadow: var(--payment-shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 9999;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    max-width: 320px;
+}
+
+.payment-toast.show {
+    transform: translateX(0);
+}
+
+.payment-toast .toast-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--payment-success);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.payment-toast .toast-content {
+    flex: 1;
+}
+
+.payment-toast .toast-title {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--payment-text);
+    margin-bottom: 0.25rem;
+}
+
+.payment-toast .toast-message {
+    font-size: 0.8125rem;
+    color: var(--payment-text-secondary);
+    line-height: 1.4;
+}
+
+/* CLEAN PAYMENT MODAL SPECIFIC STYLES */
+/* Apply modern styles to the clean-payment-modal which is actually being used */
+
+/* Modern card styling for clean payment modal sections */
+.clean-payment-modal .payment-summary-card,
+.clean-payment-modal .seller-card,
+.clean-payment-modal .instructions-card {
+    background: var(--payment-surface);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: var(--payment-transition);
+    box-shadow: var(--payment-shadow-sm);
+}
+
+.clean-payment-modal .payment-summary-card:hover,
+.clean-payment-modal .seller-card:hover {
+    box-shadow: var(--payment-shadow-md);
+    border-color: var(--payment-primary);
+}
+
+/* Enhanced Payment Summary Cards for clean modal */
+.clean-payment-modal .summary-item {
+    background: linear-gradient(135deg, var(--payment-surface) 0%, var(--payment-bg-secondary) 100%);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.25rem;
+    text-align: center;
+    transition: var(--payment-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.clean-payment-modal .summary-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+}
+
+.clean-payment-modal .summary-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--payment-shadow-md);
+    border-color: var(--payment-primary);
+}
+
+.clean-payment-modal .summary-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--payment-text-secondary);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.clean-payment-modal .summary-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+/* Enhanced Seller Card for clean modal */
+.clean-payment-modal .seller-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.clean-payment-modal .seller-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.clean-payment-modal .seller-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin-bottom: 0.25rem;
+}
+
+.clean-payment-modal .seller-username {
+    font-size: 0.875rem;
+    color: var(--payment-text-secondary);
+}
+
+.clean-payment-modal .mpesa-info {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.clean-payment-modal .mpesa-number-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-bottom: 0.25rem;
+}
+
+.clean-payment-modal .mpesa-number {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--payment-text);
+    background: var(--payment-bg-secondary);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--payment-radius);
+    border: 1px solid var(--payment-border);
+}
+
+.clean-payment-modal .copy-number-btn {
+    background: var(--payment-primary);
+    color: white;
+    border: 1px solid var(--payment-primary);
+    border-radius: var(--payment-radius);
+    padding: 0.375rem 0.5rem;
+    cursor: pointer;
+    transition: var(--payment-transition);
+}
+
+.clean-payment-modal .copy-number-btn:hover {
+    background: var(--payment-primary-hover);
+    border-color: var(--payment-primary-hover);
+    color: white;
+    transform: scale(1.05);
+}
+
+/* Enhanced Instructions Card for clean modal */
+.clean-payment-modal .alert-modern {
+    background: linear-gradient(135deg, var(--payment-primary-light) 0%, var(--payment-success-light) 100%);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    color: var(--payment-text);
+}
+
+/* Enhanced Form Styling for clean modal */
+.clean-payment-modal .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin-bottom: 0.75rem;
+    font-size: 0.9375rem;
+}
+
+.clean-payment-modal .form-label.required::after {
+    content: '*';
+    color: var(--payment-error);
+    margin-left: 0.25rem;
+}
+
+.clean-payment-modal .form-control {
+    background: var(--payment-surface);
+    border: 2px solid var(--payment-border);
+    border-radius: var(--payment-radius);
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    color: var(--payment-text);
+    transition: var(--payment-transition);
+    width: 100%;
+}
+
+.clean-payment-modal .form-control:focus {
+    outline: none;
+    border-color: var(--payment-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background: var(--payment-bg);
+}
+
+.clean-payment-modal .form-control::placeholder {
+    color: var(--payment-text-muted);
+}
+
+.clean-payment-modal .form-text {
+    font-size: 0.8125rem;
+    color: var(--payment-text-secondary);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Enhanced Footer Buttons for clean modal */
+.clean-payment-modal .clean-footer {
+    background: var(--payment-bg-secondary);
+    border-top: 1px solid var(--payment-border);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.clean-payment-modal .btn {
+    padding: 0.875rem 1.5rem;
+    border-radius: var(--payment-radius);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: var(--payment-transition);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.clean-payment-modal .btn-secondary {
+    background: transparent;
+    color: var(--payment-text-secondary);
+    border-color: var(--payment-border);
+}
+
+.clean-payment-modal .btn-secondary:hover {
+    background: var(--payment-bg-secondary);
+    color: var(--payment-text);
+    border-color: var(--payment-text-secondary);
+}
+
+.clean-payment-modal .btn-success {
+    background: linear-gradient(135deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+    color: white;
+    border-color: var(--payment-primary);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.clean-payment-modal .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+    color: white;
+}
+
+/* Responsive adjustments for clean modal */
+@media (max-width: 768px) {
+    .clean-payment-modal .seller-info {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .clean-payment-modal .mpesa-info {
+        text-align: center;
+    }
+    
+    .clean-payment-modal .mpesa-number-display {
+        justify-content: center;
+    }
+    
+    .clean-payment-modal .clean-footer {
+        flex-direction: column;
+    }
+    
+    .clean-payment-modal .btn {
+        justify-content: center;
+    }
+}
+
+/* Reset and base styles */
+.new-payment-submit-modal *,
+.new-payment-confirmation-modal * {
+    box-sizing: border-box;
+}
+
+/* Modal container styles */
+.new-payment-submit-modal,
+.new-payment-confirmation-modal {
+    background-color: var(--payment-bg);
+    color: var(--payment-text);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-xl);
+    box-shadow: var(--payment-shadow-xl);
+    overflow: hidden;
+}
+
+/* Header styles */
+.new-payment-header,
+.new-confirmation-header {
+    background: linear-gradient(135deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--payment-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.new-payment-header::before,
+.new-confirmation-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.header-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--payment-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+}
+
+.header-text {
+    color: white;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem 0;
+    line-height: 1.25;
+}
+
+.modal-subtitle {
+    font-size: 0.875rem;
+    margin: 0;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.new-close-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--payment-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: var(--payment-transition);
+    position: relative;
+    z-index: 2;
+}
+
+.new-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Body styles */
+.new-payment-body,
+.new-confirmation-body {
+    padding: 2rem;
+    background: var(--payment-bg);
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Custom scrollbar */
+.new-payment-body::-webkit-scrollbar,
+.new-confirmation-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.new-payment-body::-webkit-scrollbar-track,
+.new-confirmation-body::-webkit-scrollbar-track {
+    background: var(--payment-bg-secondary);
+    border-radius: 3px;
+}
+
+.new-payment-body::-webkit-scrollbar-thumb,
+.new-confirmation-body::-webkit-scrollbar-thumb {
+    background: var(--payment-border);
+    border-radius: 3px;
+}
+
+.new-payment-body::-webkit-scrollbar-thumb:hover,
+.new-confirmation-body::-webkit-scrollbar-thumb:hover {
+    background: var(--payment-border-hover);
+}
+
+/* Section styles */
+.summary-section,
+.recipient-section,
+.instructions-section,
+.form-section,
+.notes-section {
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin: 0 0 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-title svg {
+    color: var(--payment-primary);
+    flex-shrink: 0;
+}
+
+/* Summary grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    background: var(--payment-bg-secondary);
+    padding: 1.5rem;
+    border-radius: var(--payment-radius-lg);
+    border: 1px solid var(--payment-border);
+}
+
+.summary-item {
+    text-align: center;
+    padding: 1rem;
+    background: var(--payment-surface);
+    border-radius: var(--payment-radius);
+    border: 1px solid var(--payment-border);
+    transition: var(--payment-transition);
+}
+
+.summary-item:hover {
+    border-color: var(--payment-border-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--payment-shadow-md);
+}
+
+.summary-item.total-item {
+    background: linear-gradient(135deg, var(--payment-success) 0%, var(--payment-primary) 100%);
+    color: white;
+    border-color: transparent;
+}
+
+.summary-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    color: var(--payment-text-muted);
+}
+
+.summary-item.total-item .summary-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.summary-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--payment-text);
+    line-height: 1;
+}
+
+.summary-item.total-item .summary-value {
+    color: white;
+    font-size: 1.375rem;
+}
+
+/* Recipient card */
+.recipient-card {
+    background: var(--payment-surface);
+    border: 2px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    transition: var(--payment-transition);
+}
+
+.recipient-card:hover {
+    border-color: var(--payment-primary);
+    box-shadow: var(--payment-shadow-md);
+}
+
+.recipient-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.recipient-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    border: 3px solid var(--payment-primary);
+    flex-shrink: 0;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatar-fallback {
+    width: 100%;
+    height: 100%;
+    background: var(--payment-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.recipient-details {
+    flex: 1;
+}
+
+.recipient-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin: 0 0 0.25rem 0;
+}
+
+.recipient-username {
+    font-size: 0.875rem;
+    color: var(--payment-text-secondary);
+    margin: 0;
+}
+
+.mpesa-details {
+    text-align: right;
+}
+
+.mpesa-badge {
+    background: var(--payment-success);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--payment-radius);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+}
+
+.mpesa-number-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--payment-success-light);
+    padding: 0.75rem 1rem;
+    border-radius: var(--payment-radius);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    margin-bottom: 0.5rem;
+}
+
+.mpesa-number {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--payment-success);
+    letter-spacing: 0.05em;
+    user-select: all;
+}
+
+.mpesa-name {
+    font-size: 0.875rem;
+    color: var(--payment-text-secondary);
+    margin: 0;
+}
+
+.copy-btn {
+    background: var(--payment-success);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--payment-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--payment-transition);
+    flex-shrink: 0;
+}
+
+.copy-btn:hover {
+    background: var(--payment-success-hover);
+    transform: scale(1.1);
+}
+
+.copy-btn:active {
+    transform: scale(0.95);
+}
+
+/* Instructions card */
+.instructions-card {
+    background: var(--payment-primary-light);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--payment-radius-lg);
+    padding: 1.5rem;
+}
+
+.instructions-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--payment-text);
+}
+
+.instructions-header svg {
+    color: var(--payment-primary);
+    flex-shrink: 0;
+}
+
+.instructions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.instruction-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--payment-surface);
+    border-radius: var(--payment-radius);
+    border: 1px solid var(--payment-border);
+    transition: var(--payment-transition);
+}
+
+.instruction-step:hover {
+    border-color: var(--payment-primary);
+    box-shadow: var(--payment-shadow);
+}
+
+.step-number {
+    width: 28px;
+    height: 28px;
+    background: var(--payment-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.step-text {
+    font-size: 0.9375rem;
+    color: var(--payment-text);
+    line-height: 1.5;
+}
+
+.step-text strong {
+    color: var(--payment-primary);
+    font-weight: 600;
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.form-label svg {
+    color: var(--payment-primary);
+    flex-shrink: 0;
+}
+
+.form-label.required::after {
+    content: '*';
+    color: var(--payment-error);
+    margin-left: 0.25rem;
+    font-size: 1rem;
+}
+
+.input-container {
+    position: relative;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 0.9375rem;
+    color: var(--payment-text);
+    background: var(--payment-surface);
+    border: 2px solid var(--payment-border);
+    border-radius: var(--payment-radius);
+    transition: var(--payment-transition);
+    font-family: inherit;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--payment-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--payment-text-muted);
+}
+
+.form-control.is-valid {
+    border-color: var(--payment-success);
+    background-image: none;
+}
+
+.form-control.is-invalid {
+    border-color: var(--payment-error);
+    background-image: none;
+}
+
+.input-feedback {
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    display: none;
+}
+
+.form-control.is-valid + .input-feedback::after {
+    content: '✓';
+    color: var(--payment-success);
+    font-weight: 700;
+    display: block;
+}
+
+.form-control.is-invalid + .input-feedback::after {
+    content: '✕';
+    color: var(--payment-error);
+    font-weight: 700;
+    display: block;
+}
+
+.character-count {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.875rem;
+    font-size: 0.75rem;
+    color: var(--payment-text-muted);
+    pointer-events: none;
+}
+
+.character-count .current.warning {
+    color: var(--payment-warning);
+    font-weight: 600;
+}
+
+.form-help {
+    font-size: 0.8125rem;
+    color: var(--payment-text-secondary);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.form-error {
+    font-size: 0.8125rem;
+    color: var(--payment-error);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--payment-error-light);
+    border-radius: var(--payment-radius);
+    border-left: 4px solid var(--payment-error);
+}
+
+/* Footer styles */
+.new-payment-footer,
+.new-confirmation-footer {
+    background: var(--payment-bg-secondary);
+    border-top: 1px solid var(--payment-border);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Button styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border-radius: var(--payment-radius);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: var(--payment-transition);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn-cancel {
+    background: var(--payment-text-muted);
+    color: white;
+    border-color: var(--payment-text-muted);
+}
+
+.btn-cancel:hover:not(:disabled) {
+    background: var(--payment-text-secondary);
+    border-color: var(--payment-text-secondary);
+    transform: translateY(-1px);
+}
+
+.btn-submit,
+.btn-confirm {
+    background: linear-gradient(135deg, var(--payment-primary) 0%, var(--payment-success) 100%);
+    color: white;
+    border-color: var(--payment-primary);
+    box-shadow: var(--payment-shadow);
+}
+
+.btn-submit:hover:not(:disabled),
+.btn-confirm:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--payment-shadow-md);
+}
+
+.btn-submit:active,
+.btn-confirm:active {
+    transform: translateY(-1px);
+}
+
+/* Button loading states */
+.btn-content {
+    transition: opacity 0.2s ease;
+}
+
+.btn-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-weight: 600;
+}
+
+.btn.loading .btn-content {
+    opacity: 0;
+}
+
+.btn.loading .btn-loading {
+    opacity: 1;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-spinner-large {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--payment-border);
+    border-top: 3px solid var(--payment-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Success notification */
+.payment-success-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: var(--payment-surface);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius-lg);
+    padding: 2rem;
+    box-shadow: var(--payment-shadow-xl);
+    text-align: center;
+    max-width: 400px;
+    width: 90vw;
+    animation: fadeInScale 0.3s ease;
+}
+
+.success-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--payment-success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.success-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--payment-text);
+    margin: 0;
+}
+
+.success-message {
+    font-size: 1rem;
+    color: var(--payment-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Loading overlay */
+.payment-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+}
+
+.overlay-content {
+    text-align: center;
+    color: white;
+}
+
+.loading-text {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin: 1rem 0 0 0;
+}
+
+/* Toast notification */
+.payment-toast {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: var(--payment-surface);
+    border: 1px solid var(--payment-border);
+    border-radius: var(--payment-radius);
+    padding: 1rem 1.25rem;
+    box-shadow: var(--payment-shadow-lg);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    z-index: 10001;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: var(--payment-transition-slow);
+}
+
+.payment-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--payment-success);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.toast-content {
+    flex: 1;
+}
+
+.toast-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--payment-text);
+    margin: 0 0 0.25rem 0;
+}
+
+.toast-message {
+    font-size: 0.8125rem;
+    color: var(--payment-text-secondary);
+    margin: 0;
+}
+
+/* Animations */
+@keyframes fadeInScale {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive Design */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .new-payment-body,
+    .new-confirmation-body {
+        padding: 1.5rem;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .recipient-card {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .mpesa-details {
+        text-align: center;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: none;
+    }
+    
+    .new-payment-header,
+    .new-confirmation-header {
+        padding: 1rem;
+    }
+    
+    .header-content {
+        gap: 0.75rem;
+    }
+    
+    .header-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .modal-title {
+        font-size: 1.25rem;
+    }
+    
+    .modal-subtitle {
+        font-size: 0.8125rem;
+    }
+    
+    .new-payment-body,
+    .new-confirmation-body {
+        padding: 1rem;
+        max-height: 60vh;
+    }
+    
+    .summary-section,
+    .recipient-section,
+    .instructions-section,
+    .form-section,
+    .notes-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .summary-grid {
+        padding: 1rem;
+    }
+    
+    .recipient-card {
+        padding: 1rem;
+    }
+    
+    .recipient-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .avatar-fallback {
+        font-size: 1.25rem;
+    }
+    
+    .instructions-card {
+        padding: 1rem;
+    }
+    
+    .instruction-step {
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .step-number {
+        width: 24px;
+        height: 24px;
+        font-size: 0.8125rem;
+    }
+    
+    .step-text {
+        font-size: 0.875rem;
+    }
+    
+    .new-payment-footer,
+    .new-confirmation-footer {
+        padding: 1rem;
+        flex-direction: column-reverse;
+        gap: 0.75rem;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 1rem;
+    }
+    
+    .payment-toast {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+    }
+}
+
+/* Small mobile */
+@media (max-width: 576px) {
+    .modal-dialog {
+        margin: 0.25rem;
+    }
+    
+    .new-payment-body,
+    .new-confirmation-body {
+        max-height: 55vh;
+    }
+    
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

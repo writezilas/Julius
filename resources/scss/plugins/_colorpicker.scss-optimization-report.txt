@@ -1,0 +1,19 @@
+CSS Optimization Report for _colorpicker.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- card-bg-custom);
+    box-shadow: 0px 0px 0 2px $border-color;
+    border-radius: 50%;
+    box-shadow: $element-shadow;
+    &::after
+- &::before
+- .pcr-color-preview
+- .pcr-color-chooser
+- .pcr-color-opacity
+- .pcr-result
+- .pcr-result
+- .pcr-save
+- .pcr-clear
+- .pcr-cancel

@@ -1,0 +1,14 @@
+CSS Optimization Report for _galaxy.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- &::before
+- &::after
+- &::before
+- &::after
+- &::before
+- &::after
+- background-size: cover;
+
+        &::before

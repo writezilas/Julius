@@ -1,0 +1,11 @@
+CSS Optimization Report for _sortablejs.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .list-group-item
+- .nested-list
+- .nested-1
+- .nested-2
+- .nested-3
+- .list-group-item

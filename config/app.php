@@ -71,6 +71,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Mobile Configuration
+    |--------------------------------------------------------------------------
+    |
+    | These settings are used to optimize the application for mobile devices,
+    | including timeout multipliers and mobile-specific optimizations.
+    |
+    */
+
+    'mobile_timeout_multiplier' => env('MOBILE_TIMEOUT_MULTIPLIER', 1.5),
+    'mobile_user_agents' => [
+        'Mobile', 'Android', 'iPhone', 'iPad', 'iPod', 'BlackBerry', 
+        'Windows Phone', 'Opera Mini', 'IEMobile', 'Mobile Safari'
+    ],
+    'mobile_optimizations' => [
+        'lazy_load_images' => env('MOBILE_LAZY_LOAD', true),
+        'compress_responses' => env('MOBILE_COMPRESS', true),
+        'extended_timeouts' => env('MOBILE_EXTENDED_TIMEOUTS', true),
+        'cache_mobile_assets' => env('MOBILE_CACHE_ASSETS', true),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

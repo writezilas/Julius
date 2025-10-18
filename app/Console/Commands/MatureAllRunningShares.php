@@ -65,6 +65,9 @@ class MatureAllRunningShares extends Command
                 $profitPercentage = $tradePeriod->percentage;
                 $profit = ($share->share_will_get * $profitPercentage / 100);
                 
+                // Calculate total shares after profit
+                $totalAfterProfit = $share->total_share_count + $profit;
+                
                 // Display share information
                 $tradeName = $share->trade ? $share->trade->name : 'Unknown';
                 $this->line("📈 {$share->ticket_no} (User: {$share->user_id})");
@@ -72,14 +75,18 @@ class MatureAllRunningShares extends Command
                 $this->line("   • Period: {$share->period} days");
                 $this->line("   • Started: {$share->start_date}");
                 $this->line("   • Original Shares: {$share->share_will_get}");
+                $this->line("   • Current Total Count: {$share->total_share_count}");
                 $this->line("   • Profit Rate: {$profitPercentage}%");
                 $this->line("   • Profit to Add: {$profit}");
+                $this->line("   • Total After Maturation: {$totalAfterProfit}");
                 
                 if (!$dryRun) {
                     // Mature the share
                     $share->is_ready_to_sell = 1;
                     $share->matured_at = now();
                     $share->profit_share = $profit;
+                    // CRITICAL FIX: Update total_share_count to include profit
+                    $share->total_share_count = $share->total_share_count + $profit;
                     
                     // Save the changes
                     $share->save();

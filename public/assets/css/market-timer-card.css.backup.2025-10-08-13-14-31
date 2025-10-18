@@ -1,0 +1,413 @@
+/* Floating Market Timer Card Styles */
+.floating-market-timer {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    z-index: 1050;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: white;
+    min-width: 240px;
+    max-width: 280px;
+    opacity: 0;
+    transform: translate(100%, -50%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.floating-market-timer.show {
+    opacity: 1;
+    transform: translate(0, -50%);
+}
+
+.floating-market-timer.hide {
+    opacity: 0;
+    transform: translate(100%, -50%);
+    pointer-events: none;
+}
+
+/* Card Body - Now the main container */
+.timer-card-body {
+    padding: 18px 20px;
+}
+
+.market-close-message {
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    opacity: 0.95;
+    line-height: 1.4;
+}
+
+/* Timer Display */
+.timer-display {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.timer-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px 4px 6px;
+    min-width: 48px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.timer-unit:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.timer-value {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-variant-numeric: tabular-nums;
+    transition: all 0.3s ease;
+}
+
+/* Urgent timer styling - when 60 seconds or less remain */
+.timer-unit.urgent {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    animation: urgentPulse 1.5s ease-in-out infinite;
+    transform: scale(1.05);
+}
+
+.timer-unit.urgent .timer-value {
+    color: #ef4444;
+    text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+    animation: urgentGlow 1s ease-in-out infinite alternate;
+}
+
+.timer-unit.urgent .timer-label {
+    color: #fca5a5;
+}
+
+@keyframes urgentPulse {
+    0%, 100% {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.4);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    50% {
+        background: rgba(239, 68, 68, 0.3);
+        border-color: rgba(239, 68, 68, 0.6);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+    }
+}
+
+@keyframes urgentGlow {
+    0% {
+        text-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+        transform: scale(1);
+    }
+    100% {
+        text-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+        transform: scale(1.05);
+    }
+}
+
+/* Urgent separator styling */
+.timer-separator.urgent {
+    color: #ef4444;
+    animation: urgentBlink 0.8s infinite;
+}
+
+@keyframes urgentBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+}
+
+.timer-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.8;
+}
+
+/* Timer Separator */
+.timer-separator {
+    font-size: 20px;
+    font-weight: bold;
+    align-self: center;
+    margin-top: -8px;
+    opacity: 0.7;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 0.7; }
+    51%, 100% { opacity: 0.3; }
+}
+
+/* Progress Bar - Hidden */
+.timer-progress-container {
+    display: none;
+    margin-bottom: 0;
+}
+
+.timer-progress-bar {
+    width: 100%;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.timer-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
+    border-radius: 2px;
+    transition: width 1s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.timer-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Card Footer */
+.timer-card-footer {
+    padding: 0 20px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.timer-timezone {
+    font-weight: 500;
+}
+
+.timer-refresh {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.timer-refresh:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+.timer-refresh:active {
+    transform: scale(0.95);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .floating-market-timer {
+        top: 50%; /* Position at middle of screen */
+        right: 10px;
+        left: auto;
+        width: 200px;
+        min-width: 200px;
+        max-width: 200px;
+        transform: translate(100%, -50%); /* Center vertically and slide from right */
+    }
+    
+    .floating-market-timer.show {
+        transform: translate(0, -50%); /* Slide in while staying vertically centered */
+    }
+    
+    .floating-market-timer.hide {
+        transform: translate(100%, -50%); /* Slide out while staying vertically centered */
+    }
+    
+    .timer-card-body {
+        padding: 12px 14px;
+    }
+    
+    .market-close-message {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    
+    .timer-display {
+        gap: 4px;
+        margin-bottom: 8px;
+    }
+    
+    .timer-unit {
+        min-width: 36px;
+        padding: 6px 2px 4px;
+        border-radius: 8px;
+    }
+    
+    .timer-value {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+    
+    .timer-label {
+        font-size: 8px;
+    }
+    
+    .timer-separator {
+        font-size: 14px;
+        margin-top: -4px;
+    }
+    
+    /* Mobile urgent styling adjustments */
+    .timer-unit.urgent {
+        transform: scale(1.03);
+        animation-duration: 1.2s;
+    }
+    
+    .timer-unit.urgent .timer-value {
+        text-shadow: 0 0 6px rgba(239, 68, 68, 0.7);
+    }
+}
+
+@media (max-width: 480px) {
+    .floating-market-timer {
+        width: 180px;
+        min-width: 180px;
+        max-width: 180px;
+    }
+    
+    .timer-card-body {
+        padding: 10px 12px;
+    }
+    
+    .market-close-message {
+        font-size: 10px;
+        margin-bottom: 6px;
+    }
+    
+    .timer-display {
+        gap: 3px;
+        margin-bottom: 6px;
+    }
+    
+    .timer-unit {
+        min-width: 32px;
+        padding: 5px 2px 3px;
+        border-radius: 6px;
+    }
+    
+    .timer-value {
+        font-size: 14px;
+        margin-bottom: 1px;
+    }
+    
+    .timer-label {
+        font-size: 7px;
+    }
+    
+    .timer-separator {
+        font-size: 12px;
+        margin-top: -3px;
+    }
+    
+    /* Small mobile urgent styling adjustments */
+    .timer-unit.urgent {
+        transform: scale(1.02);
+        animation-duration: 1s;
+    }
+    
+    .timer-unit.urgent .timer-value {
+        text-shadow: 0 0 4px rgba(239, 68, 68, 0.8);
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .floating-market-timer {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .floating-market-timer,
+    .timer-unit,
+    .timer-progress-fill,
+    .timer-refresh {
+        transition: none;
+    }
+    
+    .timer-status-indicator,
+    .timer-separator,
+    .timer-progress-fill::after {
+        animation: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .floating-market-timer {
+        border: 2px solid white;
+        background: #000;
+    }
+    
+    .timer-unit {
+        border: 1px solid white;
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* Focus States for Accessibility */
+.timer-refresh:focus {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 2px;
+}
+
+/* Loading State */
+.floating-market-timer.loading {
+    opacity: 0.7;
+}
+
+.floating-market-timer.loading .timer-value {
+    animation: loading-pulse 1s infinite ease-in-out;
+}
+
+@keyframes loading-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}

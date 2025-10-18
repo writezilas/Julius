@@ -30,12 +30,6 @@
     </style>
 @endsection
 @section('content')
-
-@component('components.breadcrumb')
-@slot('li_1') @lang('translation.dashboard') @endslot
-@slot('title') {{$pageTitle}} @endslot
-@endcomponent
-
 @php
     // Calculate statistics for purchased shares
     $totalSellers = $groupByShare->count();

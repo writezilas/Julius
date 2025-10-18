@@ -1,0 +1,17 @@
+CSS Optimization Summary for market-timer-card.css
+==================================================
+Generated on: 2025-10-08 13:14:31
+
+File Size Comparison:
+- Original size: 8,574 bytes
+- Optimized size: 6,999 bytes
+- Savings: 1,575 bytes
+- Percentage saved: 18.37%
+
+Rules Analysis:
+- Rules removed: 9
+- Rules kept: 29
+
+Note: The optimized file preserves all media queries, keyframes, 
+and other critical CSS constructs. Only unused class and ID 
+selectors have been removed based on usage analysis.

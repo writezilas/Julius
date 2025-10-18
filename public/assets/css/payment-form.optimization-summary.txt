@@ -1,0 +1,17 @@
+CSS Optimization Summary for payment-form.css
+==================================================
+Generated on: 2025-10-08 13:14:40
+
+File Size Comparison:
+- Original size: 10,087 bytes
+- Optimized size: 9,778 bytes
+- Savings: 309 bytes
+- Percentage saved: 3.06%
+
+Rules Analysis:
+- Rules removed: 0
+- Rules kept: 57
+
+Note: The optimized file preserves all media queries, keyframes, 
+and other critical CSS constructs. Only unused class and ID 
+selectors have been removed based on usage analysis.

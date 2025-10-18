@@ -1,0 +1,84 @@
+CSS Optimization Report for _boxicons.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- // boxicons 2.1.1
+
+@font-face
+- .bx-ul
+- .bx-ul > li
+- 0%
+- 100%
+- 0%
+- 100%
+- 0%
+- 90%
+- 0%
+- 90%
+- 0%
+- 45%
+- 90%
+- 0%
+- 45%
+- 90%
+- 0%
+- 75%
+- 0%
+- 75%
+- 0%
+- 75%
+- 0%
+- 75%
+- 0%
+- 75%
+- 0%
+- 75%
+- 0%
+- 75%
+- 0%
+- 75%
+- from
+- 10%
+- 20%
+- 30%
+- 50%
+- 70%
+- 90%
+- 40%
+- 60%
+- 80%
+- to
+- from
+- 10%
+- 20%
+- 30%
+- 50%
+- 70%
+- 90%
+- 40%
+- 60%
+- 80%
+- to
+- .bx-spin
+- .bx-tada
+- .bx-flashing
+- .bx-burst
+- .bx-fade-up
+- .bx-fade-down
+- .bx-fade-left
+- .bx-fade-right
+- .bx-xs
+- .bx-sm
+- .bx-md
+- .bx-lg
+- .bx-fw
+- .bx-pull-left
+- .bx-pull-right
+- .bx-rotate-90
+- .bx-rotate-180
+- .bx-rotate-270
+- .bx-flip-horizontal
+- .bx-flip-vertical
+- .bx-border
+- .bx-border-circle

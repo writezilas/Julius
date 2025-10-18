@@ -1,0 +1,9 @@
+CSS Optimization Report for _tour.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- light-rgb)
+- .shepherd-footer
+- .shepherd-arrow
+- .shepherd-button

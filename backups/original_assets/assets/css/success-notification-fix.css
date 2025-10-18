@@ -1,0 +1,205 @@
+/* 
+ * Success Notification Text Color Fix
+ * Ensures proper contrast with white text on green background
+ * 
+ * This CSS fixes the issue where success notification text appears 
+ * in gray color instead of white, improving readability and accessibility.
+ */
+
+/* Fix for Bootstrap success alerts */
+.alert-success {
+    color: #ffffff !important; /* Force white text */
+}
+
+.alert-success strong,
+.alert-success b {
+    color: #ffffff !important; /* Ensure bold text is also white */
+}
+
+.alert-success .alert-link {
+    color: #ffffff !important; /* White color for links in success alerts */
+    text-decoration: underline; /* Add underline to distinguish links */
+}
+
+/* Fix for Toastr success notifications */
+.toast-success,
+.toast-success .toast-message {
+    color: #ffffff !important; /* Force white text for toastr success messages */
+}
+
+/* Fix for SweetAlert success notifications */
+.swal2-success .swal2-title {
+    color: #155724 !important; /* Dark green for success modal titles */
+}
+
+.swal2-success .swal2-html-container {
+    color: #155724 !important; /* Dark green for success modal content */
+}
+
+/* Fix for custom success notifications with green background */
+.bg-success {
+    color: #ffffff !important; /* Force white text on green background */
+}
+
+.bg-success * {
+    color: #ffffff !important; /* Force white text for all child elements */
+}
+
+/* Fix for success badges */
+.badge-success,
+.badge.bg-success {
+    color: #ffffff !important; /* Ensure badges have white text */
+}
+
+/* Fix for success buttons */
+.btn-success {
+    color: #ffffff !important; /* Ensure success buttons have white text */
+}
+
+/* Fix for notification containers with success styling */
+.notification-success,
+.flash-success {
+    color: #ffffff !important;
+}
+
+.notification-success h1,
+.notification-success h2,
+.notification-success h3,
+.notification-success h4,
+.notification-success h5,
+.notification-success h6,
+.flash-success h1,
+.flash-success h2,
+.flash-success h3,
+.flash-success h4,
+.flash-success h5,
+.flash-success h6 {
+    color: #ffffff !important;
+}
+
+.notification-success p,
+.notification-success span,
+.notification-success div,
+.flash-success p,
+.flash-success span,
+.flash-success div {
+    color: #ffffff !important;
+}
+
+/* Fix for any text elements with success class */
+.text-success {
+    color: #28a745 !important; /* Keep success text color for non-background elements */
+}
+
+/* Special fix for success alerts with background color */
+.alert.alert-success,
+.alert-success {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+    color: #155724 !important; /* Dark green text for better readability on light green background */
+}
+
+/* Fix for solid success alerts (with solid background) */
+.alert-solid.alert-success {
+    background-color: #28a745 !important; /* Solid green background */
+    color: #ffffff !important; /* White text */
+    border-color: #28a745 !important;
+}
+
+.alert-solid.alert-success * {
+    color: #ffffff !important; /* Ensure all child elements are white */
+}
+
+/* Fix for borderless success alerts */
+.alert-borderless.alert-success {
+    background-color: #d4edda !important;
+    color: #155724 !important; /* Dark green for borderless alerts */
+}
+
+/* Fix for outline success alerts */
+.alert-outline.alert-success {
+    background-color: transparent !important;
+    color: #28a745 !important; /* Success green text */
+    border: 2px solid #28a745 !important;
+}
+
+/* Fix for border-left success alerts */
+.alert-border-left.alert-success {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    border-left-color: #28a745 !important;
+}
+
+/* Fix for top-border success alerts */
+.alert-top-border.alert-success {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    border-top-color: #28a745 !important;
+}
+
+/* Fix for label-icon success alerts */
+.alert-label-icon.alert-success {
+    color: #ffffff !important;
+}
+
+.alert-label-icon.alert-success .label-icon {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+}
+
+/* Fix for additional success alerts */
+.alert-additional.alert-success .alert-body {
+    color: #155724 !important;
+}
+
+.alert-additional.alert-success .alert-content {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+}
+
+/* Dark mode compatibility */
+[data-layout-mode="dark"] .alert-success {
+    background-color: rgba(40, 167, 69, 0.2) !important;
+    border-color: #28a745 !important;
+    color: #ffffff !important;
+}
+
+[data-layout-mode="dark"] .toast-success {
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .alert-success {
+        font-size: 14px !important; /* Slightly larger text on mobile for better readability */
+    }
+    
+    .toast-success .toast-message {
+        font-size: 14px !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .alert-success {
+        background-color: #28a745 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffffff !important;
+    }
+    
+    .toast-success {
+        background-color: #28a745 !important;
+        color: #ffffff !important;
+        border: 2px solid #ffffff !important;
+    }
+}
+
+/* Print styles */
+@media print {
+    .alert-success {
+        background-color: transparent !important;
+        color: #000000 !important;
+        border: 1px solid #000000 !important;
+    }
+}

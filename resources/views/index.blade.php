@@ -200,6 +200,118 @@
         margin: -1.5rem -1.5rem 1.5rem -1.5rem;
     }
     
+    /* Admin Notifications Styles */
+    .notification-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        position: relative;
+        border-left: 3px solid #e9ecef;
+    }
+    
+    .notification-item.unread {
+        border-left-color: #28a745;
+        background: #f8fff8;
+    }
+    
+    .notification-item.success {
+        border-left-color: #28a745;
+    }
+    
+    .notification-item.info {
+        border-left-color: #17a2b8;
+    }
+    
+    .notification-item.warning {
+        border-left-color: #ffc107;
+    }
+    
+    .notification-item.error {
+        border-left-color: #dc3545;
+    }
+    
+    .notification-item:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+    
+    .notification-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 0.3rem;
+    }
+    
+    .notification-message {
+        font-size: 0.8rem;
+        color: #636e72;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+    }
+    
+    .notification-time {
+        font-size: 0.75rem;
+        color: #74b9ff;
+        text-align: right;
+    }
+    
+    .notification-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        margin-right: 0.8rem;
+        flex-shrink: 0;
+    }
+    
+    .notification-icon.success {
+        background: rgba(40, 167, 69, 0.1);
+        color: #28a745;
+    }
+    
+    .notification-icon.info {
+        background: rgba(23, 162, 184, 0.1);
+        color: #17a2b8;
+    }
+    
+    .notification-icon.warning {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+    
+    .notification-icon.error {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+    }
+    
+    .notification-empty {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #636e72;
+    }
+    
+    .notification-empty i {
+        font-size: 2rem;
+        color: #ddd;
+        margin-bottom: 1rem;
+    }
+    
+    /* Spinner animation */
+    .spinner-border-sm {
+        animation: spinner-border 0.75s linear infinite;
+    }
+    
+    @keyframes spinner-border {
+        to {
+            transform: rotate(360deg);
+        }
+    }
     .activity-item {
         background: #f8f9fa;
         border-radius: 10px;
@@ -285,6 +397,179 @@
         50% { transform: translateY(-10px); }
     }
     
+    /* User Activity Card Styles */
+    .user-activity-item {
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .user-activity-item:hover {
+        background: rgba(102, 126, 234, 0.05);
+        transform: translateX(5px);
+        padding-left: 1rem !important;
+    }
+    
+    .user-activity-item .avatar-sm {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .user-activity-item .avatar-title {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .activity-section-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .activity-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 12px;
+    }
+    
+    /* Badge animations */
+    .badge-pulse {
+        animation: badgePulse 2s infinite;
+    }
+    
+    @keyframes badgePulse {
+        0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+    }
+    
+    /* Ranking indicators */
+    .rank-indicator {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: white;
+    }
+    
+    /* User Activity Card Fixed Width and Full Height */
+    .user-activity-column {
+        position: fixed !important;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 300px !important;
+        max-width: 300px !important;
+        min-width: 300px !important;
+        flex: none !important;
+        z-index: 1000;
+        padding: 20px 15px;
+        background: #f8f9fa;
+        border-left: 1px solid #dee2e6;
+        overflow: hidden;
+    }
+    
+    .user-activity-card {
+        height: 100% !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    
+    .user-activity-card .card-body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+    
+    .user-activity-sections {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .user-activity-section {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+    }
+    
+    .user-activity-section .section-content {
+        max-height: 200px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+    
+    .user-activity-section .user-activity-item {
+        padding: 0.5rem;
+        margin-bottom: 0.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .user-activity-section h6 {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 4px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    /* Custom scrollbar for User Activity sections */
+    .user-activity-sections::-webkit-scrollbar,
+    .user-activity-section .section-content::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .user-activity-sections::-webkit-scrollbar-track,
+    .user-activity-section .section-content::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 2px;
+    }
+    
+    .user-activity-sections::-webkit-scrollbar-thumb,
+    .user-activity-section .section-content::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 2px;
+    }
+    
+    .user-activity-sections::-webkit-scrollbar-thumb:hover,
+    .user-activity-section .section-content::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.5);
+    }
+    
+    /* Section divider */
+    .user-activity-section:not(:last-child) {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Adjust main content to accommodate fixed sidebar */
+    .main-content-with-sidebar {
+        margin-right: 315px !important;
+    }
+    
     /* Mobile responsive adjustments */
     @media (max-width: 768px) {
         .stat-number {
@@ -308,6 +593,14 @@
             width: 40px;
             height: 40px;
             font-size: 1.2rem;
+        }
+        
+        .user-activity-column {
+            display: none !important;
+        }
+        
+        .main-content-with-sidebar {
+            margin-right: 0 !important;
         }
     }
     
@@ -333,7 +626,7 @@
 @slot('title') Dashboard @endslot
 @endcomponent
 <div class="row">
-    <div class="col">
+    <div class="col-12 main-content-with-sidebar">
 
         <div class="h-100">
             @can('view-analytic')
@@ -366,10 +659,39 @@
                                     <button type="button" class="btn btn-light btn-icon waves-effect waves-light layout-rightside-btn" style="border-radius: 8px;">
                                         <i class="ri-pulse-line"></i>
                                     </button>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {{-- Admin Notifications Widget - Hidden --}}
+    {{-- <div class="col-xl-4">
+        <div class="section-card">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <h5 class="section-title mb-0">
+                    <i class="ri-notification-3-line me-2 text-primary"></i>
+                    Recent Notifications
+                </h5>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge badge-soft-primary" id="notification-count">0</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="mark-all-read" title="Mark all as read">
+                        <i class="ri-check-double-line"></i>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="refresh-notifications" title="Refresh">
+                        <i class="ri-refresh-line"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <div id="admin-notifications-container">
+                    <div class="text-center text-muted py-4" id="notifications-loading">
+                        <i class="ri-loader-2-line fs-18 spinner-border-sm"></i>
+                        <p class="mt-2 mb-0">Loading notifications...</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div> --}}
                 </div>
                 <!--end row-->
 
@@ -771,456 +1093,200 @@
 
     </div> <!-- end col -->
 
-    <div class="col-auto layout-rightside-col">
-        <div class="overlay"></div>
-        <div class="layout-rightside">
-            <div class="card h-100 rounded-0">
-                <div class="card-body p-0">
-                    <div class="p-3">
-                        <h6 class="text-muted mb-0 text-uppercase fw-semibold">Recent Activity</h6>
-                    </div>
-                    <div data-simplebar style="max-height: 410px;" class="p-3 pt-0">
-                        <div class="acitivity-timeline acitivity-main">
-                            <div class="acitivity-item d-flex">
-                                <div class="flex-shrink-0 avatar-xs acitivity-avatar">
-                                    <div class="avatar-title bg-soft-success text-success rounded-circle">
-                                        <i class="ri-shopping-cart-2-line"></i>
+    <!-- User Activity Right Sidebar - Fixed position, full height -->
+    <div class="user-activity-column d-none d-xl-block">
+        <div class="section-card user-activity-card">
+            <div class="card-header">
+                <h5 class="section-title mb-0">
+                    <i class="ri-user-line me-2 text-primary"></i>
+                    User Activity
+                </h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="user-activity-sections">
+                
+                <!-- New Users Section -->
+                <div class="user-activity-section p-2 border-bottom">
+                    <h6 class="text-muted mb-2 text-uppercase fw-semibold d-flex align-items-center">
+                        <i class="ri-user-add-line me-2 text-success"></i>
+                        New Users (Top 5)
+                        <span class="badge badge-soft-success ms-2">{{ $newUsers->count() }}</span>
+                    </h6>
+                    
+                    <div class="section-content">
+                    @forelse($newUsers as $user)
+                    <div class="user-activity-item d-flex align-items-center py-2">
+                        <div class="flex-shrink-0">
+                            <div class="avatar-sm">
+                                @if($user->avatar)
+                                    <img src="{{ URL::asset($user->avatar) }}" alt="{{ $user->name }}" class="avatar-sm rounded-circle">
+                                @else
+                                    <div class="avatar-title bg-soft-primary text-primary rounded-circle">
+                                        {{ substr($user->name, 0, 1) }}
                                     </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Purchase by James Price</h6>
-                                    <p class="text-muted mb-1">Product noise evolve smartwatch </p>
-                                    <small class="mb-0 text-muted">02:14 PM Today</small>
-                                </div>
+                                @endif
                             </div>
-                            <div class="acitivity-item py-3 d-flex">
-                                <div class="flex-shrink-0 avatar-xs acitivity-avatar">
-                                    <div class="avatar-title bg-soft-danger text-danger rounded-circle">
-                                        <i class="ri-stack-fill"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Added new <span class="fw-semibold">style collection</span></h6>
-                                    <p class="text-muted mb-1">By Nesta Technologies</p>
-                                    <div class="d-inline-flex gap-2 border border-dashed p-2 mb-2">
-                                        <a href="apps-ecommerce-product-details" class="bg-light rounded p-1">
-                                            <img src="{{ URL::asset('assets/images/products/img-8.png') }}" alt="" class="img-fluid d-block" />
-                                        </a>
-                                        <a href="apps-ecommerce-product-details" class="bg-light rounded p-1">
-                                            <img src="{{ URL::asset('assets/images/products/img-2.png') }}" alt="" class="img-fluid d-block" />
-                                        </a>
-                                        <a href="apps-ecommerce-product-details" class="bg-light rounded p-1">
-                                            <img src="{{ URL::asset('assets/images/products/img-10.png') }}" alt="" class="img-fluid d-block" />
-                                        </a>
-                                    </div>
-                                    <p class="mb-0 text-muted"><small>9:47 PM Yesterday</small></p>
-                                </div>
-                            </div>
-                            <div class="acitivity-item py-3 d-flex">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ URL::asset('assets/images/users/avatar-2.jpg') }}" alt="" class="avatar-xs rounded-circle acitivity-avatar">
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Natasha Carey have liked the products
-                                    </h6>
-                                    <p class="text-muted mb-1">Allow users to like products in your
-                                        WooCommerce store.</p>
-                                    <small class="mb-0 text-muted">25 Dec, 2021</small>
-                                </div>
-                            </div>
-                            <div class="acitivity-item py-3 d-flex">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-xs acitivity-avatar">
-                                        <div class="avatar-title rounded-circle bg-secondary">
-                                            <i class="mdi mdi-sale fs-14"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Today offers by <a href="apps-ecommerce-seller-details" class="link-secondary">Digitech Galaxy</a></h6>
-                                    <p class="text-muted mb-2">Offer is valid on orders of Rs.500 Or
-                                        above for selected products only.</p>
-                                    <small class="mb-0 text-muted">12 Dec, 2021</small>
-                                </div>
-                            </div>
-                            <div class="acitivity-item py-3 d-flex">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-xs acitivity-avatar">
-                                        <div class="avatar-title rounded-circle bg-soft-danger text-danger">
-                                            <i class="ri-bookmark-fill"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Favoried Product</h6>
-                                    <p class="text-muted mb-2">Esther James have favorited product.
-                                    </p>
-                                    <small class="mb-0 text-muted">25 Nov, 2021</small>
-                                </div>
-                            </div>
-                            <div class="acitivity-item py-3 d-flex">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-xs acitivity-avatar">
-                                        <div class="avatar-title rounded-circle bg-secondary">
-                                            <i class="mdi mdi-sale fs-14"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Flash sale starting <span class="text-primary">Tomorrow.</span></h6>
-                                    <p class="text-muted mb-0">Flash sale by <a href="javascript:void(0);" class="link-secondary fw-medium">Zoetic Fashion</a></p>
-                                    <small class="mb-0 text-muted">22 Oct, 2021</small>
-                                </div>
-                            </div>
-                            <div class="acitivity-item py-3 d-flex">
-                                <div class="flex-shrink-0">
-                                    <div class="avatar-xs acitivity-avatar">
-                                        <div class="avatar-title rounded-circle bg-soft-info text-info">
-                                            <i class="ri-line-chart-line"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Monthly sales report</h6>
-                                    <p class="text-muted mb-2"><span class="text-danger">2 days
-                                            left</span> notification to submit the monthly sales
-                                        report. <a href="javascript:void(0);" class="link-warning text-decoration-underline">Reports
-                                            Builder</a></p>
-                                    <small class="mb-0 text-muted">15 Oct</small>
-                                </div>
-                            </div>
-                            <div class="acitivity-item d-flex">
-                                <div class="flex-shrink-0">
-                                    <img src="{{ URL::asset('assets/images/users/avatar-3.jpg') }}" alt="" class="avatar-xs rounded-circle acitivity-avatar" />
-                                </div>
-                                <div class="flex-grow-1 ms-3">
-                                    <h6 class="mb-1 lh-base">Frank Hook Commented</h6>
-                                    <p class="text-muted mb-2 fst-italic">" A product that has
-                                        reviews is more likable to be sold than a product. "</p>
-                                    <small class="mb-0 text-muted">26 Aug, 2021</small>
-                                </div>
-                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 fs-14">{{ $user->name }}</h6>
+                            <p class="text-muted mb-0 fs-12">Joined {{ $user->created_at->diffForHumans() }}</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <span class="badge badge-soft-success">New</span>
                         </div>
                     </div>
-
-                    <div class="p-3 mt-2">
-                        <h6 class="text-muted mb-3 text-uppercase fw-semibold">Top 10 Categories
-                        </h6>
-
-                        <ol class="ps-3 text-muted">
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Mobile & Accessories <span class="float-end">(10,294)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Desktop <span class="float-end">(6,256)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Electronics <span class="float-end">(3,479)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Home & Furniture <span class="float-end">(2,275)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Grocery <span class="float-end">(1,950)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Fashion <span class="float-end">(1,582)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Appliances <span class="float-end">(1,037)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Beauty, Toys & More <span class="float-end">(924)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Food & Drinks <span class="float-end">(701)</span></a>
-                            </li>
-                            <li class="py-1">
-                                <a href="#" class="text-muted">Toys & Games <span class="float-end">(239)</span></a>
-                            </li>
-                        </ol>
-                        <div class="mt-3 text-center">
-                            <a href="javascript:void(0);" class="text-muted text-decoration-underline">View all Categories</a>
-                        </div>
+                    @empty
+                    <div class="text-center text-muted py-2">
+                        <i class="ri-user-line fs-18 mb-1 d-block"></i>
+                        <p class="mb-0 small">No new users this week</p>
                     </div>
-                    <div class="p-3">
-                        <h6 class="text-muted mb-3 text-uppercase fw-semibold">Products Reviews</h6>
-                        <!-- Swiper -->
-                        <div class="swiper vertical-swiper" style="height: 250px;">
-                            <div class="swiper-wrapper">
-                                <div class="swiper-slide">
-                                    <div class="card border border-dashed shadow-none">
-                                        <div class="card-body">
-                                            <div class="d-flex">
-                                                <div class="flex-shrink-0 avatar-sm">
-                                                    <div class="avatar-title bg-light rounded">
-                                                        <img src="{{ URL::asset('assets/images/companies/img-1.png') }}" alt="" height="30">
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <div>
-                                                        <p class="text-muted mb-1 fst-italic text-truncate-two-lines">
-                                                            " Great product and looks great, lots of
-                                                            features. "</p>
-                                                        <div class="fs-11 align-middle text-warning">
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-end mb-0 text-muted">
-                                                        - by <cite title="Source Title">Force
-                                                            Medicines</cite>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="card border border-dashed shadow-none">
-                                        <div class="card-body">
-                                            <div class="d-flex">
-                                                <div class="flex-shrink-0">
-                                                    <img src="{{ URL::asset('assets/images/users/avatar-3.jpg') }}" alt="" class="avatar-sm rounded">
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <div>
-                                                        <p class="text-muted mb-1 fst-italic text-truncate-two-lines">
-                                                            " Amazing template, very easy to
-                                                            understand and manipulate. "</p>
-                                                        <div class="fs-11 align-middle text-warning">
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-half-fill"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-end mb-0 text-muted">
-                                                        - by <cite title="Source Title">Henry
-                                                            Baird</cite>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="card border border-dashed shadow-none">
-                                        <div class="card-body">
-                                            <div class="d-flex">
-                                                <div class="flex-shrink-0 avatar-sm">
-                                                    <div class="avatar-title bg-light rounded">
-                                                        <img src="{{ URL::asset('assets/images/companies/img-8.png') }}" alt="" height="30">
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <div>
-                                                        <p class="text-muted mb-1 fst-italic text-truncate-two-lines">
-                                                            "Very beautiful product and Very helpful
-                                                            customer service."</p>
-                                                        <div class="fs-11 align-middle text-warning">
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-line"></i>
-                                                            <i class="ri-star-line"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-end mb-0 text-muted">
-                                                        - by <cite title="Source Title">Zoetic
-                                                            Fashion</cite>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide">
-                                    <div class="card border border-dashed shadow-none">
-                                        <div class="card-body">
-                                            <div class="d-flex">
-                                                <div class="flex-shrink-0">
-                                                    <img src="{{ URL::asset('assets/images/users/avatar-2.jpg') }}" alt="" class="avatar-sm rounded">
-                                                </div>
-                                                <div class="flex-grow-1 ms-3">
-                                                    <div>
-                                                        <p class="text-muted mb-1 fst-italic text-truncate-two-lines">
-                                                            " The product is very beautiful. I like
-                                                            it. "</p>
-                                                        <div class="fs-11 align-middle text-warning">
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-fill"></i>
-                                                            <i class="ri-star-half-fill"></i>
-                                                            <i class="ri-star-line"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="text-end mb-0 text-muted">
-                                                        - by <cite title="Source Title">Nancy
-                                                            Martino</cite>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    @endforelse
                     </div>
-
-                    <div class="p-3">
-                        <h6 class="text-muted mb-3 text-uppercase fw-semibold">Customer Reviews</h6>
-                        <div class="bg-light px-3 py-2 rounded-2 mb-2">
-                            <div class="d-flex align-items-center">
-                                <div class="flex-grow-1">
-                                    <div class="fs-16 align-middle text-warning">
-                                        <i class="ri-star-fill"></i>
-                                        <i class="ri-star-fill"></i>
-                                        <i class="ri-star-fill"></i>
-                                        <i class="ri-star-fill"></i>
-                                        <i class="ri-star-half-fill"></i>
-                                    </div>
-                                </div>
-                                <div class="flex-shrink-0">
-                                    <h6 class="mb-0">4.5 out of 5</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-muted">Total <span class="fw-medium">5.50k</span>
-                                reviews</div>
-                        </div>
-
-                        <div class="mt-3">
-                            <div class="row align-items-center g-2">
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0">5 star</h6>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="p-1">
-                                        <div class="progress animated-progress progress-sm">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: 50.16%" aria-valuenow="50.16" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0 text-muted">2758</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row -->
-
-                            <div class="row align-items-center g-2">
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0">4 star</h6>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="p-1">
-                                        <div class="progress animated-progress progress-sm">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: 29.32%" aria-valuenow="29.32" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0 text-muted">1063</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row -->
-
-                            <div class="row align-items-center g-2">
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0">3 star</h6>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="p-1">
-                                        <div class="progress animated-progress progress-sm">
-                                            <div class="progress-bar bg-warning" role="progressbar" style="width: 18.12%" aria-valuenow="18.12" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0 text-muted">997</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row -->
-
-                            <div class="row align-items-center g-2">
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0">2 star</h6>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="p-1">
-                                        <div class="progress animated-progress progress-sm">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: 4.98%" aria-valuenow="4.98" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0 text-muted">227</h6>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end row -->
-
-                            <div class="row align-items-center g-2">
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0">1 star</h6>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="p-1">
-                                        <div class="progress animated-progress progress-sm">
-                                            <div class="progress-bar bg-danger" role="progressbar" style="width: 7.42%" aria-valuenow="7.42" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-auto">
-                                    <div class="p-1">
-                                        <h6 class="mb-0 text-muted">408</h6>
-                                    </div>
-                                </div>
-                            </div><!-- end row -->
-                        </div>
-                    </div>
-
-                    <div class="card sidebar-alert bg-light border-0 text-center mx-4 mb-0 mt-3">
-                        <div class="card-body">
-                            <img src="{{ URL::asset('assets/images/giftbox.png') }}" alt="">
-                            <div class="mt-4">
-                                <h5>Invite New Seller</h5>
-                                <p class="text-muted lh-base">Refer a new seller to us and earn $100
-                                    per refer.</p>
-                                <button type="button" class="btn btn-primary btn-label rounded-pill"><i class="ri-mail-fill label-icon align-middle rounded-pill fs-16 me-2"></i>
-                                    Invite Now</button>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
-            </div> <!-- end card-->
-        </div> <!-- end .rightbar-->
 
-    </div> <!-- end col -->
+                <!-- New Traders Section -->
+                <div class="user-activity-section p-2 border-bottom">
+                    <h6 class="text-muted mb-2 text-uppercase fw-semibold d-flex align-items-center">
+                        <i class="ri-exchange-line me-2 text-info"></i>
+                        New Traders (Top 5)
+                        <span class="badge badge-soft-info ms-2">{{ $newTraders->count() }}</span>
+                    </h6>
+                    
+                    <div class="section-content">
+                    @forelse($newTraders as $trader)
+                    <div class="user-activity-item d-flex align-items-center py-2">
+                        <div class="flex-shrink-0">
+                            <div class="avatar-sm">
+                                @if($trader->avatar)
+                                    <img src="{{ URL::asset($trader->avatar) }}" alt="{{ $trader->name }}" class="avatar-sm rounded-circle">
+                                @else
+                                    <div class="avatar-title bg-soft-info text-info rounded-circle">
+                                        {{ substr($trader->name, 0, 1) }}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 fs-14">{{ $trader->name }}</h6>
+                            <p class="text-muted mb-0 fs-12">First investment made</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            <span class="badge badge-soft-info">{{ $trader->shares_count }} shares</span>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center text-muted py-2">
+                        <i class="ri-exchange-line fs-18 mb-1 d-block"></i>
+                        <p class="mb-0 small">No new traders yet</p>
+                    </div>
+                    @endforelse
+                    </div>
+                </div>
+
+                <!-- Top Investors Section -->
+                <div class="user-activity-section p-2 border-bottom">
+                    <h6 class="text-muted mb-2 text-uppercase fw-semibold d-flex align-items-center">
+                        <i class="ri-trophy-line me-2 text-warning"></i>
+                        Top 5 Investors
+                        <span class="badge badge-soft-warning ms-2">{{ $topInvestors->count() }}</span>
+                    </h6>
+                    
+                    <div class="section-content">
+                    @forelse($topInvestors as $index => $investor)
+                    <div class="user-activity-item d-flex align-items-center py-2">
+                        <div class="flex-shrink-0">
+                            <div class="avatar-sm position-relative">
+                                @if($investor->avatar)
+                                    <img src="{{ URL::asset($investor->avatar) }}" alt="{{ $investor->name }}" class="avatar-sm rounded-circle">
+                                @else
+                                    <div class="avatar-title bg-soft-warning text-warning rounded-circle">
+                                        {{ substr($investor->name, 0, 1) }}
+                                    </div>
+                                @endif
+                                @if($index < 3)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                                    {{ $index + 1 }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 fs-14">{{ $investor->name }}</h6>
+                            <p class="text-muted mb-0 fs-12">Balance: KSH {{ number_format($investor->balance, 2) }}</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            @if($index == 0)
+                                <i class="ri-trophy-fill text-warning fs-18"></i>
+                            @elseif($index == 1)
+                                <i class="ri-medal-fill text-secondary fs-18"></i>
+                            @elseif($index == 2)
+                                <i class="ri-award-fill text-danger fs-18"></i>
+                            @else
+                                <span class="badge badge-soft-warning">#{{ $index + 1 }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center text-muted py-2">
+                        <i class="ri-trophy-line fs-18 mb-1 d-block"></i>
+                        <p class="mb-0 small">No investors yet</p>
+                    </div>
+                    @endforelse
+                    </div>
+                </div>
+
+                <!-- Top Referral Users Section -->
+                <div class="user-activity-section p-2">
+                    <h6 class="text-muted mb-2 text-uppercase fw-semibold d-flex align-items-center">
+                        <i class="ri-share-line me-2 text-danger"></i>
+                        Top 5 Referrals
+                        <span class="badge badge-soft-danger ms-2">{{ $topReferralUsers->count() }}</span>
+                    </h6>
+                    
+                    <div class="section-content">
+                    @forelse($topReferralUsers as $index => $referrer)
+                    <div class="user-activity-item d-flex align-items-center py-2">
+                        <div class="flex-shrink-0">
+                            <div class="avatar-sm position-relative">
+                                @if($referrer->avatar)
+                                    <img src="{{ URL::asset($referrer->avatar) }}" alt="{{ $referrer->name }}" class="avatar-sm rounded-circle">
+                                @else
+                                    <div class="avatar-title bg-soft-danger text-danger rounded-circle">
+                                        {{ substr($referrer->name, 0, 1) }}
+                                    </div>
+                                @endif
+                                @if($index < 3)
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ $index + 1 }}
+                                </span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 fs-14">{{ $referrer->name }}</h6>
+                            <p class="text-muted mb-0 fs-12">{{ $referrer->referral_count }} referrals</p>
+                        </div>
+                        <div class="flex-shrink-0">
+                            @if($index == 0)
+                                <i class="ri-crown-fill text-warning fs-18"></i>
+                            @else
+                                <span class="badge badge-soft-danger">{{ $referrer->referral_count }}</span>
+                            @endif
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center text-muted py-2">
+                        <i class="ri-share-line fs-18 mb-1 d-block"></i>
+                        <p class="mb-0 small">No referrals yet</p>
+                    </div>
+                    @endforelse
+                    </div>
+                </div>
+                
+                </div> <!-- end user-activity-sections -->
+            </div>
+        </div>
+    </div> <!-- end user-activity-column -->
 </div>
 
 @endsection
@@ -1293,6 +1359,209 @@
         formatStatsNumbers();
         formatCounterNumbers();
     });
+    
+    /*
+    // Admin Notifications System - Disabled
+    class AdminNotifications {
+        constructor() {
+            this.init();
+        }
+        
+        init() {
+            this.loadNotifications();
+            this.bindEvents();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(() => {
+                this.loadNotifications(true);
+            }, 30000);
+        }
+        
+        bindEvents() {
+            // Refresh notifications button
+            $('#refresh-notifications').click(() => {
+                this.loadNotifications();
+            });
+            
+            // Mark all as read button
+            $('#mark-all-read').click(() => {
+                this.markAllAsRead();
+            });
+        }
+        
+        async loadNotifications(silent = false) {
+            try {
+                if (!silent) {
+                    this.showLoading();
+                }
+                
+                const response = await fetch('/admin/notifications/recent?limit=10');
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.renderNotifications(data.notifications);
+                    this.updateNotificationCount(data.unread_count);
+                } else {
+                    this.showError('Failed to load notifications');
+                }
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                this.showError('Network error occurred');
+            }
+        }
+        
+        renderNotifications(notifications) {
+            const container = $('#admin-notifications-container');
+            
+            if (notifications.length === 0) {
+                container.html(`
+                    <div class="notification-empty">
+                        <i class="ri-notification-off-line d-block"></i>
+                        <p class="mb-0">No notifications yet</p>
+                    </div>
+                `);
+                return;
+            }
+            
+            let html = '';
+            notifications.forEach(notification => {
+                const timeAgo = this.getTimeAgo(notification.created_at);
+                const isUnread = !notification.is_read;
+                
+                html += `
+                    <div class="notification-item ${notification.type} ${isUnread ? 'unread' : ''}" 
+                         data-id="${notification.id}" 
+                         style="cursor: pointer;">
+                        <div class="d-flex align-items-start">
+                            <div class="notification-icon ${notification.type}">
+                                ${this.getNotificationIcon(notification.type)}
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="notification-title">${notification.title}</div>
+                                <div class="notification-message">${notification.message}</div>
+                                <div class="notification-time">${timeAgo}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.html(html);
+            
+            // Bind click events to mark individual notifications as read
+            $('.notification-item.unread').click((e) => {
+                const notificationId = $(e.currentTarget).data('id');
+                this.markAsRead(notificationId);
+            });
+        }
+        
+        getNotificationIcon(type) {
+            const icons = {
+                'success': '<i class="ri-user-add-line"></i>',
+                'info': '<i class="ri-information-line"></i>',
+                'warning': '<i class="ri-alert-line"></i>',
+                'error': '<i class="ri-error-warning-line"></i>'
+            };
+            return icons[type] || icons['info'];
+        }
+        
+        getTimeAgo(dateString) {
+            const now = new Date();
+            const notificationDate = new Date(dateString);
+            const diffInSeconds = Math.floor((now - notificationDate) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+            if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+            
+            return notificationDate.toLocaleDateString();
+        }
+        
+        updateNotificationCount(count) {
+            const badge = $('#notification-count');
+            if (count > 0) {
+                badge.text(count).show();
+                badge.removeClass('badge-soft-secondary').addClass('badge-soft-primary');
+            } else {
+                badge.text('0').hide();
+            }
+        }
+        
+        async markAsRead(notificationId) {
+            try {
+                const response = await fetch(`/admin/notifications/${notificationId}/mark-as-read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Remove unread class and update UI
+                    $(`.notification-item[data-id="${notificationId}"]`).removeClass('unread');
+                    this.loadNotifications(true); // Refresh to update count
+                }
+            } catch (error) {
+                console.error('Error marking notification as read:', error);
+            }
+        }
+        
+        async markAllAsRead() {
+            try {
+                const response = await fetch('/admin/notifications/mark-all-as-read', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    // Remove all unread classes
+                    $('.notification-item.unread').removeClass('unread');
+                    this.updateNotificationCount(0);
+                    this.showSuccess('All notifications marked as read');
+                }
+            } catch (error) {
+                console.error('Error marking all notifications as read:', error);
+            }
+        }
+        
+        showLoading() {
+            $('#admin-notifications-container').html(`
+                <div class="text-center text-muted py-4" id="notifications-loading">
+                    <i class="ri-loader-2-line fs-18 spinner-border-sm"></i>
+                    <p class="mt-2 mb-0">Loading notifications...</p>
+                </div>
+            `);
+        }
+        
+        showError(message) {
+            $('#admin-notifications-container').html(`
+                <div class="text-center text-danger py-4">
+                    <i class="ri-error-warning-line fs-18 mb-2"></i>
+                    <p class="mb-0">${message}</p>
+                </div>
+            `);
+        }
+        
+        showSuccess(message) {
+            // You can use toast or other notification systems here
+            console.log('Success:', message);
+        }
+    }
+    
+    // Initialize Admin Notifications when document is ready - Disabled
+    $(document).ready(function() {
+        @if(auth()->check() && auth()->user()->role_id != 2)
+        // window.adminNotifications = new AdminNotifications();
+        @endif
+    });
+    */
 
 </script>
 @endsection

@@ -1,0 +1,44 @@
+CSS Optimization Report for mobile-timeout-styles.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .mobile-loading-overlay
+- .mobile-loading-content
+- .mobile-loading-content p
+- .mobile-loading-content small
+- .mobile-timeout-message
+- .mobile-timeout-message h5
+- .mobile-timeout-message p
+- .mobile-offline-message
+- .mobile-connection-restored
+- .mobile-offline-message
+- .mobile-connection-restored
+- .mobile-loading
+- .mobile-loading::before
+- .mobile-loading-content
+- .mobile-timeout-message
+- .mobile-offline-message
+- .mobile-connection-restored
+- .mobile-loading-overlay
+- .mobile-loading-content
+- .mobile-loading-overlay
+- .connection-quality-indicator
+- .connection-quality-good
+- .connection-quality-slow
+- .connection-quality-unstable
+- .connection-quality-offline
+- from
+- to
+- from
+- to
+- 0%
+- 100%
+- 50%
+- .slow-connection .mobile-loading-content
+- .mobile-loading-content
+- .mobile-loading-content p
+- .mobile-loading-content small
+- .mobile-timeout-message
+- .mobile-timeout-message h5
+- .mobile-timeout-message p

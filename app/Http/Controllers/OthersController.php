@@ -107,12 +107,12 @@ class OthersController extends Controller
                 return back();
             }
 
-            // Use database locking to prevent race conditions
+            // Use database transaction for data consistency
             DB::beginTransaction();
             
             try {
-                // Lock the user_shares table for this trade to prevent race conditions
-                $userShares = UserShare::whereTradeId($trade->id)
+                // First, get shares without locking to check availability
+                $shareCount = UserShare::whereTradeId($trade->id)
                     ->where('status', 'completed')
                     ->where('is_ready_to_sell', 1)
                     ->where('total_share_count', '>', 0)
@@ -120,10 +120,7 @@ class OthersController extends Controller
                     ->whereHas('user', function ($query) {
                         $query->whereIn('status', ['active']);
                     })
-                    ->lockForUpdate() // Add row-level locking
-                    ->get();
-                
-                $shareCount = $userShares->sum('total_share_count');
+                    ->sum('total_share_count');
                 
                 if ($sharesWillGet > $shareCount) {
                     DB::rollBack();
@@ -170,41 +167,42 @@ class OthersController extends Controller
                     'amount' => $createdShare->amount
                 ]);
 
+                // Now get the shares with minimal locking for pairing
+                $userShares = UserShare::whereTradeId($trade->id)
+                    ->where('status', 'completed')
+                    ->where('is_ready_to_sell', 1)
+                    ->where('total_share_count', '>', 0)
+                    ->where('user_id', '!=', auth()->user()->id)
+                    ->whereHas('user', function ($query) {
+                        $query->whereIn('status', ['active']);
+                    })
+                    ->orderBy('total_share_count', 'desc') // Order by count for optimal pairing
+                    ->get();
+                
                 $totalShare = $sharesWillGet;
                 $matchedShare = 0;
                 $pairings = [];
                 
-                // Sort shares for optimal pairing
-                $highestShares = $userShares->where('total_share_count', '>=', $totalShare)->shuffle();
-                $arrayShares = count($highestShares) ? $highestShares : $userShares->shuffle();
-                
-                foreach ($arrayShares as $key => $share) {
+                foreach ($userShares as $share) {
                     if ($matchedShare >= $sharesWillGet) {
                         break;
                     }
                     
-                    // Refresh the share to get latest data
+                    // Only lock individual shares when we're about to modify them
                     $currentShare = UserShare::lockForUpdate()->find($share->id);
-                    if (!$currentShare) {
-                        continue; // Skip if share no longer exists
+                    if (!$currentShare || $currentShare->total_share_count <= 0) {
+                        continue; // Skip if share no longer exists or has no available shares
                     }
                     
-                    $total_share_count = $currentShare->total_share_count;
-                    
-                    // Skip if no shares available
-                    if ($total_share_count <= 0) {
-                        continue;
-                    }
-                    
-                    $sharesToPair = min($totalShare, $total_share_count);
+                    $sharesToPair = min($totalShare, $currentShare->total_share_count);
                     
                     // Validate share status before pairing
                     if ($currentShare->status !== 'completed') {
-                        \Log::warning('Attempting to pair with share that is not completed. Share ID: ' . $currentShare->id . ', Status: ' . $currentShare->status);
+                        \Log::warning('Share status changed during pairing. Share ID: ' . $currentShare->id . ', Status: ' . $currentShare->status);
                         continue;
                     }
                     
-                    // Update share quantities
+                    // Update share quantities atomically
                     $currentShare->increment('hold_quantity', $sharesToPair);
                     $currentShare->decrement('total_share_count', $sharesToPair);
                     $currentShare->save();
@@ -251,41 +249,25 @@ class OthersController extends Controller
                 $log->user_id = auth()->user()->id;
                 $createdShare->logs()->save($log);
                 
-                // Create admin notification for new share purchase
-                try {
-                    AdminNotification::newSharePurchase(
-                        $user,
-                        $trade,
-                        $request->amount,
-                        $sharesWillGet,
-                        $ticketNo
-                    );
-                } catch (\Exception $e) {
-                    \Log::warning('Failed to create admin notification for share purchase: ' . $e->getMessage());
-                    // Don't fail the transaction for notification errors
-                }
-                
-                // Send admin email notification for new share purchase
-                try {
-                    $adminEmail = SettingHelper::get('admin_email');
-                    if ($adminEmail && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
-                        Mail::to($adminEmail)->send(new NewSharePurchaseMail(
-                            $user,
-                            $trade,
-                            $request->amount,
-                            $sharesWillGet,
-                            $ticketNo
-                        ));
-                        \Log::info("Admin email sent successfully for share purchase: {$user->username} - {$ticketNo} to {$adminEmail}");
-                    } else {
-                        \Log::warning("Admin email not configured or invalid - skipping email notification for share purchase: {$user->username} - {$ticketNo}");
-                    }
-                } catch (\Exception $e) {
-                    \Log::error("Failed to send admin email for share purchase {$user->username} - {$ticketNo}: " . $e->getMessage());
-                    // Don't fail the transaction for email errors
-                }
+                // Store data for post-transaction operations
+                $postTransactionData = [
+                    'user' => $user,
+                    'trade' => $trade,
+                    'amount' => $request->amount,
+                    'shares_will_get' => $sharesWillGet,
+                    'ticket_no' => $ticketNo
+                ];
 
                 DB::commit();
+                
+                // Post-transaction operations (notifications and emails)
+                // These operations run after the database transaction is committed for better performance
+                $this->handlePostTransactionOperations($postTransactionData);
+                
+                // Clear cache for this trade since shares availability has changed
+                $cacheService = new \App\Services\ShareAvailabilityCache();
+                $cacheService->clearCache($trade->id);
+                
                 toastr()->success('Share bought successfully. Navigate to bought shares page and make payment');
                 
                 // Redirect to bought-shares page instead of going back
@@ -386,5 +368,46 @@ class OthersController extends Controller
         }
         
         return back();
+    }
+    
+    /**
+     * Handle post-transaction operations (notifications and emails)
+     * This method runs outside the database transaction for better performance
+     */
+    protected function handlePostTransactionOperations($data)
+    {
+        // Create admin notification for new share purchase
+        try {
+            AdminNotification::newSharePurchase(
+                $data['user'],
+                $data['trade'],
+                $data['amount'],
+                $data['shares_will_get'],
+                $data['ticket_no']
+            );
+            
+            \Log::info("Admin notification created for share purchase: {$data['user']->username} - {$data['ticket_no']}");
+        } catch (\Exception $e) {
+            \Log::warning('Failed to create admin notification for share purchase: ' . $e->getMessage());
+        }
+        
+        // Send admin email notification for new share purchase
+        try {
+            $adminEmail = SettingHelper::get('admin_email');
+            if ($adminEmail && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                Mail::to($adminEmail)->send(new NewSharePurchaseMail(
+                    $data['user'],
+                    $data['trade'],
+                    $data['amount'],
+                    $data['shares_will_get'],
+                    $data['ticket_no']
+                ));
+                \Log::info("Admin email sent successfully for share purchase: {$data['user']->username} - {$data['ticket_no']} to {$adminEmail}");
+            } else {
+                \Log::warning("Admin email not configured or invalid - skipping email notification for share purchase: {$data['user']->username} - {$data['ticket_no']}");
+            }
+        } catch (\Exception $e) {
+            \Log::error("Failed to send admin email for share purchase {$data['user']->username} - {$data['ticket_no']}: " . $e->getMessage());
+        }
     }
 }

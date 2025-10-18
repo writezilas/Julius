@@ -1,0 +1,8 @@
+CSS Optimization Report for _invoice.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .choices__inner
+- .choices__list--single
+- .choices__inner

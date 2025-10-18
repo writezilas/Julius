@@ -7,12 +7,15 @@ use App\Models\User;
 use App\Models\UserShare;
 use App\Models\UserSharePair;
 use App\Models\UserSharePayment;
+use App\Mail\SharePaymentApprovedMail;
+use App\Helpers\SettingHelper;
 use App\Notifications\PaymentApproved;
 use App\Notifications\PaymentSentToSeller;
 use App\Services\PaymentDeclineService;
 use App\Services\PaymentConfirmationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 
 class UserSharePaymentController extends Controller
@@ -340,6 +343,26 @@ class UserSharePaymentController extends Controller
             }
 
             DB::commit();
+            
+            // Send admin email notification for approved payment
+            try {
+                $adminEmail = SettingHelper::get('admin_email');
+                if ($adminEmail && filter_var($adminEmail, FILTER_VALIDATE_EMAIL)) {
+                    $paymentUser = $payment->sender; // The user who made the payment
+                    Mail::to($adminEmail)->send(new SharePaymentApprovedMail(
+                        $paymentUser,
+                        $payment,
+                        $payment->amount
+                    ));
+                    \Log::info("Admin email sent successfully for payment approval: {$paymentUser->username} - Payment ID {$payment->id} to {$adminEmail}");
+                } else {
+                    \Log::warning("Admin email not configured or invalid - skipping email notification for payment approval: Payment ID {$payment->id}");
+                }
+            } catch (\Exception $e) {
+                \Log::error("Failed to send admin email for payment approval - Payment ID {$payment->id}: " . $e->getMessage());
+                // Don't fail the response for email errors
+            }
+            
             toastr()->success('Payment received status updated successfully.');
         } catch (\Exception $e) {
             \Log::error('Payment confirmation failed - File:' . $e->getFile() . ' Line:' . $e->getLine() . ' Message:' . $e->getMessage() . ' PaymentID: ' . ($request->paymentId ?? 'unknown') . ' User: ' . (auth()->id() ?? 'unknown') . ' Stack: ' . $e->getTraceAsString());

@@ -1,0 +1,10 @@
+CSS Optimization Report for _coming-soon.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- &::after
+- 0%
+- 100%
+- .coming-soon-text
+- .countdown-input-group

@@ -1,0 +1,42 @@
+CSS Optimization Report for _buttons.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- + #
+- em + #
+- + #
+- em + #
+- svg
+- + #
+- em + #
+- + #
+- em + #
+- + #
+- em + #
+- + #
+- em + #
+- .btn-soft-#
+- .btn-ghost-#
+- 1
+- 0.3
+- 1);
+
+    &::after
+- >span
+- &::after
+- >span
+- .btn-#
+- label
+- light-rgb)
+- light-rgb)
+- dark-rgb)
+- dark-rgb)
+- .spinner-grow
+- .btn-#
+- .btn-outline-#
+- .btn-soft-#
+- &.btn-border
+- .icon-off
+- .icon-on
+- .icon-off

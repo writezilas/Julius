@@ -1,0 +1,13 @@
+CSS Optimization Report for _table.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- >thead
+- .border-#
+- > thead
+- .table-#
+- > thead
+- position: relative;
+        &::before
+- &::after

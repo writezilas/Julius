@@ -484,14 +484,28 @@
                         id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
                         <i class='bx bx-bell fs-22'></i>
-                        @php
-                            $unreadCount = auth()->check() ? auth()->user()->unreadNotifications->count() : 0;
-                        @endphp
-                        @if($unreadCount > 0)
-                        <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
-                            {{ $unreadCount }}
-                            <span class="visually-hidden">unread messages</span>
-                        </span>
+                        @if(auth()->check() && auth()->user()->role_id != 2)
+                            <!-- Admin Notifications -->
+                            @php
+                                // Get initial admin notification count
+                                $adminUnreadCount = \App\Models\AdminNotification::unreadCount();
+                            @endphp
+                            <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger" 
+                                  id="admin-notification-badge" style="{{ $adminUnreadCount > 0 ? 'display: block;' : 'display: none;' }}">
+                                {{ $adminUnreadCount }}
+                                <span class="visually-hidden">unread admin notifications</span>
+                            </span>
+                        @else
+                            <!-- User Notifications -->
+                            @php
+                                $unreadCount = auth()->check() ? auth()->user()->unreadNotifications->count() : 0;
+                            @endphp
+                            @if($unreadCount > 0)
+                            <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
+                                {{ $unreadCount }}
+                                <span class="visually-hidden">unread messages</span>
+                            </span>
+                            @endif
                         @endif
                     </button>
                     
@@ -499,56 +513,67 @@
                         aria-labelledby="page-header-notifications-dropdown">
 
                         <div class="dropdown-head bg-primary bg-pattern rounded-top">
-
                             <div class="p-3">
                                 <div class="row align-items-center">
                                     <div class="col">
                                         <h6 class="m-0 fs-16 fw-semibold text-white"> Notifications </h6>
-                        @if(auth()->check() && count(auth()->user()->unreadNotifications))
-                        <a class="badge badge-gradient-warning fs-13 mt-3" href="{{route('notification.read-all')}}">Mark all read</a>
-                        @endif
-                    </div>
-                    <div class="col-auto dropdown-tabs">
-                        <span class="badge badge-soft-light fs-13"> {{ auth()->check() ? count(auth()->user()->unreadNotifications) : 0 }} New</span>
+                                        @if(auth()->check() && auth()->user()->role_id != 2)
+                                            <!-- Admin Mark All Read Button -->
+                                            <button class="badge badge-gradient-warning fs-13 mt-3 border-0" 
+                                                    id="topbar-mark-all-read" style="cursor: pointer;">Mark all read</button>
+                                        @else
+                                            <!-- User Mark All Read Button -->
+                                            @if(auth()->check() && count(auth()->user()->unreadNotifications))
+                                            <a class="badge badge-gradient-warning fs-13 mt-3" href="{{route('notification.read-all')}}">Mark all read</a>
+                                            @endif
+                                        @endif
+                                    </div>
+                                    <div class="col-auto dropdown-tabs">
+                                        @if(auth()->check() && auth()->user()->role_id != 2)
+                                            <!-- Admin Notification Count -->
+                                            <span class="badge badge-soft-light fs-13" id="topbar-notification-count">{{ $adminUnreadCount ?? 0 }} New</span>
+                                        @else
+                                            <!-- User Notification Count -->
+                                            <span class="badge badge-soft-light fs-13"> {{ auth()->check() ? count(auth()->user()->unreadNotifications) : 0 }} New</span>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
-                            <div class="px-2 pt-2">
-                                <ul class="nav nav-tabs dropdown-tabs nav-tabs-custom" data-dropdown-tabs="true"
-                                    id="notificationItemsTab" role="tablist">
-                                </ul>
-                            </div>
-
                         </div>
 
                         <div class="tab-content" id="notificationItemsTabContent">
                             <div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
                                 <div data-simplebar style="max-height: 300px;" class="pe-2">
-                                    @if(auth()->check())
-                                    @foreach(auth()->user()->unreadNotifications as $notification)
-                                    <div class="text-reset notification-item d-block dropdown-item position-relative">
-                                        <div class="d-flex">
-                                            <div class="flex-1">
-                                                <a href="{{ route('notification.read', $notification->id) }}" class="stretched-link">
-                                                    <h6 class="mt-0 mb-2 lh-base">
-                                                        {{ $notification->data['heading'] }}
-                                                    </h6>
-                                                </a>
-                                                <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
-                                                    <span><i class="mdi mdi-clock-outline"></i> {{ $notification->created_at->diffForHumans() }}</span>
-                                                </p>
+                                    @if(auth()->check() && auth()->user()->role_id != 2)
+                                        <!-- Admin Notifications Container -->
+                                        <div id="topbar-admin-notifications-container">
+                                            <div class="text-center text-muted py-4" id="topbar-notifications-loading">
+                                                <i class="mdi mdi-loading mdi-spin fs-18 mb-2"></i>
+                                                <p class="mb-0">Loading notifications...</p>
                                             </div>
                                         </div>
-                                    </div>
-                                    @endforeach
+                                    @else
+                                        <!-- User Notifications -->
+                                        @if(auth()->check())
+                                        @foreach(auth()->user()->unreadNotifications as $notification)
+                                        <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                            <div class="d-flex">
+                                                <div class="flex-1">
+                                                    <a href="{{ route('notification.read', $notification->id) }}" class="stretched-link">
+                                                        <h6 class="mt-0 mb-2 lh-base">
+                                                            {{ $notification->data['heading'] }}
+                                                        </h6>
+                                                    </a>
+                                                    <p class="mb-0 fs-11 fw-medium text-uppercase text-muted">
+                                                        <span><i class="mdi mdi-clock-outline"></i> {{ $notification->created_at->diffForHumans() }}</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                        @endif
                                     @endif
-
-                                    {{-- <div class="my-3 text-center">--}}
-                                    {{-- <button type="button" class="btn btn-soft-success waves-effect waves-light">View--}}
-                                    {{-- All Notifications <i class="ri-arrow-right-line align-middle"></i></button>--}}
-                                    {{-- </div>--}}
                                 </div>
-
                             </div>
 
                             <div class="tab-pane fade p-4" id="alerts-tab" role="tabpanel" aria-labelledby="alerts-tab">

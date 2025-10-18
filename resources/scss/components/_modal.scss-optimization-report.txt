@@ -1,0 +1,13 @@
+CSS Optimization Report for _modal.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .modal-dialog-right
+- 0%
+- to
+- 0%
+- to
+- 0%
+- 50%
+- .login-modal

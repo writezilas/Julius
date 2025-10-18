@@ -1,0 +1,12 @@
+CSS Optimization Report for _form-input-spin.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- light);
+
+        button
+- light);
+
+        input
+- &.step-#

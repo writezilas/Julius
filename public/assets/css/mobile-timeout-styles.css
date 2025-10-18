@@ -1,0 +1,268 @@
+/**
+ * Mobile Timeout Styles
+ * CSS for mobile loading indicators, timeout messages, and connection status
+ */
+
+/* Mobile Loading Overlay */
+.mobile-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+}
+
+.mobile-loading-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 300px;
+    margin: 0 20px;
+}
+
+.mobile-loading-content .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 20px;
+    color: #007bff;
+}
+
+.mobile-loading-content p {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.mobile-loading-content small {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Mobile Timeout Message */
+.mobile-timeout-message {
+    position: relative;
+    z-index: 1000;
+    margin-bottom: 20px;
+    border-left: 4px solid #ffc107;
+}
+
+.mobile-timeout-message h5 {
+    margin-bottom: 10px;
+    color: #856404;
+}
+
+.mobile-timeout-message p {
+    margin-bottom: 15px;
+    color: #856404;
+}
+
+.mobile-timeout-message .btn {
+    margin-right: 10px;
+    margin-bottom: 5px;
+}
+
+/* Connection Status Messages */
+.mobile-offline-message,
+.mobile-connection-restored {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 9999;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    animation: slideDown 0.3s ease-out;
+}
+
+.mobile-offline-message {
+    border-left: 4px solid #dc3545;
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.mobile-connection-restored {
+    border-left: 4px solid #28a745;
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Form Loading State */
+.mobile-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.mobile-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 100;
+    border-radius: inherit;
+}
+
+/* Mobile-specific responsive adjustments */
+@media (max-width: 768px) {
+    .mobile-loading-content {
+        padding: 25px 20px;
+        margin: 0 15px;
+    }
+    
+    .mobile-loading-content .spinner-border {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    
+    .mobile-timeout-message {
+        margin: 10px;
+        font-size: 14px;
+    }
+    
+    .mobile-timeout-message .btn {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+    
+    .mobile-offline-message,
+    .mobile-connection-restored {
+        left: 5px;
+        right: 5px;
+        top: 5px;
+    }
+}
+
+/* iOS specific adjustments */
+@supports (-webkit-touch-callout: none) {
+    .mobile-loading-overlay {
+        -webkit-backdrop-filter: blur(2px);
+    }
+    
+    .mobile-loading-content {
+        -webkit-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Android specific adjustments */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .mobile-loading-overlay {
+        background: rgba(0, 0, 0, 0.8);
+    }
+}
+
+/* Connection Quality Indicators */
+.connection-quality-indicator {
+    position: fixed;
+    top: 50px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.connection-quality-good {
+    background: #28a745;
+    color: white;
+}
+
+.connection-quality-slow {
+    background: #ffc107;
+    color: #856404;
+}
+
+.connection-quality-unstable {
+    background: #fd7e14;
+    color: white;
+}
+
+.connection-quality-offline {
+    background: #dc3545;
+    color: white;
+}
+
+/* Animations */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Loading pulse animation for slow connections */
+.slow-connection .mobile-loading-content {
+    animation: pulse 2s infinite;
+}
+
+/* Touch-friendly buttons for mobile */
+@media (max-width: 768px) {
+    .mobile-timeout-message .btn,
+    .mobile-connection-restored .btn,
+    .mobile-offline-message .btn {
+        min-height: 44px;
+        min-width: 44px;
+        touch-action: manipulation;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .mobile-loading-content {
+        background: #2d2d2d;
+        color: #fff;
+    }
+    
+    .mobile-loading-content p {
+        color: #fff;
+    }
+    
+    .mobile-loading-content small {
+        color: #ccc;
+    }
+    
+    .mobile-timeout-message {
+        background: #2d2d2d;
+        color: #fff;
+        border-left-color: #ffc107;
+    }
+    
+    .mobile-timeout-message h5,
+    .mobile-timeout-message p {
+        color: #fff;
+    }
+}

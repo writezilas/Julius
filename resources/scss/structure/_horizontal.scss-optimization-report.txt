@@ -1,0 +1,9 @@
+CSS Optimization Report for _horizontal.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- .icon-dual
+- .icon-dual
+- .dropdown-custom-right
+- .dropdown-custom-right

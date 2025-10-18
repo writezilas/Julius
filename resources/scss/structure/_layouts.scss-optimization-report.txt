@@ -1,0 +1,9 @@
+CSS Optimization Report for _layouts.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- - #
+- - #
+- - #
+- .topnav

@@ -1,0 +1,13 @@
+CSS Optimization Report for _authentication.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- &::after
+- .particles-js-canvas-el
+- color: $success;
+
+            &::before
+- color: $danger;
+
+            &::before

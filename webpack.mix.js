@@ -1,6 +1,7 @@
 const mix = require('laravel-mix');
 const lodash = require("lodash");
 const WebpackRTLPlugin = require('webpack-rtl-plugin');
+const path = require('path');
 const folder = {
     src: "resources/", // source files
     dist: "public/", // build files
@@ -279,6 +280,28 @@ mix.webpackConfig({
     stats: {
         children: true,
     },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /[\/\\]node_modules[\/\\]/,
+                    name: 'vendors',
+                    chunks: 'all',
+                },
+                common: {
+                    name: 'common',
+                    minChunks: 2,
+                    chunks: 'all',
+                    enforce: true
+                }
+            }
+        }
+    },
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, 'resources/js'),
+        }
+    }
 });
 
 
@@ -399,6 +422,7 @@ mix.combine('resources/js/plugins.js', folder.dist_assets + "js/plugins.min.js")
 mix.combine('resources/js/layout.js', folder.dist_assets + "js/layout.js");
 mix.combine('resources/js/bootstrap.js', folder.dist_assets + "js/bootstrap.min.js");
 mix.combine('resources/js/app.js', folder.dist_assets + "js/app.min.js");
+mix.combine('resources/js/performance-optimizer.js', folder.dist_assets + "js/performance-optimizer.min.js");
 mix.combine('resources/js/pages/leaflet-us-states.js', folder.dist_assets + "js/pages/leaflet-us-states.js");
 mix.combine('resources/js/pages/form-wizard.init.js', folder.dist_assets + "js/pages/form-wizard.init.js");
 mix.combine('resources/js/pages/crm-leads.init.js', folder.dist_assets + "js/pages/crm-leads.init.js");
@@ -417,3 +441,22 @@ mix.combine('resources/js/pages/calendar.init.js', folder.dist_assets + "js/page
 mix.combine('resources/js/pages/plugins/lord-icon-2.1.0.js', folder.dist_assets + "js/pages/plugins/lord-icon-2.1.0.min.js");
 mix.combine('resources/js/pages/plugins/jsonfull-emoji-list.json', folder.dist_assets + "js/pages/plugins/jsonfull-emoji-list.json");
 mix.combine('resources/js/pages/plugins/event.init.json', folder.dist_assets + "js/pages/plugins/event.init.json");
+
+// Enable versioning for cache busting in production
+if (mix.inProduction()) {
+    mix.version();
+}
+
+// Enable source maps in development
+if (!mix.inProduction()) {
+    mix.sourceMaps();
+}
+
+// Optimize for production
+mix.options({
+    processCssUrls: false,
+    postCss: [
+        require('autoprefixer'),
+        ...(mix.inProduction() ? [require('cssnano')({ preset: 'default' })] : [])
+    ]
+});

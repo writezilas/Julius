@@ -3,11 +3,6 @@
 @section('title') {{ $pageTitle }} @endsection
 
 @section('content')
-    @component('components.breadcrumb')
-        @slot('li_1') Dashboard @endslot
-        @slot('title') {{ $pageTitle }} @endslot
-    @endcomponent
-
     <!-- Referral Statistics -->
     <div class="row">
         <div class="col-md-3">
@@ -115,13 +110,14 @@
                                             <td>
                                                 @if(isset($referral->payment_status) && $referral->payment_status === 'paid')
                                                     <span class="badge bg-success">
-                                                        <i class="fas fa-check me-1"></i>Paid
+                                                        <i class="fas fa-check me-1"></i>Completed
                                                     </span>
+                                                    <br><small class="text-success mt-1">Bonus shares sold & paid</small>
                                                 @else
                                                     <span class="badge bg-warning">
                                                         <i class="fas fa-clock me-1"></i>Pending
                                                     </span>
-                                                    <br><small class="text-muted mt-1">Bonus shares not sold yet</small>
+                                                    <br><small class="text-muted mt-1">Awaiting bonus shares sale</small>
                                                 @endif
                                             </td>
                                         </tr>

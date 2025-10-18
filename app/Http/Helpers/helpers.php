@@ -63,53 +63,9 @@ if (!function_exists('areActiveRoutesBool')) {
 if (!function_exists('checkAvailableSharePerTrade')) {
     function checkAvailableSharePerTrade($tradeId)
     {
-        // Get the trade info for better logging
-        $trade = \App\Models\Trade::find($tradeId);
-        $tradeName = $trade ? $trade->name : 'Unknown Trade';        
-        
-        $query = \App\Models\UserShare::whereTradeId($tradeId)
-            ->whereStatus('completed')
-            ->where('is_ready_to_sell', 1)
-            ->where('total_share_count', '>', 0); // Only shares with available count
-        
-        // Exclude current user if authenticated
-        $userId = null;
-        $userName = 'Guest';
-        if (auth()->check()) {
-            $userId = auth()->user()->id;
-            $userName = auth()->user()->name;
-            $query->where('user_id', '!=', $userId);
-            
-            // Log this for debugging
-            \Illuminate\Support\Facades\Log::debug("Market availability check", [
-                'user_id' => $userId,
-                'user_name' => $userName,
-                'trade_id' => $tradeId,
-                'trade_name' => $tradeName,
-                'exclude_own_shares' => true
-            ]);
-        }
-        
-        // Check for users with active status (not suspended/banned)
-        $query->whereHas('user', function ($subQuery) {
-            $subQuery->whereIn('status', ['active', 'pending', 'fine']);
-        });
-        
-        // Get the total count
-        $total = $query->sum('total_share_count');
-        
-        // Log the result for debugging
-        if (auth()->check()) {
-            \Illuminate\Support\Facades\Log::debug("Market availability result", [
-                'user_id' => $userId,
-                'user_name' => $userName,
-                'trade_id' => $tradeId,
-                'trade_name' => $tradeName,
-                'available_shares' => $total
-            ]);
-        }
-        
-        return $total;
+        // Use caching service for better performance
+        $cacheService = new \App\Services\ShareAvailabilityCache();
+        return $cacheService->getAvailableShares($tradeId);
     }
 }
 
@@ -173,8 +129,41 @@ if (!function_exists('updateMaturedShareStatus')) {
                         'timer_type' => 'selling_timer'
                     ]);
                 }
+            } else if ($share->get_from === 'allocated-by-admin') {
+                // CRITICAL FIX: Admin allocated shares should NOT earn profit
+                // Skip paused shares (legacy behavior)
+                if ($share->timer_paused) {
+                    continue;
+                }
+
+                // Get adjusted timer to account for paused duration (legacy)
+                $paymentFailureService = new \App\Services\PaymentFailureService();
+                $timerInfo = $paymentFailureService->getAdjustedShareTimer($share);
+                $adjustedEndTime = $timerInfo['adjusted_end_time'];
+
+                if ($adjustedEndTime && $adjustedEndTime < \Carbon\Carbon::now()) {
+                    // Admin allocated shares mature WITHOUT profit
+                    $share->is_ready_to_sell = 1;
+                    $share->matured_at = date_format(now(), "Y/m/d H:i:s");
+                    $share->profit_share = 0; // No profit for admin allocated shares
+                    // total_share_count remains unchanged - no profit added
+                    
+                    // Reset timer state
+                    $share->timer_paused = 0;
+                    $share->timer_paused_at = null;
+                    
+                    $share->save();
+
+                    Log::info('Admin allocated share matured WITHOUT profit: ' . $share->id, [
+                        'ticket_no' => $share->ticket_no,
+                        'user_id' => $share->user_id,
+                        'profit_added' => 0,
+                        'timer_type' => 'admin_allocated_no_profit',
+                        'get_from' => $share->get_from
+                    ]);
+                }
             } else {
-                // For admin-allocated shares, use legacy timer system
+                // For other types of shares (legacy/null get_from), use legacy timer system with profit
                 // Skip paused shares (legacy behavior)
                 if ($share->timer_paused) {
                     continue;
@@ -492,6 +481,38 @@ if (!function_exists('get_next_market_open_time')) {
         return \Carbon\Carbon::parse($todayDate . ' ' . $firstMarket->open_time, $appTimezone)->addDay();
     }
 }
+if (!function_exists('get_current_market_close_time')) {
+    /**
+     * Get the closing time of the currently active market
+     * Returns null if no market is currently open or no markets are configured
+     * 
+     * @return \Carbon\Carbon|null
+     */
+    function get_current_market_close_time()
+    {
+        $markets = get_markets();
+        $appTimezone = get_app_timezone();
+        $now = \Carbon\Carbon::now($appTimezone);
+        
+        // If no active markets are configured, market is always open (24/7), so no close time
+        if ($markets->isEmpty()) {
+            return null;
+        }
+        
+        // Find the currently active market
+        foreach ($markets as $market) {
+            $todayDate = $now->format('Y-m-d');
+            $open = \Carbon\Carbon::parse($todayDate . ' ' . $market->open_time, $appTimezone);
+            $close = \Carbon\Carbon::parse($todayDate . ' ' . $market->close_time, $appTimezone);
+            
+            if ($now->between($open, $close)) {
+                return $close;
+            }
+        }
+        
+        return null;
+    }
+}
 if (!function_exists('findTradeWithMostLiquidity')) {
     /**
      * Find the trade with the most available shares for optimal referral bonus liquidity
@@ -596,7 +617,7 @@ if (!function_exists('createRefferalBonus')) {
             'old_amount'   => ($oldamount - $sharesWillGet),
             'add_amount'   => $sharesWillGet,
             'new_amount'   => $oldamount,
-            'type'         => 'refferal-bonus',
+            'description'  => 'Referral bonus for user: ' . $user->username,
         ];
         Invoice::create($invoiceData);
     }
@@ -618,6 +639,80 @@ if (!function_exists('calculateTradeProgressPercentage')) {
             return $progressData['progress_percentage'] ?? 0.0;
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("Error calculating progress percentage for trade {$tradeId}: " . $e->getMessage());
+            return 0.0;
+        }
+    }
+}
+
+if (!function_exists('calculateUserSharesProgressPercentage')) {
+    /**
+     * Calculate the progress percentage for a user's shares sold from their wallet
+     * Progress shows how much of their maximum available shares have been sold
+     * Formula: 100 - ((current_available_shares / max_ever_available_shares) * 100)
+     * Where: 0% = no shares sold yet (wallet full), 100% = all shares sold (wallet empty)
+     * 
+     * @param int $userId
+     * @param int $tradeId
+     * @return float
+     */
+    function calculateUserSharesProgressPercentage(int $userId, int $tradeId): float
+    {
+        try {
+            // Get all user's shares for this trade
+            $userShares = \App\Models\UserShare::where('user_id', $userId)
+                ->where('trade_id', $tradeId)
+                ->get();
+            
+            if ($userShares->isEmpty()) {
+                return 0.0;
+            }
+            
+            $currentlyAvailable = 0;
+            $maxEverAvailable = 0;
+            
+            foreach ($userShares as $share) {
+                // Calculate what this share contributed to the user's wallet
+                // Use share_will_get as primary source, then quantity as fallback
+                $originalShares = ($share->share_will_get ?? $share->quantity ?? 0);
+                $profitShares = ($share->profit_share ?? 0);
+                
+                // Calculate the maximum total this share ever contributed to user's wallet
+                $shareMaxTotal = $originalShares + $profitShares;
+                $maxEverAvailable += $shareMaxTotal;
+                
+                // Calculate currently available shares
+                if ($share->status === 'sold') {
+                    // Sold shares contribute 0 to currently available
+                    // (currentlyAvailable += 0 - implicit)
+                } elseif ($share->status === 'completed' && $share->is_ready_to_sell == 1) {
+                    // Available shares (ready to sell)
+                    $currentlyAvailable += $share->total_share_count;
+                }
+                // Other statuses (pending, failed, etc.) also contribute 0 to currently available
+            }
+            
+            // Calculate progress percentage
+            // Formula: 100 - ((current_available / max_ever_available) * 100)
+            // This shows how much has been sold: 100% = all sold, 0% = nothing sold
+            if ($maxEverAvailable > 0) {
+                $availabilityPercentage = ($currentlyAvailable / $maxEverAvailable) * 100;
+                $progressPercentage = 100 - $availabilityPercentage;
+                
+                \Illuminate\Support\Facades\Log::info("User {$userId} shares progress for trade {$tradeId}", [
+                    'current_available' => $currentlyAvailable,
+                    'max_ever_available' => $maxEverAvailable,
+                    'availability_percentage' => $availabilityPercentage,
+                    'progress_percentage' => $progressPercentage,
+                    'meaning' => $progressPercentage . '% of shares have been sold from wallet'
+                ]);
+                
+                return round($progressPercentage, 2);
+            }
+            
+            return 0.0;
+            
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Error calculating user shares progress for user {$userId}, trade {$tradeId}: " . $e->getMessage());
             return 0.0;
         }
     }

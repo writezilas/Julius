@@ -1,0 +1,6 @@
+CSS Optimization Report for payment-confirmation-modal-enhanced-fix.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .payment-confirmation-modal-open

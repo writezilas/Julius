@@ -1,0 +1,19 @@
+CSS Optimization Report for _dashboard.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .flatpickr-prev-month
+- .flatpickr-next-month
+- .flatpickr-monthDropdown-months
+- .numInputWrapper
+- .flatpickr-days
+- .crypto-widget
+- //nft dashboard
+
+.bg-marketplace
+- .marketplace-icon
+- .swiper-button-next
+- .swiper-button-prev
+- .swiper-button-prev
+- .jvectormap-legend-cnt-h .jvectormap-legend-tick-sample

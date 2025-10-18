@@ -1,10 +1,6 @@
 @extends('layouts.master')
 @section('title') {{$pageTitle}}  @endsection
 @section('content')
-	@component('components.breadcrumb')
-		@slot('li_1') Pages @endslot
-		@slot('title') {{$pageTitle}}  @endslot
-	@endcomponent
 	<div class="row">
         <div class="col-lg-8 offset-lg-2">
             <div class="card">

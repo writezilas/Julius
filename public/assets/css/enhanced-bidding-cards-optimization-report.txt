@@ -1,0 +1,27 @@
+CSS Optimization Report for enhanced-bidding-cards.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- .progress-notification
+- .progress-notification-success
+- .progress-notification-warning
+- .progress-notification-error
+- .progress-notification.fade-out
+- from
+- to
+- from
+- to
+- .animate-fade-in
+- from
+- to
+- from
+- to

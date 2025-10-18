@@ -49,7 +49,15 @@
         })
     });
 
-    $(document).ready(function() {
+$(document).ready(function() {
+        // Initialize Feather Icons
+        if (typeof feather !== 'undefined') {
+            feather.replace();
+            console.log('✅ Feather icons initialized successfully');
+        } else {
+            console.warn('⚠️ Feather icons library not loaded');
+        }
+        
         $('.select2').select2();
 
         $('.select2').on('select2:open', function () {
@@ -65,6 +73,19 @@
         $(document).on('click', '#deselectall', function() {
             $('.select2').val(null).trigger('change');
         });
+        
+        // Global function to reinitialize Feather icons (useful for dynamic content)
+        window.reinitializeFeatherIcons = function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+                console.log('♾ Feather icons reinitialized');
+            }
+        };
+        
+        // Also reinitialize icons after a short delay to catch any dynamically loaded content
+        setTimeout(function() {
+            window.reinitializeFeatherIcons();
+        }, 1000);
     });
     
 </script>

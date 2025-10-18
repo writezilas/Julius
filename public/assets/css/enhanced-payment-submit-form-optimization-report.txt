@@ -1,0 +1,32 @@
+CSS Optimization Report for enhanced-payment-submit-form.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .copy-success
+- from
+- to
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 50%
+- 0%
+- 100%
+- 50%
+- 0%
+- 15%
+- 85%
+- 100%

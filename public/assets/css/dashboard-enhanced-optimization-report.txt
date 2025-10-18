@@ -1,0 +1,65 @@
+CSS Optimization Report for dashboard-enhanced.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 0%
+- 100%
+- 0%
+- 50%
+- 100%
+- .theme-transition
+- from
+- to
+- .modal-dialog-scrollable
+- .modal-dialog-scrollable
+- .modal-dialog-lg
+- .modal-dialog-scrollable
+- .modern-announcement-card
+- .modern-announcement-body
+- .announcement-scroll-container
+- .announcement-image-col
+- .announcement-image-container
+- .announcement-featured-image
+- .image-overlay
+- .overlay-icon
+- .announcement-badges-row
+- .modern-badge
+- .modern-badge::before
+- .modern-announcement-item:hover .modern-badge::before
+- .badge-new
+- .badge-recent
+- .badge-video
+- .badge-category
+- 0%
+- 100%
+- 50%
+- .meta-item
+- .meta-item i
+- .btn-modern-primary
+- .btn-modern-primary::before
+- .btn-modern-primary:hover::before
+- .btn-modern-outline
+- .btn-modern-ghost
+- .modern-pagination-wrapper
+- .pagination-info
+- .modern-announcement-header
+- .announcement-icon-wrapper
+- .announcement-content-wrapper
+- .announcement-image-col
+- .announcement-image-container
+- .announcement-text-col
+- .announcement-badges-row
+- .modern-badge
+- .meta-item
+- .btn-modern-primary
+- .modern-pagination-wrapper
+- .modern-empty-state
+- .empty-state-icon
+- .icon-wrapper
+- .empty-state-title
+- .empty-state-description
+- .announcement-scroll-container
+- .announcement-content-wrapper
+- .modern-badge
+- .btn-modern-primary

@@ -187,18 +187,32 @@
 .section-title {
     text-align: center;
     margin-bottom: 3rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
 
 .section-title h2 {
     font-size: 2.2rem;
     font-weight: 700;
     color: #333;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    width: 100%;
+    display: block;
+    order: 1;
 }
 
 .section-title p {
     color: #666;
     font-size: 1.1rem;
+    text-align: center;
+    width: 100%;
+    display: block;
+    margin-top: 0;
+    order: 2;
 }
 
 .warning-box {
@@ -241,19 +255,38 @@
         display: none;
     }
     
+    .section-title {
+        text-align: center !important;
+        width: 100% !important;
+        margin-bottom: 2rem;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
     .section-title h2 {
         font-size: 1.8rem;
+        text-align: center !important;
+        width: 100% !important;
+        margin-bottom: 0.8rem;
+        display: block !important;
+        order: 1 !important;
+    }
+    
+    .section-title p {
+        text-align: center !important;
+        width: 100% !important;
+        font-size: 1rem;
+        display: block !important;
+        margin-top: 0 !important;
+        order: 2 !important;
     }
 }
 </style>
 @endsection
 
 @section('content')
-	@component('components.breadcrumb')
-		@slot('li_1') Pages @endslot
-		@slot('title') {{$pageTitle}}  @endslot
-	@endcomponent
-
 	<!-- Hero Section -->
 	<div class="how-it-works-hero">
 		<div class="container-fluid">
@@ -267,8 +300,8 @@
 	</div>
 
 	<!-- How to Bid Section -->
-	<div class="row">
-		<div class="col-12">
+	<div class="row justify-content-center">
+		<div class="col-12 text-center">
 			<div class="section-title">
 				<h2>How Our Platform Works</h2>
 				<p>Simple steps to start your investment journey</p>

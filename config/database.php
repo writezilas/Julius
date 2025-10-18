@@ -60,7 +60,20 @@ return [
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                PDO::ATTR_TIMEOUT => env('DB_TIMEOUT', 120), // Increase timeout for mobile
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'",
             ]) : [],
+            // Connection pool settings for mobile optimization
+            'pool' => [
+                'min_connections' => env('DB_POOL_MIN', 1),
+                'max_connections' => env('DB_POOL_MAX', 10),
+                'connect_timeout' => env('DB_CONNECT_TIMEOUT', 60),
+                'wait_timeout' => env('DB_WAIT_TIMEOUT', 3600),
+                'interactive_timeout' => env('DB_INTERACTIVE_TIMEOUT', 3600),
+            ],
+            'sticky' => env('DB_STICKY', true),
         ],
 
         'pgsql' => [

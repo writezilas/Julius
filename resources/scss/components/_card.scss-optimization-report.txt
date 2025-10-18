@@ -1,0 +1,17 @@
+CSS Optimization Report for _card.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .card-drop
+- .card-title-desc
+- // card color variant
+
+@mixin card-variant($bg)
+- .card-#
+- .card-border-#
+- .card-status
+- .custom-loader
+- to
+- .plus
+- .plus

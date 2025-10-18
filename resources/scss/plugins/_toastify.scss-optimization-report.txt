@@ -1,0 +1,20 @@
+CSS Optimization Report for _toastify.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 0.12)
+- 0 10px 36px -4px rgba(77
+- 96
+- 232
+- 0.61
+- 0.355
+- .toast-close
+- .toastify-right
+- .toastify-top
+- .toastify-bottom
+- .toastify-rounded
+- .toastify-avatar
+- .toastify-center
+- .toastify-right
+- .toastify-left

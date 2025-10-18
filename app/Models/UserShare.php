@@ -25,6 +25,17 @@ class UserShare extends Model
         'profit_share'
     ];
     
+    protected $casts = [
+        'start_date' => 'datetime',
+        'matured_at' => 'datetime',
+        'selling_started_at' => 'datetime',
+        'timer_paused_at' => 'datetime',
+        'selling_timer_paused_at' => 'datetime',
+        'payment_timer_paused_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+    
     // Model Events
     protected static function booted()
     {
@@ -36,6 +47,45 @@ class UserShare extends Model
                 } catch (\Exception $e) {
                     \Log::error('Error ending conversations for completed share: ' . $e->getMessage());
                 }
+            }
+            
+            // Clear share availability cache when relevant fields change
+            $relevantFields = ['status', 'is_ready_to_sell', 'total_share_count'];
+            $shouldClearCache = false;
+            
+            foreach ($relevantFields as $field) {
+                if ($userShare->isDirty($field)) {
+                    $shouldClearCache = true;
+                    break;
+                }
+            }
+            
+            if ($shouldClearCache) {
+                try {
+                    $cacheService = new \App\Services\ShareAvailabilityCache();
+                    $cacheService->clearCache($userShare->trade_id);
+                } catch (\Exception $e) {
+                    \Log::warning('Error clearing share availability cache: ' . $e->getMessage());
+                }
+            }
+        });
+        
+        // Also clear cache when shares are created or deleted
+        static::created(function ($userShare) {
+            try {
+                $cacheService = new \App\Services\ShareAvailabilityCache();
+                $cacheService->clearCache($userShare->trade_id);
+            } catch (\Exception $e) {
+                \Log::warning('Error clearing share availability cache on create: ' . $e->getMessage());
+            }
+        });
+        
+        static::deleted(function ($userShare) {
+            try {
+                $cacheService = new \App\Services\ShareAvailabilityCache();
+                $cacheService->clearCache($userShare->trade_id);
+            } catch (\Exception $e) {
+                \Log::warning('Error clearing share availability cache on delete: ' . $e->getMessage());
             }
         });
     }

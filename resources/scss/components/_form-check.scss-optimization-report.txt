@@ -1,0 +1,29 @@
+CSS Optimization Report for _form-check.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- label
+- .form-check-#
+- .form-radio-#
+- &.form-check-#
+- background-image: none;
+
+            &::before
+- &.form-radio-#
+- background-image: none;
+
+            &::before
+- .form-switch-#
+- &.form-switch-#
+- &::before
+- position: relative;
+        background-image: none;
+
+        &::before
+- background-image: none;
+            background-color: $form-check-input-bg;
+            @include transition($form-switch-transition);
+
+            &::before
+- label

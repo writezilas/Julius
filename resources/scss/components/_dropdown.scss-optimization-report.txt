@@ -1,0 +1,21 @@
+CSS Optimization Report for _dropdown.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- 100%
+- 0%
+- 100%
+- 0%
+- .dropdown-menu-md
+- border-left: none;
+    &::after
+- // Dropdown Mega Menu
+
+.dropdown-mega
+- // Dropdown size
+
+.dropdown-mega-menu-xl
+- .dropdown-mega-menu-lg
+- .dropdown-menu-start
+- .dropdownmenu-#

@@ -19,12 +19,6 @@
     </style>
 @endsection
 @section('content')
-
-    @component('components.breadcrumb')
-        @slot('li_1') @lang('translation.dashboard') @endslot
-        @slot('title') {{$pageTitle}} @endslot
-    @endcomponent
-
     @php
         // Use ShareStatusService for consistent status across all pages
         $shareStatusService = app(\App\Services\ShareStatusService::class);
@@ -128,53 +122,7 @@
     @endphp
 
     <!-- Share Information Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card share-header">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-lg-8">
-                            <h3 class="text-white mb-2">
-                                <i class="ri-share-line align-middle me-2"></i>
-                                Share Details: {{$share->ticket_no}}
-                            </h3>
-                            @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
-                                <p class="text-white-75 mb-0 fs-16">
-                                    @if (isset($showSellerHistory) && $showSellerHistory && isset($showBuyerHistory) && $showBuyerHistory)
-                                        Track and manage your complete pairing history - both buying and selling activities
-                                    @elseif (isset($showSellerHistory) && $showSellerHistory)
-                                        Track and manage your current selling transactions and payment confirmations
-                                    @elseif (isset($showBuyerHistory) && $showBuyerHistory)
-                                        View your historical buying transactions for this share
-                                    @else
-                                        Track and manage your paired share transactions and payment confirmations
-                                    @endif
-                                </p>
-                            @else
-                                <p class="text-white-75 mb-0 fs-16">
-                                    @if (isset($hasSellerPairings) && $hasSellerPairings)
-                                        This share has current pairing activity. Pairing information will be displayed once processing is complete.
-                                    @else
-                                        This share is ready for new buyers. Pairing information will be displayed when buyers are found.
-                                    @endif
-                                </p>
-                            @endif
-                        </div>
-                        <div class="col-lg-4 text-end">
-                            <div class="text-white">
-                                <div class="mb-3">
-                                    <span class="badge {{ $statusInfo['class'] }} fs-6 px-3 py-2" title="{{ $statusInfo['description'] }}">
-                                        {{ $statusInfo['status'] }}
-                                    </span>
-                                </div>
-                                <h6 class="text-white mb-0">{{ $statusInfo['description'] }}</h6>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     @if (isset($shouldShowPairHistory) && $shouldShowPairHistory)
     <!-- Statistics Cards -->
@@ -538,7 +486,7 @@
             $payment = \App\Models\UserSharePayment::where('user_share_pair_id', $pairedShare->id)->orderBy('id', 'desc')->first();
         @endphp
         @if($payment)
-            <div class="modal fade" id="soldShareDetails{{ $pairedShare->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="paymentModalLabel{{ $pairedShare->id }}" aria-hidden="true">
+            <div class="modal fade payment-confirmation-modal" id="soldShareDetails{{ $pairedShare->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="paymentModalLabel{{ $pairedShare->id }}" aria-hidden="true">
                 <div class="modal-dialog modal-lg modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-header bg-primary bg-gradient">
@@ -730,8 +678,8 @@
                                 </div>
                             </div>
 
-                            <!-- Actual Payment Submission Details Card -->
-                            <div class="card border-0 bg-warning-subtle">
+                            <!-- Actual Payment Submission Details Card - HIDDEN -->
+                            <div class="card border-0 bg-warning-subtle" style="display: none;">
                                 <div class="card-body">
                                     <h6 class="card-title mb-3 text-warning">
                                         <i class="ri-send-plane-line align-middle me-2"></i>

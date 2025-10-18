@@ -1,0 +1,10 @@
+CSS Optimization Report for app.rtl.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- .megamenu-list li
+- .megamenu-list li a
+- .topbar-badge-sm
+- #search-dropdown-reponsive
+- .app-content

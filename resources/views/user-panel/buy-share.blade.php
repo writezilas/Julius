@@ -152,11 +152,6 @@ $pageTitle = 'Buy Shares - ' . ($trade->name ?? 'Trade');
 @endsection
 
 @section('content')
-    @component('components.breadcrumb')
-        @slot('li_1') @lang('translation.dashboard') @endslot
-        @slot('title') Buy Shares @endslot
-    @endcomponent
-
     <div class="row">
         <div class="col-lg-12">
             <!-- Trade Information Card -->

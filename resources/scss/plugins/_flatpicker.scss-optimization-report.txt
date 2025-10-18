@@ -1,0 +1,77 @@
+CSS Optimization Report for _flatpicker.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- -1px 0 0 $border-color
+- 0 1px 0 $border-color
+- 0 -1px 0 $border-color
+- 0 3px 13px rgba(0
+- .flatpickr-time
+- .hasWeeks .dayContainer
+- .hasTime .dayContainer
+- .hasWeeks .dayContainer
+- &.hasTime .flatpickr-time
+- &.noCalendar.hasTime .flatpickr-time
+- &::before
+- &::after
+- &.rightMost::before
+- &.arrowRight::before
+- &.rightMost::after
+- &.arrowRight::after
+- &.arrowCenter::before
+- &.arrowCenter::after
+- &::before
+- &::after
+- &.arrowTop::before
+- &.arrowTop::after
+- &.arrowTop::before
+- &.arrowTop::after
+- &.arrowBottom::before
+- &.arrowBottom::after
+- &.arrowBottom::before
+- &.arrowBottom::after
+- .flatpickr-wrapper
+- 0.9);
+
+        &.flatpickr-disabled
+- i
+- &.flatpickr-prev-month
+- &.flatpickr-next-month
+- width: 100%;
+
+        &::-ms-clear
+- &::-webkit-outer-spin-button
+- &::-webkit-inner-spin-button
+- dark-rgb)
+- 0.05);
+        span
+- .numInputWrapper
+- &.arrowUp::after
+- .flatpickr-monthDropdown-month
+- .dayContainer
+- .flatpickr-weeks
+- 0px
+- &.startRange
+- &.endRange
+- &.startRange.inRange
+- &.endRange.inRange
+- &.startRange.prevMonthDay
+- &.endRange.prevMonthDay
+- &.startRange.nextMonthDay
+- &.endRange.nextMonthDay
+- .endRange
+- &.endRange
+- light)
+- 5px 0 0 var(--#
+- .rangeMode .flatpickr-day
+- .flatpickr-weekday
+- .flatpickr-innerContainer
+- .flatpickr-rContainer
+- &.hasSeconds .numInputWrapper
+- &.time24hr .numInputWrapper
+- &.flatpickr-minute
+- &.flatpickr-second
+- .flatpickr-am-pm
+- from
+- to

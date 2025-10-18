@@ -1,0 +1,49 @@
+CSS Optimization Report for _ribbons.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- display: inline-block;
+
+            &::before
+- &::after
+- .ribbon
+- .ribbon
+- text-align: right;
+
+                &::before
+- &::after
+- .ribbon
+- .icon-ribbon
+- .ribbon
+- .ribbon-content
+- .ribbon-#
+- &::before
+- &::after
+- .ribbon-#
+- &::before
+- &::after
+- // Icon ribbon
+
+    .icon-ribbon
+- 0.06)
+- 0 1px 0 0 rgba(0
+- .ribbon-two-#
+- .ribbon-three
+- position: relative;
+        display: block;
+        text-align: center;
+        color: $white;
+        font-size: 14px;
+        line-height: 1;
+        padding: 12px 8px 10px;
+        border-top-right-radius: 8px;
+        width: 90px;
+
+        &::after
+- &::before
+- &::before
+- &::after
+- &::after
+- .ribbon-three-#
+- &::after

@@ -1,0 +1,14 @@
+CSS Optimization Report for _kanban.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- &::-webkit-scrollbar
+- &::-webkit-scrollbar:vertical
+- &::-webkit-scrollbar:horizontal
+- &::-webkit-scrollbar-track
+- .tasks-img
+- .tasks-wrapper
+- &::before
+- .tasks-list-menu
+- .tasks-list-menu

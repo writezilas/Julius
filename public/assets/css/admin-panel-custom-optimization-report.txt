@@ -1,0 +1,18 @@
+CSS Optimization Report for admin-panel-custom.css
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- \n    0%
+- \n    100%
+- \n
+
+
+
+.market-page
+- 0%
+- 50%
+- 100%
+- 0%
+- 100%
+- 50%

@@ -1,0 +1,14 @@
+CSS Optimization Report for _ckeditor.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- rgba(var(--#
+- &.ck-dropdown__panel_ne
+- &.ck-dropdown__panel_se
+- &.ck-dropdown__panel
+- .ck-editor__editable
+- .ck-tooltip__text
+- &::before
+- .ck-editor
+- &.ck-editor__main>.ck-editor__editable

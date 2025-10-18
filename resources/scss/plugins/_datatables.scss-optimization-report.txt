@@ -1,0 +1,14 @@
+CSS Optimization Report for _datatables.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- &::before
+- &::before
+- &.dtr-title
+- .dataTables_length
+- .dataTables_filter
+- .dataTables_info
+- .dataTables_paginate
+- label
+- &.dtr-modal-display

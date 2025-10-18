@@ -1,0 +1,6 @@
+CSS Optimization Report for _footer.scss
+Generated on: 2025-10-08 13:12:15
+
+Potentially unused selectors:
+
+- + #

@@ -1,0 +1,37 @@
+CSS Optimization Report for _chat.scss
+Generated on: 2025-10-08 13:12:14
+
+Potentially unused selectors:
+
+- - #
+- .chat-user-message
+- .unread-msg-user
+- .user-status
+- .user-status
+- .chat-content
+- .chat-welcome-section
+- .nav-btn
+- .conversation-list
+- .check-message-icon
+- .message-box-drop
+- .message-box-drop
+- .ctext-wrap
+- .ctext-content
+- .attached-file-avatar
+- .conversation-name
+- font-size: 18px;
+                padding: 4px;
+                color: $gray-600;
+                &::after
+- .chat-time
+- >a
+- .chat-time
+- //Copy Message Alert
+.copyclipboard-alert
+- 1);
+
+    .conversation-name
+- .ctext-wrap-content
+- .message-img-link
+- - #
+- - #

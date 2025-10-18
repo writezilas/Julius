@@ -44,8 +44,8 @@ class ShareStatusService
         // Admin-allocated shares special handling
         if ($share->get_from === 'allocated-by-admin' && $share->status === 'completed') {
             return [
-                'status' => 'Admin Allocated',
-                'class' => 'bg-success',
+                'status' => 'Completed',
+                'class' => 'bg-success-admin',
                 'description' => 'Share allocated by administrator - no payment required'
             ];
         }
